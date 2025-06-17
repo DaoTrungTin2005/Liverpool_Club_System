@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/reset.css" />
+    <link rel="stylesheet" href="./css/style_hcn.css" />
+    <title>Hinh Chu Nhat</title>
+  </head>
+  <body>
+    <div class="header">
+      <div class="thechon">
+        <a href="./hcn.html"><button class="chonhinh">Hinh Chu Nhat</button></a>
+        <a href="./hv.html"><button class="chonhinh">Hinh Vuong</button></a>
+        <a href="./ht.html"><button class="chonhinh">Hinh Tron</button></a>
+        <a href="./hthang.html"><button class="chonhinh">Hinh Thang</button></a>
+      </div>
+    </div>
+    <div class="thechung">
+      <div class="back">
+        <a href="./index.html">
+          <button class="btn">Back</button>
+        </a>
+      </div>
+      <div class="nhap">
+        <form action="" class="form">
+          <label for="" class="label">
+            Nhap Lieu Vao O Ben Duoi De Tinh Chu Vi Va Dien Tich Cua Hinh:
+            <br /><input
+              type="text"
+              placeholder="Hay Nhap Chieu Dai"
+              class="nhaplieu"
+              id="chieudai"
+            />
+            <br />
+            <input
+              type="text"
+              class="nhaplieu"
+              placeholder="Hay Nhap Chieu Rong"
+              id="chieurong"
+            />
+            <br />
+            <button class="Gui" onclick="LayData(event)">An De Tinh</button>
+          </label>
+        </form>
+      </div>
+      <div class="ketqua">
+        <p class="hienthi" id="hienthi">
+          ....Ket qua se hien sau khi tinh toan....
+        </p>
+      </div>
+      <div class="ve" id="ve"></div>
+    </div>
+    <script src="./hieuung.js"></script>
+  </body>
+</html>

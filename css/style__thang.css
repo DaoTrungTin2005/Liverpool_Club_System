@@ -1,0 +1,54 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 1.6rem;
+  display: flex;
+}
+.btn {
+  cursor: pointer;
+  width: 200px;
+  height: 50px;
+  font-size: 20px;
+}
+.thechung {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.form {
+  display: inline-block;
+}
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  margin-top: 1vh;
+}
+.Gui {
+  width: 50%;
+  margin: 0 auto;
+}
+.hienthi {
+  margin-top: 20px;
+  font-size: 20px;
+}
+.thechon {
+  display: flex;
+  flex-direction: column;
+}
+.chonhinh {
+  cursor: pointer;
+  width: 200px;
+  height: 100px;
+  background-color: yellowgreen;
+  font-size: 20px;
+}
+.header {
+  left: 0;
+}
