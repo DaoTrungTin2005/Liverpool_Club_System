@@ -158,6 +158,8 @@ function LayData__4(event) {
   }
 
   let tinhchuvi = new HinhThang(a, b, c, d, h);
+  let dt = Number(Math.sqrt(d ** 2 - h ** 2));
+  let ct = Number(Math.sqrt(c ** 2 - h ** 2));
 
   document.getElementById("hienthi__4").innerHTML =
     "Chu vi la: " +
@@ -165,4 +167,11 @@ function LayData__4(event) {
     "<br />" +
     "Dien tich la: " +
     tinhchuvi.Dientich();
+  const vehinh = document.getElementById("ve");
+  vehinh.style.width = a * 37.8 + "px";
+  vehinh.style.height = 0 * 37.8 + "px";
+  // vehinh.style.border = "2px solid black";
+  vehinh.style.borderBottom = h * 37.8 + "px solid black";
+  vehinh.style.borderRight = dt * 37.8 + "px solid transparent";
+  vehinh.style.borderLeft = ct * 37.8 + "px solid transparent";
 }
