@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 1.6rem;
+}
+.khoichung {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+.khoitren {
+  height: 50%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.khoiduoi {
+  height: 50%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+img {
+  margin: 100px auto;
+}
+.desc {
+  font-weight: 700;
+}
+.khoigiua {
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+}
+.btn__tong {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
