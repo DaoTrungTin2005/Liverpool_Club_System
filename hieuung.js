@@ -174,4 +174,13 @@ function LayData__4(event) {
   vehinh.style.borderBottom = h * 37.8 + "px solid black";
   vehinh.style.borderRight = dt * 37.8 + "px solid transparent";
   vehinh.style.borderLeft = ct * 37.8 + "px solid transparent";
+  if (h === d) {
+    vehinh.style.borderRight = 0;
+  }
+  if (h === c) {
+    vehinh.style.borderLef = 0;
+  } else {
+    document.getElementById("hienthi__4").innerHTML = "Nhap sai em oi";
+    return;
+  }
 }
