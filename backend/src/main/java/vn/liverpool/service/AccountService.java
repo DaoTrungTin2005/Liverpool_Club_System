@@ -5,6 +5,7 @@ import java.util.Optional;
 
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import vn.liverpool.domain.Account;
 import vn.liverpool.domain.Role;
@@ -12,6 +13,7 @@ import vn.liverpool.domain.dto.RegisterDTO;
 import vn.liverpool.repository.AccountRepository;
 import vn.liverpool.repository.RoleRepository;
 
+@Service
 public class AccountService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
