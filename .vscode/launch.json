@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-LiverpoolClubSystemApplication<liverpool-club-system>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "vn.liverpool.liverpool_club_system.LiverpoolClubSystemApplication",
+            "projectName": "liverpool-club-system",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
