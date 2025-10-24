@@ -13,17 +13,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // ✅ Tắt CSRF
-            .cors(cors -> {}) // ✅ Cho phép CORS (kết hợp CorsConfig)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/accounts/create_account").permitAll() // cho phép tạo account tự do
-                .anyRequest().authenticated()
-            );
+                .csrf(csrf -> csrf.disable()) // ✅ Tắt CSRF
+                .cors(cors -> {
+                }) // ✅ Cho phép CORS (kết hợp CorsConfig)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/accounts/create_account", // cho phép tạo account tự do
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**")
+                        .permitAll()
+                        .anyRequest().authenticated());
 
         return http.build();
     }
 
-        @Bean
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

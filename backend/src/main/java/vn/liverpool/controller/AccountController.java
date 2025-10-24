@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import vn.liverpool.domain.dto.RegisterDTO;
 import vn.liverpool.service.AccountService;
@@ -24,6 +29,25 @@ public class AccountController {
     }
 
     @PostMapping("/create_account")
+    @Operation(summary = "Create new account")
+@ApiResponses(value = {
+    @ApiResponse(
+        responseCode = "200",
+        description = "Account created successfully",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(example = "{\"status\":\"success\",\"message\":\"Account created successfully\",\"data\":{\"id\":1,\"fullname\":\"John Doe\",\"email\":\"john@example.com\"}}")
+        )
+    ),
+    @ApiResponse(
+        responseCode = "400",
+        description = "Validation failed",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(example = "{\"status\":\"error\",\"message\":\"Validation failed\",\"errors\":{\"fullname\":\"Full name is required\",\"email\":\"Email is required\"}}")
+        )
+    )
+})
     public ResponseEntity<?> createAccount(@Valid @RequestBody RegisterDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
