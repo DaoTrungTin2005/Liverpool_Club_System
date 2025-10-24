@@ -25,10 +25,9 @@ public class AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Nhận RegisterDTO (ban đầu dữ liệu gửi từ fe đã map thành RegisterDTO ròi), rồi tạo Account Entity lưu db
     public Account createAccount(RegisterDTO registerDTO) {
-        if (accountRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
+
 
         Account account = new Account();
         account.setFullname(registerDTO.getFullname());

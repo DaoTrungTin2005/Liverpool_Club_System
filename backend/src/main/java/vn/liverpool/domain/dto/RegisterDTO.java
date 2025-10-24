@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import vn.liverpool.validation.UniqueEmail;
 
+// Nhận từ fe gửi sang khi đăng ký tài khoản
 @Getter
 @Setter
 public class RegisterDTO {
@@ -14,6 +16,7 @@ public class RegisterDTO {
 
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")
+    @UniqueEmail(message = "Email already exists")
     private String email;
 
     @NotBlank(message = "Password is required")
