@@ -5,7 +5,7 @@ export default function LogoRight() {
     <img
       src={bgRegister}
       alt="Firmino"
-      className="container w-[41.6%] h-dvh max-sm:hidden object-fit"
+      className="container w-[33.6%] h-dvh max-sm:hidden object-cover"
     />
   );
 }

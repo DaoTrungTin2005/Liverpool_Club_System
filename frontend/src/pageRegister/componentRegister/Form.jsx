@@ -49,15 +49,13 @@ export default function Form() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
-    fieldKeys.forEach((key, idx) => {
+    fieldKeys.forEach((key) => {
       const val = user[key];
       if (!validators[key](val)) {
         if (key === "email") newErrors[key] = "Please enter a valid email.";
         if (key === "fullName") newErrors[key] = "Please enter your full name.";
         if (key === "password")
           newErrors[key] = "Password must be at least 6 characters.";
-      } else {
-        alert("Registration Successful ");
       }
     });
 
@@ -72,9 +70,7 @@ export default function Form() {
       if (inputs[idx]) inputs[idx].focus();
       return;
     }
-
-    // submit success (đổi thành hành động thực tế của bạn)
-    console.log("Submitted user:", user);
+    alert("Registration Successful");
   };
 
   return (

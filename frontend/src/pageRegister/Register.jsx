@@ -15,7 +15,7 @@ export default function Register() {
     <>
       <div className="flex flex-row text-white">
         <BGregister></BGregister>
-        <div className="container w-[58.4%] max-sm:w-dvw  items-center justify-center">
+        <div className="container w-[70.4%] max-sm:w-dvw  items-center justify-center">
           <div className="flex flex-col bg-linear-[var(--colorBg)] items-center justify-center h-dvh">
             <Logoregister></Logoregister>
             <p className="text-3xl p-1 m-1">Create an account</p>
@@ -30,7 +30,7 @@ export default function Register() {
             </div>
             <Form></Form>
             <label htmlFor="" className="mb-2 text-black font-bold">
-              Already have an account?
+              Already have an account?{" "}
               <Link to="/login" className="text-white hover:text-gray-200">
                 Login
               </Link>

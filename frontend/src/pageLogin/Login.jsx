@@ -15,11 +15,11 @@ export default function Login() {
     <>
       <div className="flex flex-row text-white">
         <BGregister></BGregister>
-        <div className="container w-[58.4%] max-sm:w-dvw  items-center justify-center">
+        <div className="container w-[70.4%] max-sm:w-dvw  items-center justify-center">
           <div className="flex flex-col bg-linear-[var(--colorBg)] items-center justify-center h-dvh">
             <Logoregister></Logoregister>
             <p className="text-3xl p-1 m-1">Welcome Back</p>
-            <button className="flex text-base border border-white items-center gap-4 px-12 m-2 py-2 cursor-pointer hover:outline-2 justify-center rounded-lg">
+            <button className="flex text-base border border-white items-center gap-4 px-20 m-2 py-2 cursor-pointer hover:outline-2 justify-center rounded-lg">
               Sign in with Google
               <SvgGoogle></SvgGoogle>
             </button>

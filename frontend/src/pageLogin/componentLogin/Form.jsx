@@ -45,14 +45,14 @@ export default function Form() {
       newErrors.password = "Password is required";
     } else if (user.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
-    } else {
-      alert("Login Successful ");
     }
-
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
       console.log("Login attempted with:", user);
+    }
+    if (!newErrors.email && !newErrors.password) {
+      alert("Login Successful");
     }
   };
 
