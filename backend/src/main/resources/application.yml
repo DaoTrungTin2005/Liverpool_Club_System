@@ -1,0 +1,58 @@
+# =============================
+# APPLICATION INFO
+# =============================
+spring:
+  application:
+    name: Liverpool Club System
+
+# =============================
+# DATABASE CONFIG
+# =============================
+  datasource:
+    url: jdbc:mysql://localhost:3306/liverpool_club_system
+    username: root
+    password: trungtin07012005
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# =============================
+# GOOGLE OAuth2 LOGIN
+# =============================
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_GOOGLE_CLIENT_ID
+            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            scope: openid,profile,email
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
+# =============================
+# JWT CONFIG
+# =============================
+liverpool:
+  jwt:
+    base64-secret: 8IwUeFe8scxcIi+764aJ0U9afTDnuZtI9vOPGxU9P072FE6EFRoohAYmAJR/zNKeMAb5wPL1aQY7mDoB5K0DDw==
+    token-validity-in-seconds: 8640000  # 100 ngày
+
+# =============================
+# LOGGING
+# =============================
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    vn.liverpool: DEBUG  # Log cả package của bạn

@@ -1,6 +1,12 @@
 package vn.liverpool.domain;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "accounts")
-public class Account {
+public class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,4 +62,20 @@ public class Account {
     protected void onUpdate() {
         this.updatedAt = Instant.now(); // khi update, chỉ updatedAt được cập nhật = thời gian hiện tại.
     }
+
+    // ===== UserDetails methods =====
+// UserDetails
+    @Override
+    // Trrả về danh sách roles) của user
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (role == null) return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
+    }
+
+    @Override public String getUsername() { return email; } //Trả về email (dùng để đăng nhập)
+    @Override public String getPassword() { return password; }
+    @Override public boolean isAccountNonExpired() { return true; } //Kiểm tra tài khoản hết hạn chưa
+    @Override public boolean isAccountNonLocked() { return true; } //Kiểm tra tài khoản bị khóa chưa
+    @Override public boolean isCredentialsNonExpired() { return true; } // mk hết hạn chưa
+    @Override public boolean isEnabled() { return true; } // tài khoản đnag hoạt đ ko
 }
