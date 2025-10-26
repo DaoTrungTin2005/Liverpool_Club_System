@@ -13,16 +13,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // ✅ Tắt CSRF
-                .cors(cors -> {
-                }) // ✅ Cho phép CORS (kết hợp CorsConfig)
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable()) // Tắt CORS từ Spring Security, dùng filter riêng
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/accounts/create_account", // cho phép tạo account tự do
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**")
+                                "/swagger-ui.html")
                         .permitAll()
                         .anyRequest().authenticated());
 
