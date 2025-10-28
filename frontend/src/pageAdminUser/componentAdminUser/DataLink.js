@@ -19,7 +19,7 @@ export const DataLink = [
     link: "/admin/product",
   },
   { svg: SvgAdmin03, content: "Manage User", link: "/admin/user" },
-  { svg: SvgAdmin04, content: "Manager Ticket", link: "/admin/ticket" },
+  { svg: SvgAdmin04, content: "Manage Ticket", link: "/admin/ticket" },
   { svg: SvgAdmin05, content: "My Club", link: "/admin/club" },
   { svg: SvgAdmin06, content: "Bill Information", link: "/admin/bill" },
   { svg: SvgAdmin07, content: "Statistics", link: "/admin/statistics" },

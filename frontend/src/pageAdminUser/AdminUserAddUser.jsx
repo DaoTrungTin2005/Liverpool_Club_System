@@ -3,11 +3,27 @@ import ImgAdminUser01Component from "./componentAdminUser/ImgAdminUser01";
 import LinkGoPage from "./componentAdminUser/LinkGoPage.jsx";
 import Button from "./componentAdminUser/Button.jsx";
 import Form from "./componentAdminUser/Form.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../pageRegister/Register.css";
 
 export default function AdminUserAddUser() {
-  const [role, setRole] = useState(null); // 'admin' or 'user'
+  const navigate = useNavigate();
+  const [validateSignal, setValidateSignal] = useState(0);
+  // track form validity on demand
+  const [pendingNavigate, setPendingNavigate] = useState(false);
+
+  const handleValidityChange = ({ isValid /*, values, role */ }) => {
+    if (pendingNavigate) {
+      setPendingNavigate(false);
+      if (isValid) navigate("/admin/user/adduser/question");
+    }
+  };
+
+  const handleAdd = () => {
+    // request Form to validate all fields; if valid, Form will trigger handleValidityChange and navigate
+    setPendingNavigate(true);
+    setValidateSignal((s) => s + 1);
+  };
 
   return (
     <>
@@ -19,58 +35,14 @@ export default function AdminUserAddUser() {
         </div>
         <div className="w-[80%] bg-white mr-10 ml-10 mt-15 mb-10 shadow-2xl rounded-3xl flex items-center flex-col justify-center gap-5">
           <p className="text-2xl text-[#2B3674] font-bold">Add User</p>
-          <Form />
-          <form action="" className="mr-35 mt-20">
-            <div className="flex flex-col gap-4">
-              <p className="text-[#2B3674] text-sm">Role</p>
-              <div className="flex gap-4 items-center">
-                <button
-                  type="button"
-                  onClick={() => setRole("admin")}
-                  aria-pressed={role === "admin"}
-                  className={`px-4 w-30 h-6 font-bold items-center rounded ${
-                    role === "admin"
-                      ? "bg-red-600 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  ADMIN
-                </button>
-                <input
-                  className="sr-only"
-                  type="radio"
-                  name="role"
-                  value="admin"
-                  checked={role === "admin"}
-                  onChange={() => setRole("admin")}
-                />
+          <Form
+            onValidityChange={handleValidityChange}
+            validateSignal={validateSignal}
+          />
 
-                <button
-                  type="button"
-                  onClick={() => setRole("user")}
-                  aria-pressed={role === "user"}
-                  className={`px-4 w-30 h-6 font-bold items-center rounded ${
-                    role === "user"
-                      ? "bg-red-600 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  USER
-                </button>
-                <input
-                  className="sr-only"
-                  type="radio"
-                  name="role"
-                  value="user"
-                  checked={role === "user"}
-                  onChange={() => setRole("user")}
-                />
-              </div>
-            </div>
-          </form>
-          <Link to={"/admin/user/adduser/question"}>
-            <Button text="Add" />
-          </Link>
+          <div>
+            <Button text="Add" onClick={handleAdd} />
+          </div>
         </div>
       </div>
     </>
