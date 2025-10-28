@@ -38,7 +38,7 @@ export default function AdminUserUpdate() {
               // Navigate only if form is valid after validation
               setTimeout(() => {
                 if (formState.isValid) {
-                  navigate("/admin/user/add/user/update/question");
+                  navigate("/admin/user/update/question");
                 }
               }, 0);
             }}

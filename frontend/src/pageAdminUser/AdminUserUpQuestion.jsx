@@ -23,7 +23,7 @@ export default function AddUserAddQuestion(props) {
           <p className="text-[#636363] font-bold text-3xl">{tilte.text01}</p>
           <p className="text-[#98A0B4] italic text-sm">{tilte.text02}</p>
           <img src={FrameX} alt="FrameX" />
-          <Options link={"/admin/user"} notlink="/admin/user/add/user/update" />
+          <Options link={"/admin/user"} notlink="/admin/user/update" />
         </div>
         ;
       </div>

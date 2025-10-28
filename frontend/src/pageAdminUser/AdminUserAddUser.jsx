@@ -15,7 +15,7 @@ export default function AdminUserAddUser() {
   const handleValidityChange = ({ isValid /*, values, role */ }) => {
     if (pendingNavigate) {
       setPendingNavigate(false);
-      if (isValid) navigate("/admin/user/adduser/question");
+      if (isValid) navigate("/admin/user/add/question");
     }
   };
 

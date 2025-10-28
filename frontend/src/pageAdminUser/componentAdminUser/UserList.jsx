@@ -34,7 +34,7 @@ export default function UserList() {
           <div>User</div>
           <div>Online</div>
           <div className="flex">
-            <Link to={"/admin/user/add/user/update"}>
+            <Link to={"/admin/user/update"}>
               <SvgAdminUpdate />
             </Link>
             <Link to={"/admin/user/delete"}>

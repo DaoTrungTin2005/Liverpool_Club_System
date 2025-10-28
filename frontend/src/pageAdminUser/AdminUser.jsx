@@ -18,7 +18,7 @@ export default function AdminUser() {
         <div className="flex flex-col w-[78%]">
           <div className="flex justify-between w-full items-center mb-6">
             <Search />
-            <Link to={"/admin/user/adduser"}>
+            <Link to={"/admin/user/add"}>
               <Button text={"Add User"} />
             </Link>
           </div>

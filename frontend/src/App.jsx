@@ -17,17 +17,14 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin/user" element={<AdminUser />} />
-        <Route path="/admin/user/adduser" element={<AdminUserAddUser />} />
+        <Route path="/admin/user/add" element={<AdminUserAddUser />} />
         <Route
-          path="/admin/user/adduser/question"
+          path="/admin/user/add/question"
           element={<AddUserAddQuestion />}
         />
+        <Route path="/admin/user/update" element={<AdminUserUpdate />} />
         <Route
-          path="/admin/user/add/user/update"
-          element={<AdminUserUpdate />}
-        />
-        <Route
-          path="/admin/user/add/user/update/question"
+          path="/admin/user/update/question"
           element={<AdminUserUpQuesion />}
         />
         <Route
