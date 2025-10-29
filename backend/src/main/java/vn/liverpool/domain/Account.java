@@ -36,8 +36,12 @@ public class Account implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
+    // ✅ Google OAuth2 ID
+    @Column(name = "google_id", unique = true)
+    private String googleId;
+
 
     @ManyToOne
     @JoinColumn(name = "role_id")

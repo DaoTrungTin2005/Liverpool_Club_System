@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng nhập thành công</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+      padding: 50px;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    h1 { font-size: 2.5em; margin-bottom: 20px; }
+    .info { 
+      background: rgba(0,0,0,0.2);
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 1.1em;
+    }
+    .token { 
+      word-break: break-all;
+      background: #000;
+      color: #0f0;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+    button:hover { background: #218838; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Đăng nhập Google thành công!</h1>
+    
+    <div class="info">
+      <strong>Email:</strong> <span id="email">Đang tải...</span>
+    </div>
+    
+    <div class="info">
+      <strong>Họ tên:</strong> <span id="fullname">Đang tải...</span>
+    </div>
+    
+    <div class="info">
+      <strong>Token JWT:</strong>
+      <div class="token" id="token">Đang tải...</div>
+    </div>
+    
+    <button id="copyBtn">Copy Token</button>
+  </div>
+
+  <!-- ĐOẠN SCRIPT CỦA BẠN ĐẶT Ở ĐÂY -->
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const email = params.get('email');
+    const fullname = decodeURIComponent(params.get('fullname'));  // GIẢI MÃ
+
+    document.getElementById('token').textContent = token || 'Không có token';
+    document.getElementById('email').textContent = email || 'Không có email';
+    document.getElementById('fullname').textContent = fullname || 'Không có tên';
+
+    // Copy token
+    document.getElementById('copyBtn').onclick = () => {
+      if (token) {
+        navigator.clipboard.writeText(token);
+        alert('Token đã được copy vào clipboard!');
+      } else {
+        alert('Không có token để copy!');
+      }
+    };
+  </script>
+</body>
+</html>

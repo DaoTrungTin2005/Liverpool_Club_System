@@ -25,20 +25,22 @@ spring:
   # =============================
   # GOOGLE OAuth2 LOGIN
   # =============================
+
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: 30169928975-piq1fl9d9u2oudhsh4pb19birna32p95.apps.googleusercontent.com
-            client-secret: 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
-            scope: openid,profile,email
+            client-id: 30169928975-6749alnp7ou2nbt330g39vsddbgls96b.apps.googleusercontent.com
+            client-secret: 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
+            scope: openid, profile, email
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
         provider:
           google:
-            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
             token-uri: https://oauth2.googleapis.com/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
 
 # =============================
 # JWT CONFIG
