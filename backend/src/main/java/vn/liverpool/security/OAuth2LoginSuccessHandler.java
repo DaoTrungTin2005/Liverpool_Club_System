@@ -40,29 +40,41 @@ public void onAuthenticationSuccess(HttpServletRequest request, HttpServletRespo
     String name = (String) attributes.get("name");
     String googleId = (String) attributes.get("sub");
 
-    log.info("Google OAuth2 Success: email={}, name={}, googleId={}", email, name, googleId);
-
     Account account = accountRepository.findByEmail(email)
-            .orElseGet(() -> {
-                log.info("Creating new Google user: {}", email);
-                return createGoogleUser(email, name, googleId);
-            });
+            .orElseGet(() -> createGoogleUser(email, name, googleId));
 
     String token = jwtProvider.generateToken(account);
 
-    // MÃ HÓA fullname để tránh lỗi Unicode
-    String encodedFullname = URLEncoder.encode(account.getFullname(), StandardCharsets.UTF_8);
+    // TRẢ JSON CHO FE
+    if (response.isCommitted()) return;
 
-    String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/oauth2-success.html")
-            .queryParam("token", token)
-            .queryParam("email", account.getEmail())
-            .queryParam("fullname", encodedFullname)
-            .build().toUriString();
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
 
-    log.info("Redirecting to: {}", targetUrl);
-    getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    String jsonResponse = """
+        {
+            "status": "success",
+            "message": "Login successful",
+            "data": {
+                "token": "%s",
+                "id": %d,
+                "email": "%s",
+                "fullname": "%s",
+                "role": "%s"
+            },
+            "timestamp": "%s"
+        }
+        """.formatted(
+            token,
+            account.getId(),
+            account.getEmail(),
+            account.getFullname(),
+            account.getRole().getName(),
+            java.time.Instant.now()
+        );
+
+    response.getWriter().write(jsonResponse);
 }
-
     private Account createGoogleUser(String email, String name, String googleId) {
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("❌ Role USER not found! Please run SQL: INSERT INTO roles (name) VALUES ('USER');"));

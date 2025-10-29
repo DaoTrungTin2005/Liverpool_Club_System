@@ -1,11 +1,13 @@
 // src/main/java/vn/liverpool/controller/AuthController.java
 package vn.liverpool.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +16,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import vn.liverpool.domain.Account;
 import vn.liverpool.domain.dto.LoginRequest;
 import vn.liverpool.domain.dto.LoginResponse;
@@ -72,5 +76,24 @@ public class AuthController {
     @GetMapping("/login/google")
 public void loginWithGoogle(HttpServletResponse response) throws IOException {
     response.sendRedirect("/oauth2/authorization/google");
+}
+
+// src/main/java/vn/liverpool/controller/AuthController.java
+
+@GetMapping("/login/google/start")
+public ResponseEntity<?> startGoogleLogin(HttpServletRequest request) {
+    // TỰ ĐỘNG LẤY BASE URL TỪ REQUEST (ngrok hoặc localhost)
+    String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request)
+            .replacePath(null)
+            .build()
+            .toUriString();
+
+    String redirectUrl = baseUrl + "/oauth2/authorization/google";
+
+    return ResponseEntity.ok(Map.of(
+        "status", "redirect",
+        "message", "Redirecting to Google",
+        "redirectUrl", redirectUrl
+    ));
 }
 }

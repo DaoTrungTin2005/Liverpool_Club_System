@@ -53,6 +53,7 @@ public class SecurityConfig {
                     "/login/oauth2/**",         // Callback URL của Google
                     "/error" ,
                     "/api/auth/login/google",
+                    "/api/auth/login/google/start",
                     "/oauth2-success.html"                   // Cho phép hiển thị trang lỗi
                 ).permitAll()
                 .anyRequest().authenticated()
