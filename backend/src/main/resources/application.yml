@@ -5,9 +5,9 @@ spring:
   application:
     name: Liverpool Club System
 
-# =============================
-# DATABASE CONFIG
-# =============================
+  # =============================
+  # DATABASE CONFIG
+  # =============================
   datasource:
     url: jdbc:mysql://localhost:3306/liverpool_club_system
     username: root
@@ -22,16 +22,16 @@ spring:
       hibernate:
         format_sql: true
 
-# =============================
-# GOOGLE OAuth2 LOGIN
-# =============================
+  # =============================
+  # GOOGLE OAuth2 LOGIN
+  # =============================
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            client-id: 30169928975-piq1fl9d9u2oudhsh4pb19birna32p95.apps.googleusercontent.com
+            client-secret: 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
             scope: openid,profile,email
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
         provider:
@@ -55,4 +55,4 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
-    vn.liverpool: DEBUG  # Log cả package của bạn
+    vn.liverpool: DEBUG
