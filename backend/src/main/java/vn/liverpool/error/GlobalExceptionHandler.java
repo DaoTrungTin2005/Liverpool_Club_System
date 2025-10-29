@@ -35,4 +35,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error(ex.getMessage())); // message là tự làm á
     }
-}
+
+    // Bắt BAD CREDENTIALS (đăng nhập sai)
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<String>> handleBadCredentials() {
+        return ResponseEntity.status(401)
+                .body(ApiResponse.error("Email hoặc mật khẩu không đúng"));
+    }
+}       

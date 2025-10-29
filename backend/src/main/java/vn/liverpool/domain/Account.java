@@ -63,17 +63,16 @@ public class Account implements UserDetails {
         this.updatedAt = Instant.now(); // khi update, chỉ updatedAt được cập nhật = thời gian hiện tại.
     }
 
-    // ===== UserDetails methods =====
-// UserDetails
+    // ===== UserDetails  =====
+    // Implement mấy phương thức của UserDetails đế cung cấp thông tin user cho Spring Security (Cái UserDetailsService đã tìm dc user rồi thì trả về UserDetails này cho Spring Security xài)
     @Override
-    // Trrả về danh sách roles) của user
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null) return List.of();
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
     }
 
     @Override public String getUsername() { return email; } //Trả về email (dùng để đăng nhập)
-    @Override public String getPassword() { return password; }
+    @Override public String getPassword() { return password; } // so sánh pass
     @Override public boolean isAccountNonExpired() { return true; } //Kiểm tra tài khoản hết hạn chưa
     @Override public boolean isAccountNonLocked() { return true; } //Kiểm tra tài khoản bị khóa chưa
     @Override public boolean isCredentialsNonExpired() { return true; } // mk hết hạn chưa
