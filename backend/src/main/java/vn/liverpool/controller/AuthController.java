@@ -42,7 +42,8 @@ public class AuthController {
         // Spring tự động gọi UserDetailsService.loadUserByUsername(email)
         // để tìm user trong DB.
         // Spring tự so sánh password nhập vào với password trong DB
-        // sử dụng PasswordEncoder (thường là BCryptPasswordEncoder). (DaoAuthenticationProvider)
+        // sử dụng PasswordEncoder (thường là BCryptPasswordEncoder).
+        // (DaoAuthenticationProvider)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
@@ -73,27 +74,16 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Login successful", response));
     }
 
-    @GetMapping("/login/google")
-public void loginWithGoogle(HttpServletResponse response) throws IOException {
-    response.sendRedirect("/oauth2/authorization/google");
-}
+    @GetMapping("/login/google/start")
+    public ResponseEntity<?> startGoogleLogin(HttpServletRequest request) {
+        // TỰ ĐỘNG LẤY BASE URL TỪ REQUEST (ngrok hoặc localhost)
+String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
 
-// src/main/java/vn/liverpool/controller/AuthController.java
+        String redirectUrl = baseUrl + "/oauth2/authorization/google";
 
-@GetMapping("/login/google/start")
-public ResponseEntity<?> startGoogleLogin(HttpServletRequest request) {
-    // TỰ ĐỘNG LẤY BASE URL TỪ REQUEST (ngrok hoặc localhost)
-    String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request)
-            .replacePath(null)
-            .build()
-            .toUriString();
-
-    String redirectUrl = baseUrl + "/oauth2/authorization/google";
-
-    return ResponseEntity.ok(Map.of(
-        "status", "redirect",
-        "message", "Redirecting to Google",
-        "redirectUrl", redirectUrl
-    ));
-}
+        return ResponseEntity.ok(Map.of(
+                "status", "redirect",
+                "message", "Redirecting to Google",
+                "redirectUrl", redirectUrl));
+    }
 }

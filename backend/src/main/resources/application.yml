@@ -31,8 +31,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 30169928975-6749alnp7ou2nbt330g39vsddbgls96b.apps.googleusercontent.com
-            client-secret: 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
+            client-id: 30169928975-5polqm01k1mgi0618ji8d7vi6uplc2ui.apps.googleusercontent.com
+            client-secret: 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
             scope: openid, profile, email
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
         provider:
@@ -58,3 +58,6 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     vn.liverpool: DEBUG
+
+server:
+  forward-headers-strategy: framework
