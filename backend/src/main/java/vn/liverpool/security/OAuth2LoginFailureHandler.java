@@ -18,7 +18,7 @@ public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHan
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
         
-        log.error("❌ OAuth2 Login Failed!");
+        log.error("OAuth2 Login Failed!");
         log.error("Exception type: {}", exception.getClass().getName());
         log.error("Exception message: {}", exception.getMessage());
         

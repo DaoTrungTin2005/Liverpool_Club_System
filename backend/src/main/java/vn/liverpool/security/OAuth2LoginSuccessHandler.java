@@ -77,7 +77,7 @@ public void onAuthenticationSuccess(HttpServletRequest request, HttpServletRespo
 }
     private Account createGoogleUser(String email, String name, String googleId) {
         Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("❌ Role USER not found! Please run SQL: INSERT INTO roles (name) VALUES ('USER');"));
+                .orElseThrow(() -> new RuntimeException(" Role USER not found! Please run SQL: INSERT INTO roles (name) VALUES ('USER');"));
 
         Account account = new Account();
         account.setEmail(email);
@@ -85,7 +85,7 @@ public void onAuthenticationSuccess(HttpServletRequest request, HttpServletRespo
         account.setGoogleId(googleId);
         account.setRole(userRole);
         
-        // ✅ Set password ngẫu nhiên cho Google user (vì họ không dùng password login)
+        // Set password ngẫu nhiên cho Google user (vì họ không dùng password login)
         // Hoặc để null nếu đã cho phép nullable=true ở Entity
         account.setPassword(UUID.randomUUID().toString()); // Password random, không ai biết được
         
