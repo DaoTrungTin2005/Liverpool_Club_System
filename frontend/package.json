@@ -10,8 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.7",
     "@tailwindcss/cli": "^4.1.15",
-    "axios": "^1.12.2",
+    "axios": "^1.13.1",
     "clsx": "^2.1.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

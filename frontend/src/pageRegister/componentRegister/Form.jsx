@@ -1,41 +1,41 @@
 import Name from "./FormData";
 import "../../output.css";
 import { useState } from "react";
+import axios from "axios";
 
 export default function Form() {
   const handleFocus = (e) => {
-    e.target.placeholder = ""; // Xóa placeholder khi focus
+    e.target.placeholder = "";
   };
 
   const handleBlur = (e) => {
     if (!e.target.value) {
-      e.target.placeholder = e.target.getAttribute("data-placeholder") || ""; // Khôi phục nếu input trống
+      e.target.placeholder = e.target.getAttribute("data-placeholder") || "";
     }
   };
 
-  //khởi tạo state dưới dạng object để quản lý nhiều trường input
   const [user, setUser] = useState({
     email: "",
     fullName: "",
     password: "",
   });
 
-  // per-field error state
   const [errors, setErrors] = useState({
     email: "",
     fullName: "",
     password: "",
   });
 
-  //hàm xử lý thay đổi dữ liệu khi nhập vào input
+  const [, setServerMessage] = useState("");
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setUser((prevUser) => ({
       ...prevUser,
       [name]: value,
     }));
-
     setErrors((prev) => ({ ...prev, [name]: "" }));
+    setServerMessage("");
   };
 
   const validators = {
@@ -46,8 +46,9 @@ export default function Form() {
 
   const fieldKeys = ["email", "fullName", "password"];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const newErrors = {};
     fieldKeys.forEach((key) => {
       const val = user[key];
@@ -63,14 +64,56 @@ export default function Form() {
 
     const hasError = Object.keys(newErrors).length > 0;
     if (hasError) {
-      // focus first error
       const firstKey = Object.keys(newErrors)[0];
       const idx = fieldKeys.indexOf(firstKey);
       const inputs = document.querySelectorAll("form input");
       if (inputs[idx]) inputs[idx].focus();
       return;
     }
-    alert("Registration Successful");
+
+    // --- Gọi API ---
+    try {
+      const res = await axios.post(
+        "https://367a5f36e756.ngrok-free.app/api/accounts/create_account",
+        {
+          fullname: user.fullName,
+          email: user.email,
+          password: user.password,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      //  Nếu API trả thành công
+      console.log(res.data);
+
+      alert(` ${res.data.message || "Account created successfully!"}`);
+
+      // Reset form
+      setUser({ email: "", fullName: "", password: "" });
+    } catch (err) {
+      if (err.response) {
+        console.error(err.response.data);
+        const data = err.response.data.data || {};
+
+        //  Gộp thông tin lỗi trả về từ BE
+        let errorText = `${err.response.data.message || "Registration failed"}`;
+        if (data.fullname) errorText += `\n- ${data.fullname}`;
+        if (data.email) errorText += `\n- ${data.email}`;
+
+        alert(` ${errorText}`);
+
+        // Cập nhật lỗi ở input
+        setErrors((prev) => ({
+          ...prev,
+          fullName: data.fullname || "",
+          email: data.email || "",
+        }));
+      } else {
+        alert(" Cannot connect to server. Please try again later.");
+      }
+    }
   };
 
   return (
@@ -83,7 +126,7 @@ export default function Form() {
           const key = fieldKeys[index];
           const hasError = Boolean(errors[key]);
           return (
-            <div className="flex flex-col gap-2 px-14 " key={index}>
+            <div className="flex flex-col gap-2 px-14" key={index}>
               <label htmlFor={key} className="text-xl">
                 {item.name}
               </label>

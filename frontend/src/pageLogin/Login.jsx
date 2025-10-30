@@ -4,7 +4,6 @@ import Form from "./componentLogin/Form.jsx";
 import Line from "../pageRegister/componentRegister/Line.jsx";
 import BGregister from "../pageRegister/componentRegister/BGregister.jsx";
 import Logoregister from "../pageRegister/componentRegister/Logoregister.jsx";
-import SvgGoogle from "../assets/svg/svgGoogle.jsx";
 import { SvgFacebook } from "../assets/svg/SvgSocialMedia.jsx";
 import { SvgTwitter } from "../assets/svg/SvgSocialMedia.jsx";
 import { SvgInstagram } from "../assets/svg/SvgSocialMedia.jsx";
@@ -19,10 +18,7 @@ export default function Login() {
           <div className="flex flex-col bg-linear-[var(--colorBg)] items-center justify-center h-dvh">
             <Logoregister></Logoregister>
             <p className="text-3xl p-1 m-1">Welcome Back</p>
-            <button className="flex text-base border border-white items-center gap-4 px-20 m-2 py-2 cursor-pointer hover:outline-2 justify-center rounded-lg">
-              Sign in with Google
-              <SvgGoogle></SvgGoogle>
-            </button>
+
             <div className="flex justify-center items-center gap-4">
               <Line></Line>
               <p>Or</p>
