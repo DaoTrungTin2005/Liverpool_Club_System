@@ -38,10 +38,15 @@ public class Account implements UserDetails {
 
     @Column(nullable = true)
     private String password;
-    // ✅ Google OAuth2 ID
+    // Google OAuth2 ID
     @Column(name = "google_id", unique = true)
     private String googleId;
 
+    @Column(unique = true)
+    private String uid;
+
+    @Column(nullable = false)
+    private String status = "Offline"; // default
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -67,18 +72,44 @@ public class Account implements UserDetails {
         this.updatedAt = Instant.now(); // khi update, chỉ updatedAt được cập nhật = thời gian hiện tại.
     }
 
-    // ===== UserDetails  =====
-    // Implement mấy phương thức của UserDetails đế cung cấp thông tin user cho Spring Security (Cái UserDetailsService đã tìm dc user rồi thì trả về UserDetails này cho Spring Security xài)
+    // ===== UserDetails =====
+    // Implement mấy phương thức của UserDetails đế cung cấp thông tin user cho
+    // Spring Security (Cái UserDetailsService đã tìm dc user rồi thì trả về
+    // UserDetails này cho Spring Security xài)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (role == null) return List.of();
+        if (role == null)
+            return List.of();
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
     }
 
-    @Override public String getUsername() { return email; } //Trả về email (dùng để đăng nhập)
-    @Override public String getPassword() { return password; } // so sánh pass
-    @Override public boolean isAccountNonExpired() { return true; } //Kiểm tra tài khoản hết hạn chưa
-    @Override public boolean isAccountNonLocked() { return true; } //Kiểm tra tài khoản bị khóa chưa
-    @Override public boolean isCredentialsNonExpired() { return true; } // mk hết hạn chưa
-    @Override public boolean isEnabled() { return true; } // tài khoản đnag hoạt đ ko
+    @Override
+    public String getUsername() {
+        return email;
+    } // Trả về email (dùng để đăng nhập)
+
+    @Override
+    public String getPassword() {
+        return password;
+    } // so sánh pass
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    } // Kiểm tra tài khoản hết hạn chưa
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    } // Kiểm tra tài khoản bị khóa chưa
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    } // mk hết hạn chưa
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    } // tài khoản đnag hoạt đ ko
 }

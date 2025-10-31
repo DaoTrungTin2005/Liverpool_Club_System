@@ -39,6 +39,16 @@ public class AccountService {
             throw new RuntimeException("Role USER not found");
         }
         account.setRole(userRole.get());
+
+    
+        account.setUid(generateUID());
+        account.setStatus("Offline");
         return accountRepository.save(account);
+    }
+
+
+    private String generateUID() {
+        long count = accountRepository.count();
+        return String.format("%04dA", count + 1);
     }
 }
