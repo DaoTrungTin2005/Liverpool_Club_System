@@ -7,10 +7,9 @@ import vn.liverpool.domain.Account;
 import vn.liverpool.domain.Role;
 import vn.liverpool.domain.dto.AccountResponseDTO;
 import vn.liverpool.domain.dto.CreateUserByAdminDTO;
+import vn.liverpool.domain.dto.UpdateUserByAdminDTO;
 import vn.liverpool.repository.AccountRepository;
 import vn.liverpool.repository.RoleRepository;
-
-
 
 @Service
 @RequiredArgsConstructor
@@ -57,9 +56,38 @@ public class AdminUserService {
                 saved.getFullname(),
                 saved.getEmail(),
                 saved.getCreatedAt(),
-                saved.getUpdatedAt()
-        );
+                saved.getUpdatedAt());
     }
 
+// =================== UPDATE ===========================
+
+    public AccountResponseDTO updateUser(Long id, UpdateUserByAdminDTO dto) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+
+        // Kiểm tra email trùng (trừ chính nó)
+        if (!account.getEmail().equals(dto.email()) &&
+                accountRepository.existsByEmail(dto.email())) {
+            throw new IllegalArgumentException("Email already exists: " + dto.email());
+        }
+
+        Role role = roleRepository.findByName(dto.role())
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + dto.role()));
+
+        // CHỈ CẬP NHẬT: fullName, email, role
+        account.setFullname(dto.fullName());
+        account.setEmail(dto.email());
+        account.setRole(role);
+        // KHÔNG ĐỘNG VÀO PASSWORD
+
+        Account saved = accountRepository.save(account);
+
+        return new AccountResponseDTO(
+                saved.getId(),
+                saved.getFullname(),
+                saved.getEmail(),
+                saved.getCreatedAt(),
+                saved.getUpdatedAt());
+    }
 
 }
