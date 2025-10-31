@@ -11,4 +11,5 @@ import vn.liverpool.domain.Account;
 public interface AccountRepository extends JpaRepository<Account, Long> { 
     Optional<Account> findByEmail(String email); // Để check email đã tồn tại
 
+    boolean existsByEmail(String email);
 }
