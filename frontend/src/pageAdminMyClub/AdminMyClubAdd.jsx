@@ -18,6 +18,7 @@ export default function AdminMyClubAdd() {
   const [joined, setJoined] = useState("");
   const [location, setLocation] = useState("");
   const [nationality, setNationality] = useState("");
+  const [position, setPosition] = useState("");
 
   // === Upload ảnh ===
   const backgroundRef = useRef(null);
@@ -40,6 +41,7 @@ export default function AdminMyClubAdd() {
   const joinedRef = useRef(null);
   const locationRef = useRef(null);
   const nationalityRef = useRef(null);
+  const positionRef = useRef(null);
 
   // Hàm xử lý ảnh nền
   function handleBackgroundClick() {
@@ -138,6 +140,7 @@ export default function AdminMyClubAdd() {
     if (!location.trim()) newErrors.location = true;
     if (!nationality.trim()) newErrors.nationality = true;
     if (!joined) newErrors.joined = true;
+    if (!position) newErrors.position = true;
 
     setErrors(newErrors);
 
@@ -153,6 +156,7 @@ export default function AdminMyClubAdd() {
       location: locationRef,
       nationality: nationalityRef,
       joined: joinedRef,
+      position: positionRef,
     };
     const ref = focusMap[firstError];
     if (ref?.current) {
@@ -266,8 +270,8 @@ export default function AdminMyClubAdd() {
                 ></textarea>
               </label>
 
-              <div className="flex gap-15 items-center">
-                <label className="flex flex-col w-30">
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col w-26">
                   Number
                   <input
                     type="text"
@@ -282,9 +286,29 @@ export default function AdminMyClubAdd() {
                     ref={numberRef}
                   />
                 </label>
-
+                <label className="flex flex-col w-26 ml-5 h-14">
+                  Position
+                  <select
+                    className={`flex-1 w-26 h-12 rounded-md border ${
+                      errors.position ? "border-red-500" : "border-gray-300"
+                    }`}
+                    value={position}
+                    onChange={(e) => {
+                      setPosition(e.target.value);
+                      setErrors((prev) => ({ ...prev, position: false })); // Xóa lỗi khi chọn
+                    }}
+                    ref={positionRef}
+                  >
+                    <option value="">Choose</option>
+                    <option value="GOALKEEPERS">GOALKEEPERS</option>
+                    <option value="DEFENDERS">DEFENDERS</option>
+                    <option value="MIDIFIELDERS">MIDIFIELDERS</option>
+                    <option value="FORWARD">FORWARD</option>
+                    <option value="COACHING STAFF">COACHING STAFF</option>
+                  </select>
+                </label>
                 {/* === Background Upload === */}
-                <label className="w-30 pl-10 flex flex-col items-center text-sm text-[#2B3674]">
+                <label className="w-26 flex flex-col items-center text-sm text-[#2B3674]">
                   Background
                   <input
                     type="file"
@@ -317,7 +341,7 @@ export default function AdminMyClubAdd() {
                 </label>
 
                 {/* === Bio Image Upload === */}
-                <label className="w-30 pl-6 flex flex-col items-center text-sm text-[#2B3674]">
+                <label className="w-26 flex flex-col items-center text-sm text-[#2B3674]">
                   Bio Image
                   <input
                     type="file"

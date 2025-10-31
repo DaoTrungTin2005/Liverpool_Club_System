@@ -63,13 +63,17 @@ export default function AdminMyClubView() {
                 </div>
               </div>
 
-              <div className="flex gap-15 items-center">
-                <label className="flex w-30">
+              <div className="flex gap-5 items-center">
+                <label className="flex w-26">
                   Number:<p className="m-auto">11</p>
                 </label>
 
+                <label className="flex w-26">
+                  Position:<p className="m-auto">Attack</p>
+                </label>
+
                 {/* === Background Upload === */}
-                <label className="w-30  flex flex-col items-center text-sm text-[#2B3674]">
+                <label className="w-26  flex flex-col items-center text-sm text-[#2B3674]">
                   Background
                   <img
                     src=""
@@ -78,7 +82,7 @@ export default function AdminMyClubView() {
                 </label>
 
                 {/* === Bio Image Upload === */}
-                <label className="w-30  flex flex-col items-center text-sm text-[#2B3674]">
+                <label className="w-26  flex flex-col items-center text-sm text-[#2B3674]">
                   Bio Image
                   <img
                     src=""

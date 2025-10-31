@@ -10,35 +10,37 @@ export default function PlayerList() {
       <p className="mx-6 text-[#2B3674] font-bold text-2xl my-3">Player List</p>
 
       {/* Bảng */}
-      <div className="mx-2 overflow-x-auto">
-        <div className="grid grid-cols-[repeat(9,minmax(0,1fr))] min-w-full text-[#2B3674] text-sm">
+      <div className="mx-2 ml-6 overflow-x-auto">
+        <div className="grid grid-cols-[repeat(10,minmax(0,1fr))] min-w-full text-[#2B3674] text-sm">
           {/* ===== Header ===== */}
-          <div className="font-semibold text-[#A3AED0] flex items-center mx-6">
+          <div className="font-semibold text-[#A3AED0] flex items-center">
             PlayerID <SvgAdminOrder />
           </div>
-          <div className="font-semibold text-[#A3AED0] flex items-center mx-6">
+          <div className="font-semibold text-[#A3AED0] flex items-center ">
             PlayerName <SvgAdminOrder />
           </div>
-          <div className="font-semibold text-[#A3AED0] mx-6">Bio</div>
-          <div className="font-semibold text-[#A3AED0] mx-6">Information</div>
-          <div className="font-semibold text-[#A3AED0] mx-6">Stats</div>
-          <div className="font-semibold text-[#A3AED0] mx-6">Number</div>
-          <div className="font-semibold text-[#A3AED0] mx-6">Background</div>
-          <div className="font-semibold text-[#A3AED0] mx-6">Bio Image</div>
-          <div className="font-semibold text-[#A3AED0] flex items-center mx-6">
+          <div className="font-semibold text-[#A3AED0] ">Bio</div>
+          <div className="font-semibold text-[#A3AED0] ">Information</div>
+          <div className="font-semibold text-[#A3AED0] ">Stats</div>
+          <div className="font-semibold text-[#A3AED0] ">Number</div>
+          <div className="font-semibold text-[#A3AED0] ">Position</div>
+          <div className="font-semibold text-[#A3AED0] ">Background</div>
+          <div className="font-semibold text-[#A3AED0] ">Bio Image</div>
+          <div className="font-semibold text-[#A3AED0] flex items-center ">
             Action <SvgAdminOrder />
           </div>
 
           {/* ===== Data Row ===== */}
-          <div className="truncate py-2 mx-6">001A</div>
-          <div className="truncate py-2 mx-6">DaoTinTrung</div>
-          <div className="truncate py-2 mx-6">Is the um bo</div>
-          <div className="truncate py-2 mx-6">...View more</div>
-          <div className="truncate py-2 mx-6">...View more</div>
-          <div className="truncate py-2 mx-6">11</div>
-          <div className="truncate py-2 mx-6">Img.ten</div>
-          <div className="truncate py-2 mx-6">Img.ten</div>
-          <div className="flex items-center justify-center gap-2 mx-6">
+          <div className="truncate py-2 ">001A</div>
+          <div className="truncate py-2 ">DaoTinTrung</div>
+          <div className="truncate py-2 ">Is the um bo</div>
+          <div className="truncate py-2 ">...View more</div>
+          <div className="truncate py-2 ">...View more</div>
+          <div className="truncate py-2 ">11</div>
+          <div className="truncate py-2 ">Attack</div>
+          <div className="truncate py-2 ">Img.ten</div>
+          <div className="truncate py-2 ">Img.ten</div>
+          <div className="flex items-center justify-center gap-2 mr-10 ">
             <Link to={"/admin/club/update"}>
               <SvgAdminUpdate />
             </Link>
