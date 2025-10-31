@@ -14,6 +14,8 @@ import AdminMyClubDelete from "./pageAdminMyClub/AdminMyClubDelete.jsx";
 import AdminMyClubUpdate from "./pageAdminMyClub/AdminMyClubUpdate.jsx";
 import AdminMyClubUpdateQuestion from "./pageAdminMyClub/AdminMyClubUpdateQuestion.jsx";
 import AdminMyClubView from "./pageAdminMyClub/AdminMyClubView.jsx";
+import MyClub from "./PageUserView/MyClub.jsx";
+import ProfilePlayer from "./componentUserView/ProfilePlayer.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
@@ -51,6 +53,8 @@ function App() {
           element={<AdminMyClubUpdateQuestion />}
         />
         <Route path="/admin/club/view" element={<AdminMyClubView />} />
+        <Route path="/myclub" element={<MyClub />} />
+        <Route path="/myclub/player" element={<ProfilePlayer />} />
       </Routes>
     </BrowserRouter>
   );

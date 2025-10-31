@@ -304,7 +304,6 @@ export default function AdminMyClubAdd() {
                     <option value="DEFENDERS">DEFENDERS</option>
                     <option value="MIDIFIELDERS">MIDIFIELDERS</option>
                     <option value="FORWARD">FORWARD</option>
-                    <option value="COACHING STAFF">COACHING STAFF</option>
                   </select>
                 </label>
                 {/* === Background Upload === */}
