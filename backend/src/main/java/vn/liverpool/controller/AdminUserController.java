@@ -41,4 +41,13 @@ public class AdminUserController {
         AccountResponseDTO updated = adminUserService.updateUser(id, dto);
         return ResponseEntity.ok(ApiResponse.success("User updated successfully", updated));
     }
+
+    
+    // 3. DELETE USER
+    // ==============================
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+        adminUserService.deleteUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User deleted successfully", null));
+    }
 }

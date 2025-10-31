@@ -90,4 +90,14 @@ public class AdminUserService {
                 saved.getUpdatedAt());
     }
 
+    // ===============DELETE===================
+
+    public void deleteUser(Long id) {
+    // Kiểm tra user có tồn tại kh
+    if (!accountRepository.existsById(id)) {
+        throw new IllegalArgumentException("User not found with id: " + id);
+    }
+    accountRepository.deleteById(id);
+}
+
 }
