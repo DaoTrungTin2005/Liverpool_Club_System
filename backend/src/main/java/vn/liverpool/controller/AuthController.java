@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -29,61 +30,69 @@ import vn.liverpool.util.ApiResponse;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtProvider;
+        private final AuthenticationManager authenticationManager;
+        private final JwtTokenProvider jwtProvider;
 
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
-        // Xác thực email + password
+        @PostMapping("/login")
+        public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+                // Xác thực email + password
 
-        // Nó làm 3 việc ngầm:
-        // Tạo đối tượng UsernamePasswordAuthenticationToken
-        // Object này chứa thông tin mà user vừa nhập (email, password).
-        // Spring tự động gọi UserDetailsService.loadUserByUsername(email)
-        // để tìm user trong DB.
-        // Spring tự so sánh password nhập vào với password trong DB
-        // sử dụng PasswordEncoder (thường là BCryptPasswordEncoder).
-        // (DaoAuthenticationProvider)
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+                // Nó làm 3 việc ngầm:
+                // Tạo đối tượng UsernamePasswordAuthenticationToken
+                // Object này chứa thông tin mà user vừa nhập (email, password).
+                // Spring tự động gọi UserDetailsService.loadUserByUsername(email)
+                // để tìm user trong DB.
+                // Spring tự so sánh password nhập vào với password trong DB
+                // sử dụng PasswordEncoder (thường là BCryptPasswordEncoder).
+                // (DaoAuthenticationProvider)
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-        // Lấy Account từ Principal
+                // Lấy Account từ Principal
 
-        // Vì Account implements UserDetails, nên Spring đặt chính Account vào
-        // principal.
-        // Lúc này, account chứa đầy đủ:id email fullname role (để gán quyền)
+                // Vì Account implements UserDetails, nên Spring đặt chính Account vào
+                // principal.
+                // Lúc này, account chứa đầy đủ:id email fullname role (để gán quyền)
 
-        Account account = (Account) authentication.getPrincipal();
+                Account account = (Account) authentication.getPrincipal();
 
-        // Tạo JWT khi đăng nhập thành công (cục zàng nên nhớ là cái
-        // JwtAuthenticationFilter nó chạy trc controller nha, nên lần đầu đăng nhập này
-        // chưa có token, sau khi đăng nhập thành công thì tạo token gửi về cho fe,
-        // những lần sau fe gửi kèm token lên, filter (chạy trc controller) nó kiểm tra
-        // token rồi lấy user từ token gán vào SecurityContext luôn ko cần đăng nhập
-        // lại)
-        String token = jwtProvider.generateToken(account);
+                // Tạo JWT khi đăng nhập thành công (cục zàng nên nhớ là cái
+                // JwtAuthenticationFilter nó chạy trc controller nha, nên lần đầu đăng nhập này
+                // chưa có token, sau khi đăng nhập thành công thì tạo token gửi về cho fe,
+                // những lần sau fe gửi kèm token lên, filter (chạy trc controller) nó kiểm tra
+                // token rồi lấy user từ token gán vào SecurityContext luôn ko cần đăng nhập
+                // lại)
+                String token = jwtProvider.generateToken(account);
 
-        // Trả về response
-        LoginResponse response = new LoginResponse(
-                token,
-                account.getId(),
-                account.getEmail(),
-                account.getFullname(),
-                account.getRole().getName());
+                // Trả về response
+                LoginResponse response = new LoginResponse(
+                                token,
+                                account.getId(),
+                                account.getEmail(),
+                                account.getFullname(),
+                                account.getRole().getName());
 
-        return ResponseEntity.ok(ApiResponse.success("Login successful", response));
-    }
+                return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+        }
 
-    @GetMapping("/login/google/start")
-    public ResponseEntity<?> startGoogleLogin(HttpServletRequest request) {
-        // TỰ ĐỘNG LẤY BASE URL TỪ REQUEST (ngrok hoặc localhost)
-String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        @GetMapping("/login/google/start")
+        public ResponseEntity<?> startGoogleLogin(HttpServletRequest request) {
+                // ServletUriComponentsBuilder.fromCurrentContextPath() : tự động lấy URL động
+                String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
 
-        String redirectUrl = baseUrl + "/oauth2/authorization/google";
+                String redirectUrl = baseUrl + "/oauth2/authorization/google";
 
-        return ResponseEntity.ok(Map.of(
-                "status", "redirect",
-                "message", "Redirecting to Google",
-                "redirectUrl", redirectUrl));
-    }
+                // Sau khi Google trả về mã authorization_code,
+                // Spring Security sẽ:
+                // Gọi Google API /token để lấy access_token. (nó tự làm)
+                // Gọi /userinfo để lấy thông tin người dùng (email, name, sub, …). (nó tự làm)
+                // Tạo OAuth2User sau đó  gọi OAuth2LoginSuccessHandler lưu thông tin ng dùng và tạo JWT
+
+
+                //Trả json
+                return ResponseEntity.ok(Map.of(
+                                "status", "redirect",
+                                "message", "Redirecting to Google",
+                                "redirectUrl", redirectUrl));
+        }
 }

@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Slf4j
+// Khi đăng nhập Google thất bại, Spring Security gọi onAuthenticationFailure
+@Slf4j // tự tạo log , log.info
 @Component
 public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
