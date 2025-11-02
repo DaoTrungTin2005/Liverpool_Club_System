@@ -2,8 +2,6 @@ package vn.liverpool.service;
 
 import java.util.Optional;
 
-
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +17,16 @@ public class AccountService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AccountService(AccountRepository accountRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public AccountService(AccountRepository accountRepository, RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Nhận RegisterDTO (ban đầu dữ liệu gửi từ fe đã map thành RegisterDTO ròi), rồi tạo Account Entity lưu db
+    // Nhận RegisterDTO (ban đầu dữ liệu gửi từ fe đã map thành RegisterDTO ròi),
+    // rồi tạo Account Entity lưu db
     public Account createAccount(RegisterDTO registerDTO) {
-
 
         Account account = new Account();
         account.setFullname(registerDTO.getFullname());
@@ -40,15 +39,12 @@ public class AccountService {
         }
         account.setRole(userRole.get());
 
-    
         account.setUid(generateUID());
         account.setStatus("Offline");
         return accountRepository.save(account);
     }
 
-
     private String generateUID() {
-        long count = accountRepository.count();
-        return String.format("%04dA", count + 1);
+        return java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

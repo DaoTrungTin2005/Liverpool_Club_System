@@ -33,6 +33,15 @@ public class AdminUserController {
                 .body(ApiResponse.success("User added successfully", response));
     }
 
+    // LẤY THÔNG TIN CŨ ĐỂ ĐỔ VÀO KHI UPDATE (ĐỂ NHÌN THẤY NHỮNG TRƯỜNG CŨ CỦA THẰNG
+    // MUỐN UPDATE)
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<AccountResponseDTO>> getUserById(@PathVariable Long id) {
+        AccountResponseDTO user = adminUserService.getUserById(id);
+        return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", user));
+    }
+
     // 2. UPDATE USER (EDIT)
     // ==============================
     @PutMapping("/edit/{id}")

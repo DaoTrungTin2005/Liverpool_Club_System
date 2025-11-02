@@ -95,6 +95,19 @@ public class AdminUserService {
                 saved.getUpdatedAt());
     }
 
+    // ===============ĐỔ DỮ LIỆU CỦA THẰNG MUỐN UPDATE =================
+    public AccountResponseDTO getUserById(Long id) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+
+        return new AccountResponseDTO(
+                account.getId(),
+                account.getFullname(),
+                account.getEmail(),
+                account.getCreatedAt(),
+                account.getUpdatedAt());
+    }
+
     // ===============DELETE===================
 
     public void deleteUser(Long id) {
@@ -134,7 +147,7 @@ public class AdminUserService {
         // phân trang.
         Page<Account> accountPage = accountRepository.findAll(spec, pageable);
 
-        //Bỏ vào response trả ra cho FE (ẩn password)
+        // Bỏ vào response trả ra cho FE (ẩn password)
         List<UserListResponseDTO> dtos = accountPage.stream()
                 .map(account -> new UserListResponseDTO(
                         account.getId(),
@@ -146,14 +159,13 @@ public class AdminUserService {
                         account.getCreatedAt()))
                 .toList();
 
-                // Trả kq
+        // Trả kq
         return new PageImpl<>(dtos, pageable, accountPage.getTotalElements());
     }
 
     // =================== GENERATE UID ===================
     private String generateUID() {
-        long count = accountRepository.count();
-        return String.format("%04dA", count + 1);
+        return java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
 }
