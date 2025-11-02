@@ -1,6 +1,11 @@
 package vn.liverpool.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -270,7 +275,8 @@ public class PlayerService {
         // --------------Ròi trả về nè---------------------
 
         // Lúc create cần setStats() vì player ban đầu chưa có trong DB
-        // player.getStats().add(stats) ở trên đã gán rồi nên giờ khỏi set nữa lấy ra xài
+        // player.getStats().add(stats) ở trên đã gán rồi nên giờ khỏi set nữa lấy ra
+        // xài
         List<PlayerDetailWithStatsResponseDTO.StatsDetail> statsDetails = updated.getStats().stream()
                 // trả ra StatsDetails có giải , goal, assist, matches
                 .map(s -> new PlayerDetailWithStatsResponseDTO.StatsDetail(
@@ -280,7 +286,7 @@ public class PlayerService {
                         s.getAssists()))
                 .toList();
 
-                // Trả đầy đủ
+        // Trả đầy đủ
         return new PlayerDetailWithStatsResponseDTO(
                 updated.getId(),
                 updated.getPlayerName(),
@@ -332,36 +338,45 @@ public class PlayerService {
 
     // ?========================GET ALL PLAYER========================
     @Transactional(readOnly = true)
-    public List<PlayerDetailWithStatsResponseDTO> getAllPlayersWithStats() {
+    public Page<PlayerDetailWithStatsResponseDTO> getAllPlayersWithStats(int page, int size, String sort,
+            String search) {
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
                 + "/uploads/players/";
 
-        return playerRepository.findAll().stream()
-                .map(player -> {
-                    List<PlayerDetailWithStatsResponseDTO.StatsDetail> statsDetails = player.getStats().stream()
-                            .map(s -> new PlayerDetailWithStatsResponseDTO.StatsDetail(
-                                    s.getTournament().getName(),
-                                    s.getMatches(),
-                                    s.getGoals(),
-                                    s.getAssists()))
-                            .toList();
+        // Xử lý sort
+        String sortBy = sort.trim(); // Chỉ lấy tên field
+        Sort.Direction direction = Sort.Direction.ASC; // LUÔN TĂNG DẦN
 
-                    return new PlayerDetailWithStatsResponseDTO(
-                            player.getId(),
-                            player.getPlayerName(),
-                            player.getBio(),
-                            player.getShirtNumber(),
-                            player.getPosition().getName(),
-                            player.getBackgroundImage() != null ? baseUrl + player.getBackgroundImage() : null,
-                            player.getBioImage() != null ? baseUrl + player.getBioImage() : null,
-                            player.getDateOfBirth(),
-                            player.getLocation(),
-                            player.getNationality(),
-                            player.getJoinedClub(),
-                            statsDetails);
-                })
-                .toList();
+        // Tạo Pageable (phân trang + sort)
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        // Gọi repo
+        Page<Player> playerPage = playerRepository.findAllWithSearch(search, pageable);
+
+        return playerPage.map(player -> {
+            List<PlayerDetailWithStatsResponseDTO.StatsDetail> statsDetails = player.getStats().stream()
+                    .map(s -> new PlayerDetailWithStatsResponseDTO.StatsDetail(
+                            s.getTournament().getName(),
+                            s.getMatches(),
+                            s.getGoals(),
+                            s.getAssists()))
+                    .toList();
+
+            return new PlayerDetailWithStatsResponseDTO(
+                    player.getId(),
+                    player.getPlayerName(),
+                    player.getBio(),
+                    player.getShirtNumber(),
+                    player.getPosition().getName(),
+                    player.getBackgroundImage() != null ? baseUrl + player.getBackgroundImage() : null,
+                    player.getBioImage() != null ? baseUrl + player.getBioImage() : null,
+                    player.getDateOfBirth(),
+                    player.getLocation(),
+                    player.getNationality(),
+                    player.getJoinedClub(),
+                    statsDetails);
+        });
     }
 
 }
