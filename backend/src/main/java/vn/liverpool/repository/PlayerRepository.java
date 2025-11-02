@@ -1,5 +1,6 @@
 package vn.liverpool.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -42,4 +43,10 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
             WHERE p.id = :id
             """)
     Optional<Player> findByIdWithStats(@Param("id") Long id);
+
+    // Lấy danh sách cầu thủ theo nhóm vị trí (Defender, Midfielder, Forward,
+    // Goalkeeper)
+    @Query("SELECT p FROM Player p JOIN FETCH p.stats WHERE UPPER(p.position.name) = UPPER(:group)") // KO PHÂN BIỆT HOA
+                                                                                                     // THƯỜNG
+    List<Player> findByPositionGroup(@Param("group") String group);
 }

@@ -3,6 +3,8 @@ package vn.liverpool.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import vn.liverpool.domain.dto.player.CreatePlayerRequest;
+import vn.liverpool.domain.dto.player.ListPlayerFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
@@ -89,4 +92,29 @@ public class PlayerController {
         return ResponseEntity.ok(ApiResponse.success("Edit form data loaded successfully", data));
     }
 
+
+    //==============LIST PLAYERS FOLLOW POSITION ==============
+    @GetMapping("/goalkeepers")
+public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getGoalkeepers() {
+    return ResponseEntity.ok(ApiResponse.success("Goalkeepers retrieved successfully",
+            playerService.getPlayersByPositionGroup("GOALKEEPER")));
+}
+
+@GetMapping("/defenders")
+public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getDefenders() {
+    return ResponseEntity.ok(ApiResponse.success("Defenders retrieved successfully",
+            playerService.getPlayersByPositionGroup("DEFENDER")));
+}
+
+@GetMapping("/midfielders")
+public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getMidfielders() {
+    return ResponseEntity.ok(ApiResponse.success("Midfielders retrieved successfully",
+            playerService.getPlayersByPositionGroup("MIDFIELDER")));
+}
+
+@GetMapping("/attackers")
+public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getAttackers() {
+    return ResponseEntity.ok(ApiResponse.success("Attackers retrieved successfully",
+            playerService.getPlayersByPositionGroup("ATTACKER")));
+}
 }

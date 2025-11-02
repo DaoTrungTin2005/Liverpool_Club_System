@@ -16,6 +16,7 @@ import vn.liverpool.domain.PlayerStats;
 import vn.liverpool.domain.Position;
 import vn.liverpool.domain.Tournament;
 import vn.liverpool.domain.dto.player.CreatePlayerRequest;
+import vn.liverpool.domain.dto.player.ListPlayerFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
 // import vn.liverpool.domain.dto.player.PlayerResponseDTO;
@@ -414,5 +415,42 @@ public class PlayerService {
                 player.getNationality(),
                 player.getJoinedClub(),
                 stats);
+    }
+
+    // =====================LIST PLAYERS FOLLOW POSITION (TÍNH TỔNG NỮA NHE)
+    // ====================
+    @Transactional(readOnly = true)
+
+    // Lấy danh sách cầu thủ theo nhóm vị trí (GOALKEEPER, DEFENDER, …)
+    public List<ListPlayerFollowPositionResponse> getPlayersByPositionGroup(String group) {
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                + "/uploads/players/";
+
+        // Hàm lấy các cầu thủ theo nhóm vị trí từ repository
+        List<Player> players = playerRepository.findByPositionGroup(group);
+
+        // Dùng Java Stream để map từng Player vào ListPlayerFollowPositionResponse
+        return players.stream().map(player -> {
+
+            // Tính tổng matches, goals, assists . Duyệt danh sách . lấy matches, nếu null
+            // thì 0 và Cộng dồn
+            int totalMatches = player.getStats().stream()
+                    .mapToInt(s -> s.getMatches() != null ? s.getMatches() : 0).sum();
+            int totalGoals = player.getStats().stream()
+                    .mapToInt(s -> s.getGoals() != null ? s.getGoals() : 0).sum();
+            int totalAssists = player.getStats().stream()
+                    .mapToInt(s -> s.getAssists() != null ? s.getAssists() : 0).sum();
+
+            // Trả phản hồi
+            return ListPlayerFollowPositionResponse.builder()
+                    .id(player.getId())
+                    .playerName(player.getPlayerName())
+                    .shirtNumber(player.getShirtNumber())
+                    .bioImage(player.getBioImage() != null ? baseUrl + player.getBioImage() : null)
+                    .totalMatches(totalMatches)
+                    .totalGoals(totalGoals)
+                    .totalAssists(totalAssists)
+                    .build();
+        }).toList();
     }
 }
