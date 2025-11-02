@@ -348,11 +348,11 @@ public class PlayerService {
                 + "/uploads/players/";
 
         // Xử lý sort
-        String sortBy = sort.trim(); // Chỉ lấy tên field
-        Sort.Direction direction = Sort.Direction.ASC; // LUÔN TĂNG DẦN
+        // String sortBy = sort.trim(); // Chỉ lấy tên field
+        // Sort.Direction direction = Sort.Direction.ASC; // LUÔN TĂNG DẦN
 
         // Tạo Pageable (phân trang + sort)
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Pageable pageable = PageRequest.of(page, size);
 
         // Gọi repo
         Page<Player> playerPage = playerRepository.findAllWithSearch(search, pageable);
