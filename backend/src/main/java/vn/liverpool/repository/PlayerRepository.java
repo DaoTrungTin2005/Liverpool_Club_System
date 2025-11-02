@@ -49,4 +49,15 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     @Query("SELECT p FROM Player p JOIN FETCH p.stats WHERE UPPER(p.position.name) = UPPER(:group)") // KO PHÂN BIỆT HOA
                                                                                                      // THƯỜNG
     List<Player> findByPositionGroup(@Param("group") String group);
+
+    // Lấy danh sách cầu thủ cùng vị trí , loại trừ cầu thủ đang xem
+
+    @Query("SELECT p FROM Player p " +
+            "LEFT JOIN FETCH p.stats s " +
+            "LEFT JOIN FETCH s.tournament " +
+            "WHERE p.position.name = :positionName " + // lọc theo tên vị trí
+            "AND p.id != :excludeId") // trừ chính nó
+    List<Player> findByPositionNameExcludingPlayer(
+            @Param("positionName") String positionName,
+            @Param("excludeId") Long excludeId);
 }

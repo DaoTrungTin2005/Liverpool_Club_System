@@ -19,6 +19,7 @@ import vn.liverpool.domain.dto.player.CreatePlayerRequest;
 import vn.liverpool.domain.dto.player.ListPlayerFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
+import vn.liverpool.domain.dto.player.PlayerProfileWithSuggestionFollowPositionResponse;
 // import vn.liverpool.domain.dto.player.PlayerResponseDTO;
 import vn.liverpool.repository.PlayerRepository;
 import vn.liverpool.repository.PlayerStatsRepository;
@@ -218,7 +219,7 @@ public class PlayerService {
 
                 // Lưu ảnh mới
                 String bioImageName = UUID.randomUUID() + "_" + bioImage.getOriginalFilename();
-                bioImage.transferTo(new File(uploadDir + "/"+ bioImageName));
+                bioImage.transferTo(new File(uploadDir + "/" + bioImageName));
                 player.setBioImage(bioImageName);
             }
 
@@ -452,5 +453,61 @@ public class PlayerService {
                     .totalAssists(totalAssists)
                     .build();
         }).toList();
+    }
+
+    // ========HIỂN THỊ PROFILE CẦU THỦ + GỌI Ý THEO VỊ TRÍ========
+
+    @Transactional(readOnly = true)
+    public PlayerProfileWithSuggestionFollowPositionResponse getPlayerProfileWithSuggestions(Long id) {
+
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                + "/uploads/players/";
+
+        Player player = playerRepository.findByIdWithStats(id)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found with id: " + id));
+
+        String positionName = player.getPosition().getName();
+
+        // lấy cầu thủ lọc theo tên vị trí , trừ chính nó
+        List<Player> samePlayers = playerRepository.findByPositionNameExcludingPlayer(positionName, id);
+
+        List<PlayerProfileWithSuggestionFollowPositionResponse.SuggestedPlayer> otherPlayers = samePlayers.stream()
+                .limit(10)
+                .map(p -> {
+                    // Tính TỔNG stats từ tất cả các giải
+                    int totalMatches = p.getStats().stream()
+                            .mapToInt(s -> s.getMatches() != null ? s.getMatches() : 0).sum();
+                    int totalGoals = p.getStats().stream()
+                            .mapToInt(s -> s.getGoals() != null ? s.getGoals() : 0).sum();
+                    int totalAssists = p.getStats().stream()
+                            .mapToInt(s -> s.getAssists() != null ? s.getAssists() : 0).sum();
+
+                    // Trả về thông tin cầu thủ gợi ý theo vị trí với thông tin cần thiết
+                    return new PlayerProfileWithSuggestionFollowPositionResponse.SuggestedPlayer(
+                            p.getId(),
+                            p.getPlayerName(),
+                            p.getShirtNumber(),
+                            p.getBioImage() != null ? baseUrl + p.getBioImage() : null,
+                            totalMatches,
+                            totalGoals,
+                            totalAssists);
+                })
+                .toList();
+
+                // Trả về đẩy đủ thông tin profile cầu thủ + gợi ý cầu thủ cùng vị trí
+        return PlayerProfileWithSuggestionFollowPositionResponse.builder()
+                .id(player.getId())
+                .playerName(player.getPlayerName())
+                .bio(player.getBio())
+                .shirtNumber(player.getShirtNumber())
+                .positionName(positionName)
+                .backgroundImage(player.getBackgroundImage() != null ? baseUrl + player.getBackgroundImage() : null)
+                .bioImage(player.getBioImage() != null ? baseUrl + player.getBioImage() : null)
+                .dateOfBirth(player.getDateOfBirth())
+                .location(player.getLocation())
+                .nationality(player.getNationality())
+                .joinedClub(player.getJoinedClub())
+                .otherPlayers(otherPlayers)
+                .build();
     }
 }

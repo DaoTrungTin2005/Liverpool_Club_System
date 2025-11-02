@@ -15,6 +15,7 @@ import vn.liverpool.domain.dto.player.CreatePlayerRequest;
 import vn.liverpool.domain.dto.player.ListPlayerFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
+import vn.liverpool.domain.dto.player.PlayerProfileWithSuggestionFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
 // import vn.liverpool.domain.dto.player.PlayerResponseDTO;
 import vn.liverpool.service.PlayerService;
@@ -85,36 +86,45 @@ public class PlayerController {
         return ResponseEntity.ok(ApiResponse.success("Player detail retrieved successfully", player));
     }
 
-    // LẤY DỮ LIỆU CỦA THẰNG PLAYER MUỐN UPDATE (khác với thằng hiển thị của 1 thằng player là trả về trường id để fe xử lí thay vì chỉ trả tên để hiện)
+    // LẤY DỮ LIỆU CỦA THẰNG PLAYER MUỐN UPDATE (khác với thằng hiển thị của 1 thằng
+    // player là trả về trường id để fe xử lí thay vì chỉ trả tên để hiện)
     @GetMapping("/{id}/edit")
     public ResponseEntity<ApiResponse<PlayerEditResponse>> getPlayerForEdit(@PathVariable Long id) {
         PlayerEditResponse data = playerService.getPlayerForEdit(id);
         return ResponseEntity.ok(ApiResponse.success("Edit form data loaded successfully", data));
     }
 
-
-    //==============LIST PLAYERS FOLLOW POSITION ==============
+    // ==============LIST PLAYERS FOLLOW POSITION ==============
     @GetMapping("/goalkeepers")
-public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getGoalkeepers() {
-    return ResponseEntity.ok(ApiResponse.success("Goalkeepers retrieved successfully",
-            playerService.getPlayersByPositionGroup("GOALKEEPER")));
-}
+    public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getGoalkeepers() {
+        return ResponseEntity.ok(ApiResponse.success("Goalkeepers retrieved successfully",
+                playerService.getPlayersByPositionGroup("GOALKEEPER")));
+    }
 
-@GetMapping("/defenders")
-public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getDefenders() {
-    return ResponseEntity.ok(ApiResponse.success("Defenders retrieved successfully",
-            playerService.getPlayersByPositionGroup("DEFENDER")));
-}
+    @GetMapping("/defenders")
+    public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getDefenders() {
+        return ResponseEntity.ok(ApiResponse.success("Defenders retrieved successfully",
+                playerService.getPlayersByPositionGroup("DEFENDER")));
+    }
 
-@GetMapping("/midfielders")
-public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getMidfielders() {
-    return ResponseEntity.ok(ApiResponse.success("Midfielders retrieved successfully",
-            playerService.getPlayersByPositionGroup("MIDFIELDER")));
-}
+    @GetMapping("/midfielders")
+    public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getMidfielders() {
+        return ResponseEntity.ok(ApiResponse.success("Midfielders retrieved successfully",
+                playerService.getPlayersByPositionGroup("MIDFIELDER")));
+    }
 
-@GetMapping("/attackers")
-public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getAttackers() {
-    return ResponseEntity.ok(ApiResponse.success("Attackers retrieved successfully",
-            playerService.getPlayersByPositionGroup("ATTACKER")));
-}
+    @GetMapping("/attackers")
+    public ResponseEntity<ApiResponse<List<ListPlayerFollowPositionResponse>>> getAttackers() {
+        return ResponseEntity.ok(ApiResponse.success("Attackers retrieved successfully",
+                playerService.getPlayersByPositionGroup("ATTACKER")));
+    }
+
+// ==============HIỂN THỊ PLAYER PROFILE VÀ GỢI Ý CẦU THỦ CÙNG VỊ TRÍ ==============
+    @GetMapping("/{id}/profile")
+    public ResponseEntity<ApiResponse<PlayerProfileWithSuggestionFollowPositionResponse>> getPlayerProfile(
+            @PathVariable Long id) {
+        PlayerProfileWithSuggestionFollowPositionResponse response = playerService.getPlayerProfileWithSuggestions(id);
+        return ResponseEntity
+                .ok(ApiResponse.success("Player profile with suggestions retrieved successfully", response));
+    }
 }
