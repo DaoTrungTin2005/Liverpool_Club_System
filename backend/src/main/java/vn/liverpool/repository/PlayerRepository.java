@@ -31,4 +31,15 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
             )
             """)
     Page<Player> findAllWithSearch(@Param("search") String search, Pageable pageable);
+
+    // ============== Để khi lấy thông tin cầu thủ ấy (như để xem chi tiết 1 cầu thù
+    // hay hiện lại dữ liệu của 1 cầu thủ muốn update) ==============
+    @Query("""
+            SELECT p FROM Player p
+            LEFT JOIN FETCH p.position
+            LEFT JOIN FETCH p.stats ps
+            LEFT JOIN FETCH ps.tournament
+            WHERE p.id = :id
+            """)
+    Optional<Player> findByIdWithStats(@Param("id") Long id);
 }

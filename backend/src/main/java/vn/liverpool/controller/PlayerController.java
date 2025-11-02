@@ -11,10 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.liverpool.domain.dto.player.CreatePlayerRequest;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
+import vn.liverpool.domain.dto.player.PlayerEditResponse;
+import vn.liverpool.domain.dto.player.PlayerEditResponse;
 // import vn.liverpool.domain.dto.player.PlayerResponseDTO;
 import vn.liverpool.service.PlayerService;
 import vn.liverpool.util.ApiResponse;
-
 
 @RestController
 @RequestMapping("/api/players")
@@ -62,22 +63,30 @@ public class PlayerController {
     // GET ALL PLAYERS BAO GỒM STATS
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<Page<PlayerDetailWithStatsResponseDTO>>> getAllPlayers(
-        //Nhận dl
+            // Nhận dl
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "playerName,asc") String sort, // mặc định tăng dần
-            @RequestParam(required = false) String search) { //search = null -> không bắt buộc, nếu không có -> tìm tất cả
+            @RequestParam(required = false) String search) { // search = null -> không bắt buộc, nếu không có -> tìm tất
+                                                             // cả
 
         Page<PlayerDetailWithStatsResponseDTO> playersPage = playerService.getAllPlayersWithStats(page, size, sort,
                 search);
         return ResponseEntity.ok(ApiResponse.success("Players retrieved successfully", playersPage));
     }
 
-    // GET PLAYER DETAIL (bao gồm stats)
+    // LẤY DỮ LIỆU ĐỂ HIỂN THỊ CỦA 1 THẰNG PLAYER
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PlayerDetailWithStatsResponseDTO>> getPlayerDetail(@PathVariable Long id) {
         PlayerDetailWithStatsResponseDTO player = playerService.getPlayerDetail(id);
         return ResponseEntity.ok(ApiResponse.success("Player detail retrieved successfully", player));
+    }
+
+    // LẤY DỮ LIỆU CỦA THẰNG PLAYER MUỐN UPDATE (khác với thằng hiển thị của 1 thằng player là trả về trường id để fe xử lí thay vì chỉ trả tên để hiện)
+    @GetMapping("/{id}/edit")
+    public ResponseEntity<ApiResponse<PlayerEditResponse>> getPlayerForEdit(@PathVariable Long id) {
+        PlayerEditResponse data = playerService.getPlayerForEdit(id);
+        return ResponseEntity.ok(ApiResponse.success("Edit form data loaded successfully", data));
     }
 
 }

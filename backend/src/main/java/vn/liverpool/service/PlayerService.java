@@ -17,6 +17,7 @@ import vn.liverpool.domain.Position;
 import vn.liverpool.domain.Tournament;
 import vn.liverpool.domain.dto.player.CreatePlayerRequest;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
+import vn.liverpool.domain.dto.player.PlayerEditResponse;
 // import vn.liverpool.domain.dto.player.PlayerResponseDTO;
 import vn.liverpool.repository.PlayerRepository;
 import vn.liverpool.repository.PlayerStatsRepository;
@@ -302,15 +303,16 @@ public class PlayerService {
                 statsDetails);
     }
 
-    // =================================GET DETAIL
-    // PLAYER===============================
+    // =====================GET DETAIL PLAYER=========================
     @Transactional(readOnly = true)
     public PlayerDetailWithStatsResponseDTO getPlayerDetail(Long id) {
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
                 + "/uploads/players/";
 
-        Player player = playerRepository.findById(id)
+        // Có thể dùng findByIdWithStats để lấy luôn stats, lấy luôn tournament, lấy
+        // luôn id
+        Player player = playerRepository.findByIdWithStats(id)
                 .orElseThrow(() -> new IllegalArgumentException("Player not found with id: " + id));
 
         List<PlayerDetailWithStatsResponseDTO.StatsDetail> statsDetails = player.getStats().stream()
@@ -379,4 +381,38 @@ public class PlayerService {
         });
     }
 
+    // ==================LẤY DỮ LIỆU CỦA THẰNG MUỐN UPDATE=================
+    @Transactional(readOnly = true)
+    public PlayerEditResponse getPlayerForEdit(Long id) {
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                + "/uploads/players/";
+
+        // Có thể dùng findByIdWithStats để lấy luôn stats, lấy luôn tỏurnament, lấy
+        // luôn id
+        Player player = playerRepository.findByIdWithStats(id)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+
+        var stats = player.getStats().stream()
+                .map(s -> new PlayerEditResponse.StatsEdit(
+                        s.getTournament().getId(),
+                        s.getTournament().getName(), // LẤY TỪ BẢNG tournament
+                        s.getMatches(),
+                        s.getGoals(),
+                        s.getAssists()))
+                .toList();
+
+        return new PlayerEditResponse(
+                player.getId(),
+                player.getPlayerName(),
+                player.getBio(),
+                player.getShirtNumber(),
+                player.getPosition().getId(),
+                player.getBackgroundImage() != null ? baseUrl + player.getBackgroundImage() : null,
+                player.getBioImage() != null ? baseUrl + player.getBioImage() : null,
+                player.getDateOfBirth(),
+                player.getLocation(),
+                player.getNationality(),
+                player.getJoinedClub(),
+                stats);
+    }
 }
