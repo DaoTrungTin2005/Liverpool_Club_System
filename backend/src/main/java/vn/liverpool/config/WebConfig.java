@@ -10,8 +10,8 @@ public class WebConfig implements WebMvcConfigurer {
     // cấu hình có thể truy cập ảnh qua URL
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Cho phép truy cập folder uploads/players qua URL
         registry.addResourceHandler("/uploads/players/**")
-                .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/players/");
+                .addResourceLocations("classpath:/static/uploads/players/");
     }
+
 }

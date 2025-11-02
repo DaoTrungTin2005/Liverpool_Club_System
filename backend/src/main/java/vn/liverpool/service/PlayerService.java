@@ -211,25 +211,25 @@ public class PlayerService {
             if (bioImage != null && !bioImage.isEmpty()) {
                 // Xóa ảnh cũ
                 if (player.getBioImage() != null) {
-                    File oldFile = new File(uploadDir + player.getBioImage());
+                    File oldFile = new File(uploadDir + "/" + player.getBioImage());
                     if (oldFile.exists())
                         oldFile.delete();
                 }
 
                 // Lưu ảnh mới
                 String bioImageName = UUID.randomUUID() + "_" + bioImage.getOriginalFilename();
-                bioImage.transferTo(new File(uploadDir + bioImageName));
+                bioImage.transferTo(new File(uploadDir + "/"+ bioImageName));
                 player.setBioImage(bioImageName);
             }
 
             if (backgroundImage != null && !backgroundImage.isEmpty()) {
                 if (player.getBackgroundImage() != null) {
-                    File oldFile = new File(uploadDir + player.getBackgroundImage());
+                    File oldFile = new File(uploadDir + "/" + player.getBackgroundImage());
                     if (oldFile.exists())
                         oldFile.delete();
                 }
                 String bgImageName = UUID.randomUUID() + "_" + backgroundImage.getOriginalFilename();
-                backgroundImage.transferTo(new File(uploadDir + bgImageName));
+                backgroundImage.transferTo(new File(uploadDir + "/" + bgImageName));
                 player.setBackgroundImage(bgImageName);
             }
         } catch (IOException e) {
