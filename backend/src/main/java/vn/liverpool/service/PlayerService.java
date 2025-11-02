@@ -172,9 +172,30 @@ public class PlayerService {
 
     @Transactional
     public void deletePlayer(Long id) {
-        if (!playerRepository.existsById(id)) {
-            throw new IllegalArgumentException("Player not found with id: " + id);
+        // Lấy player trước khi xóa (để biết tên file ảnh)
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found with id: " + id));
+
+        // Đường dẫn thư mục chứa ảnh
+        String uploadDir = System.getProperty("user.dir") + "/backend/src/main/resources/static/uploads/players/";
+
+        // Xóa ảnh bio (nếu có)
+        if (player.getBioImage() != null) {
+            File bioFile = new File(uploadDir + player.getBioImage());
+            if (bioFile.exists()) {
+                bioFile.delete();
+            }
         }
+
+        // Xóa ảnh background (nếu có)
+        if (player.getBackgroundImage() != null) {
+            File bgFile = new File(uploadDir + player.getBackgroundImage());
+            if (bgFile.exists()) {
+                bgFile.delete();
+            }
+        }
+
+        // Cuối cùng mới xóa trong DB
         playerRepository.deleteById(id);
     }
 
@@ -494,7 +515,7 @@ public class PlayerService {
                 })
                 .toList();
 
-                // Trả về đẩy đủ thông tin profile cầu thủ + gợi ý cầu thủ cùng vị trí
+        // Trả về đẩy đủ thông tin profile cầu thủ + gợi ý cầu thủ cùng vị trí
         return PlayerProfileWithSuggestionFollowPositionResponse.builder()
                 .id(player.getId())
                 .playerName(player.getPlayerName())
