@@ -16,6 +16,7 @@ import vn.liverpool.domain.dto.player.ListPlayerFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
 import vn.liverpool.domain.dto.player.PlayerProfileWithSuggestionFollowPositionResponse;
+import vn.liverpool.domain.dto.player.PlayerStatsWithSuggestionFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
 // import vn.liverpool.domain.dto.player.PlayerResponseDTO;
 import vn.liverpool.service.PlayerService;
@@ -119,12 +120,22 @@ public class PlayerController {
                 playerService.getPlayersByPositionGroup("ATTACKER")));
     }
 
-// ==============HIỂN THỊ PLAYER PROFILE VÀ GỢI Ý CẦU THỦ CÙNG VỊ TRÍ ==============
+    // ==============HIỂN THỊ PLAYER PROFILE VÀ GỢI Ý CẦU THỦ CÙNG VỊ TRÍ
+    // ==============
     @GetMapping("/{id}/profile")
     public ResponseEntity<ApiResponse<PlayerProfileWithSuggestionFollowPositionResponse>> getPlayerProfile(
             @PathVariable Long id) {
         PlayerProfileWithSuggestionFollowPositionResponse response = playerService.getPlayerProfileWithSuggestions(id);
         return ResponseEntity
                 .ok(ApiResponse.success("Player profile with suggestions retrieved successfully", response));
+    }
+
+    // ==============HIỂN THỊ PLAYER STATS VÀ GỢI Ý CẦU THỦ CÙNG VỊ TRÍ
+    // ==============
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<ApiResponse<PlayerStatsWithSuggestionFollowPositionResponse>> getPlayerStats(
+            @PathVariable Long id) {
+        PlayerStatsWithSuggestionFollowPositionResponse response = playerService.getPlayerStatsWithSuggestions(id);
+        return ResponseEntity.ok(ApiResponse.success("Player stats with suggestions retrieved successfully", response));
     }
 }

@@ -20,6 +20,7 @@ import vn.liverpool.domain.dto.player.ListPlayerFollowPositionResponse;
 import vn.liverpool.domain.dto.player.PlayerDetailWithStatsResponseDTO;
 import vn.liverpool.domain.dto.player.PlayerEditResponse;
 import vn.liverpool.domain.dto.player.PlayerProfileWithSuggestionFollowPositionResponse;
+import vn.liverpool.domain.dto.player.PlayerStatsWithSuggestionFollowPositionResponse;
 // import vn.liverpool.domain.dto.player.PlayerResponseDTO;
 import vn.liverpool.repository.PlayerRepository;
 import vn.liverpool.repository.PlayerStatsRepository;
@@ -528,6 +529,81 @@ public class PlayerService {
                 .location(player.getLocation())
                 .nationality(player.getNationality())
                 .joinedClub(player.getJoinedClub())
+                .otherPlayers(otherPlayers)
+                .build();
+    }
+
+    // =====HIỂN THỊ THÔNG SỐ CẦU THỦ + GỢI Ý CẦU THỦ CÙNG VỊ TRÍ ==============
+
+    @Transactional(readOnly = true)
+    public PlayerStatsWithSuggestionFollowPositionResponse getPlayerStatsWithSuggestions(Long id) {
+
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                + "/uploads/players/";
+
+        // Lấy thông tin player với stats
+        Player player = playerRepository.findByIdWithStats(id)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found with id: " + id));
+
+        String positionName = player.getPosition().getName();
+
+        // ============ TÍNH TỔNG STATS (TOTAL) ============
+        int totalMatches = player.getStats().stream()
+                .mapToInt(s -> s.getMatches() != null ? s.getMatches() : 0)
+                .sum();
+        int totalGoals = player.getStats().stream()
+                .mapToInt(s -> s.getGoals() != null ? s.getGoals() : 0)
+                .sum();
+        int totalAssists = player.getStats().stream()
+                .mapToInt(s -> s.getAssists() != null ? s.getAssists() : 0)
+                .sum();
+
+        // ============ STATS CHI TIẾT THEO TỪNG GIẢI ============
+        List<PlayerStatsWithSuggestionFollowPositionResponse.TournamentStats> tournamentStats = player.getStats()
+                .stream()
+                .map(s -> new PlayerStatsWithSuggestionFollowPositionResponse.TournamentStats(
+                        s.getTournament().getName(), // Tên giải
+                        s.getMatches(),
+                        s.getGoals(),
+                        s.getAssists()))
+                .toList();
+
+        // ============ LẤY CẦU THỦ CÙNG VỊ TRÍ (GỢI Ý) ============
+        List<Player> samePlayers = playerRepository.findByPositionNameExcludingPlayer(positionName, id);
+
+        List<PlayerStatsWithSuggestionFollowPositionResponse.SuggestedPlayer> otherPlayers = samePlayers.stream()
+                .limit(10) // Giới hạn 10 cầu thủ
+                .map(p -> {
+                    // Tính tổng stats cho từng cầu thủ gợi ý
+                    int pTotalMatches = p.getStats().stream()
+                            .mapToInt(s -> s.getMatches() != null ? s.getMatches() : 0).sum();
+                    int pTotalGoals = p.getStats().stream()
+                            .mapToInt(s -> s.getGoals() != null ? s.getGoals() : 0).sum();
+                    int pTotalAssists = p.getStats().stream()
+                            .mapToInt(s -> s.getAssists() != null ? s.getAssists() : 0).sum();
+
+                    return new PlayerStatsWithSuggestionFollowPositionResponse.SuggestedPlayer(
+                            p.getId(),
+                            p.getPlayerName(),
+                            p.getShirtNumber(),
+                            p.getBioImage() != null ? baseUrl + p.getBioImage() : null,
+                            pTotalMatches,
+                            pTotalGoals,
+                            pTotalAssists);
+                })
+                .toList();
+
+        // ============ TRẢ VỀ RESPONSE ============
+        return PlayerStatsWithSuggestionFollowPositionResponse.builder()
+                .id(player.getId())
+                .playerName(player.getPlayerName())
+                .shirtNumber(player.getShirtNumber())
+                .positionName(positionName)
+                .backgroundImage(player.getBackgroundImage() != null ? baseUrl + player.getBackgroundImage() : null)
+                .totalMatches(totalMatches)
+                .totalGoals(totalGoals)
+                .totalAssists(totalAssists)
+                .tournamentStats(tournamentStats)
                 .otherPlayers(otherPlayers)
                 .build();
     }
