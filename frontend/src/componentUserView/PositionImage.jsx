@@ -1,6 +1,7 @@
 import "../output.css";
 import defaultImage from "../assets/img/ViewPlayer.png";
 import { Link } from "react-router-dom";
+import { editimageapi } from "../Api/editimageapi.js";
 
 export default function PositionImg({
   image = defaultImage,
@@ -9,12 +10,16 @@ export default function PositionImg({
   match = "4",
   goal = "2",
   assists = "2",
+  playerId, // Giữ prop này
 }) {
   return (
-    <Link to={"/myclub/player"}>
+    <Link
+      to="/myclub/player"
+      state={{ playerId }} // Truyền playerId qua state
+    >
       <div className="relative flex flex-col items-center group cursor-pointer">
         <img
-          src={image}
+          src={editimageapi(image, defaultImage)}
           alt={alt}
           className="w-[350px] h-[500px] rounded-2xl shadow-xl object-cover"
         />

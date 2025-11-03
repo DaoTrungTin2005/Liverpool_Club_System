@@ -112,55 +112,165 @@ export default function BodyPlayer({
 
       {/* === STATS TAB === */}
       {activeTab === "stats" && (
-        <div className="flex flex-col">
-          <div className="max-w-6xl mx-auto px-6 py-10">
-            {/* Matches */}
-            <div className="text-center mb-12">
-              <h2 className="text-6xl font-bold mb-8">MATCHES</h2>
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-30">
-                <StatBox label="TOTAL" value={stats.matches.total} big />
-                <div className=" flex gap-10">
-                  <StatBox label="CHAMPION LEAGUE" value={stats.matches.ucl} />
-                  <StatBox label="PREMIER LEAGUE" value={stats.matches.epl} />
-                  <StatBox label="CARABAO CUP" value={stats.matches.carabao} />
-                  <StatBox label="FA CUP" value={stats.matches.fa} />
+        <div className="flex flex-col justify-center items-center bg-black text-white py-20">
+          {/* ========== MATCHES ========== */}
+          <div className="text-center mb-16 w-full">
+            <h2 className="text-6xl font-bold mb-8 tracking-wide text-white">
+              MATCHES
+            </h2>
+            <div className="w-full max-w-5xl mx-auto border-t border-b border-gray-500">
+              <div className="grid grid-cols-5 text-center divide-x divide-gray-600">
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    TOTAL
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.matches.total}
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Goals */}
-            <div className="text-center mb-12">
-              <h2 className="text-6xl font-bold mb-8">GOALS</h2>
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-30">
-                <StatBox label="TOTAL" value={stats.goals.total} big />
-                <div className=" flex gap-10">
-                  <StatBox label="CHAMPION LEAGUE" value={stats.goals.ucl} />
-                  <StatBox label="PREMIER LEAGUE" value={stats.goals.epl} />
-                  <StatBox label="CARABAO CUP" value={stats.goals.carabao} />
-                  <StatBox label="FA CUP" value={stats.goals.fa} />
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    CHAMPION LEAGUE
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.matches.ucl}
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Assists */}
-            <div className="text-center">
-              <h2 className="text-6xl font-bold mb-8">ASSISTS</h2>
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-30">
-                <StatBox label="TOTAL" value={stats.assists.total} big />
-                <div className=" flex gap-10">
-                  <StatBox label="CHAMPION LEAGUE" value={stats.assists.ucl} />
-                  <StatBox label="PREMIER LEAGUE" value={stats.assists.epl} />
-                  <StatBox label="CARABAO CUP" value={stats.assists.carabao} />
-                  <StatBox label="FA CUP" value={stats.assists.fa} />
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    PREMIER LEAGUE
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.matches.epl}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    CARABAO CUP
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.matches.carabao}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    FA CUP
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.matches.fa}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* ========== GOALS ========== */}
+          <div className="text-center mb-16 w-full">
+            <h2 className="text-6xl font-bold mb-8 tracking-wide text-white">
+              GOALS
+            </h2>
+            <div className="w-full max-w-5xl mx-auto border-t border-b border-gray-500">
+              <div className="grid grid-cols-5 text-center divide-x divide-gray-600">
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    TOTAL
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.goals.total}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    CHAMPION LEAGUE
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.goals.ucl}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    PREMIER LEAGUE
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.goals.epl}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    CARABAO CUP
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.goals.carabao}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    FA CUP
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.goals.fa}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ========== ASSISTS ========== */}
+          <div className="text-center mb-16 w-full">
+            <h2 className="text-6xl font-bold mb-8 tracking-wide text-white">
+              ASSISTS
+            </h2>
+            <div className="w-full max-w-5xl mx-auto border-t border-b border-gray-500">
+              <div className="grid grid-cols-5 text-center divide-x divide-gray-600">
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    TOTAL
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.assists.total}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    CHAMPION LEAGUE
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.assists.ucl}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    PREMIER LEAGUE
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.assists.epl}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    CARABAO CUP
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.assists.carabao}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                  <p className="text-sm font-semibold text-white uppercase tracking-wider">
+                    FA CUP
+                  </p>
+                  <p className="text-5xl font-bold text-red-600 drop-shadow-[0_0_8px_#ff0000] mt-2">
+                    {stats.assists.fa}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="mt-16 bg-gradient-to-t from-red-950 via-red-900 to-transparent py-10">
-            <div className="max-w-6xl mx-auto px-6 flex flex-wrap justify-center items-center gap-8 md:gap-16">
+            <div className="max-w-6xl mx-auto px-2 flex flex-wrap justify-center items-center gap-8 max-sm:gap-0">
               <img src={C1} className="h-20 w-20"></img>
-              <img src={EPL} className="h-24 w-24"></img>
-              <img src={CARABAO} className="h-15 w-15 "></img>
+              <img src={EPL} className="h-20 w-20"></img>
+              <img src={CARABAO} className="h-20 w-10 "></img>
               <img src={FA} className="h-20 w-15"></img>
             </div>
           </div>

@@ -8,7 +8,7 @@ export default function Form() {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  //  Khi mở app, kiểm tra token có trong localStorage hoặc URL (Google redirect)
+  // Kiểm tra token từ URL (Google callback) và chuyển hướng
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get("token");
@@ -16,13 +16,22 @@ export default function Form() {
     if (tokenFromUrl) {
       localStorage.setItem("authToken", tokenFromUrl);
       setIsLoggedIn(true);
-      window.history.replaceState({}, document.title, "/"); // xóa ?token= khỏi URL
+      // Xóa token khỏi URL
+      window.history.replaceState({}, document.title, "/");
+      // Chuyển hướng đến /admin/user
+      window.location.href = "/admin/user";
     } else {
       const token = localStorage.getItem("authToken");
-      if (token) setIsLoggedIn(true);
+      if (token) {
+        setIsLoggedIn(true);
+        // Nếu đã có token (trước đó), vẫn chuyển hướng đến /admin/user
+        window.location.href = "/admin/user";
+      }
     }
   }, []);
 
+  // Nếu đang ở trang login mà đã có token → không render form
+  // (vì useEffect sẽ tự redirect)
   const handleFocus = (e) => (e.target.placeholder = "");
   const handleBlur = (e) => {
     if (!e.target.value)
@@ -52,7 +61,7 @@ export default function Form() {
 
     try {
       const res = await axios.post(
-        "https://367a5f36e756.ngrok-free.app/api/auth/login",
+        "https://0d9ffd8a6329.ngrok-free.app/api/auth/login",
         {
           email: user.email,
           password: user.password,
@@ -65,19 +74,19 @@ export default function Form() {
         }
       );
 
-      console.log("🔹 Response:", res.data);
       const token = res.data?.data?.token;
 
       if (token) {
         localStorage.setItem("authToken", token);
         setIsLoggedIn(true);
-        alert("Login successful!");
         setUser({ email: "", password: "" });
+        // Chuyển hướng đến /admin/user
+        window.location.href = "/admin/user";
       } else {
         alert("Server didn't return a valid token.");
       }
     } catch (err) {
-      console.error("❌ Error:", err);
+      console.error("Error:", err);
       if (err.response) {
         const msg = err.response.data.message || "Login failed";
         alert(` ${msg}`);
@@ -88,31 +97,28 @@ export default function Form() {
   };
 
   // 🔹 Login với Google
+  // Login với Google
   const handleGoogleLogin = async () => {
     try {
-      // Gọi API để lấy link Google Auth
       const res = await fetch(
-        "https://367a5f36e756.ngrok-free.app/api/auth/login/google/start",
+        "https://0d9ffd8a6329.ngrok-free.app/api/auth/login/google/start",
         {
           headers: { "ngrok-skip-browser-warning": "true" },
         }
       );
 
       const data = await res.json();
-      console.log("🔹 Google login start:", data);
 
-      // Nếu có redirect URL thì chuyển hướng
       if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
       } else {
-        alert(" Server không trả về redirectUrl hợp lệ!");
+        alert("Server không trả về redirectUrl hợp lệ!");
       }
     } catch (error) {
       console.error("Lỗi khi gọi API Google Login:", error);
       alert("Không thể kết nối đến máy chủ Google Login!");
     }
   };
-
   //  Nếu đã đăng nhập → hiển thị trang logged-in
   if (isLoggedIn) {
     return (

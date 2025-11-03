@@ -14,17 +14,25 @@ export default function Form({
   showPass = true,
   onValidityChange,
   validateSignal,
+  defaultValues = {},
 }) {
-  // Component chính của Form
-  // - Trả về markup form
-  // - Quản lý trạng thái values, errors, touched, role
-  // - Expose validateAll qua validateSignal và báo trạng thái qua onValidityChange
+  const [role, setRole] = useState(null);
   const [values, setValues] = useState({
     fullName: "",
     email: "",
     password: "",
   });
-
+  useEffect(() => {
+    if (defaultValues && Object.keys(defaultValues).length > 0) {
+      setValues((prev) => ({
+        ...prev,
+        fullName: defaultValues.fullName || defaultValues.fullname || "",
+        email: defaultValues.email || "",
+        password: defaultValues.password || "",
+      }));
+      setRole(defaultValues.role || null);
+    }
+  }, [JSON.stringify(defaultValues)]);
   const [errors, setErrors] = useState({
     fullName: "",
     email: "",
@@ -98,7 +106,6 @@ export default function Form({
     }));
   };
 
-  const [role, setRole] = useState(null); // 'admin' or 'user'
   const fullNameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
@@ -160,15 +167,23 @@ export default function Form({
 
   // notify parent on each change of validity
   useEffect(() => {
-    // Effect này thông báo cho parent mỗi khi trạng thái errors/values/role thay đổi.
-    // Parent có thể dùng thông tin này để cập nhật UI (ví dụ bật/tắt nút Add).
     const isValid =
       !errors.fullName &&
       !errors.email &&
       (!showPass || !errors.password) &&
       !!role;
-    if (onValidityChange) onValidityChange({ isValid, values, role });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // tránh gọi callback nếu không có gì thay đổi
+    onValidityChange?.((prev) => {
+      if (
+        prev.isValid !== isValid ||
+        JSON.stringify(prev.values) !== JSON.stringify(values) ||
+        prev.role !== role
+      ) {
+        return { isValid, values, role };
+      }
+      return prev;
+    });
   }, [errors, values, role]);
 
   return (
@@ -240,7 +255,7 @@ export default function Form({
             )}
           </label>
         )}
-        <div action="" className="mr-35">
+        <div className="mr-35">
           <div className="flex flex-col gap-4">
             <p className="text-[#2B3674] text-sm">Role</p>
             <div className="flex gap-4 items-center">

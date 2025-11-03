@@ -3,26 +3,30 @@ import ImgAdminUser01Component from "./componentAdminUser/ImgAdminUser01";
 import LinkGoPage from "./componentAdminUser/LinkGoPage.jsx";
 import Button from "./componentAdminUser/Button.jsx";
 import Form from "./componentAdminUser/Form.jsx";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../pageRegister/Register.css";
 
 export default function AdminUserAddUser() {
-  const navigate = useNavigate();
   const [validateSignal, setValidateSignal] = useState(0);
-  // track form validity on demand
-  const [pendingNavigate, setPendingNavigate] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+  const navigate = useNavigate();
 
-  const handleValidityChange = ({ isValid /*, values, role */ }) => {
-    if (pendingNavigate) {
-      setPendingNavigate(false);
-      if (isValid) navigate("/admin/user/add/question");
+  const handleValidityChange = ({ isValid, values }) => {
+    if (!pendingSubmit) return;
+    setPendingSubmit(false);
+
+    if (!isValid) {
+      alert("Please fix the errors in the form.");
+      return;
     }
+
+    // CHỈ CHUYỂN DỮ LIỆU, KHÔNG GỌI API
+    navigate("/admin/user/add/question", { state: { userData: values } });
   };
 
   const handleAdd = () => {
-    // request Form to validate all fields; if valid, Form will trigger handleValidityChange and navigate
-    setPendingNavigate(true);
-    setValidateSignal((s) => s + 1);
+    setPendingSubmit(true);
+    setValidateSignal((prev) => prev + 1);
   };
 
   return (

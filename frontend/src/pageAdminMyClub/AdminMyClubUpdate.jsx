@@ -8,6 +8,9 @@ import { SvgGoal } from "../assets/svg/SvgAdmin.jsx";
 import { SvgLocation } from "../assets/svg/SvgAdmin.jsx";
 import { SvgNationality } from "../assets/svg/SvgAdmin.jsx";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import api from "../Api/apitoken.js";
 
 export default function AdminMyClubUpdate() {
   // === State chính ===
@@ -16,7 +19,7 @@ export default function AdminMyClubUpdate() {
   const [number, setNumber] = useState("");
   const [dob, setDob] = useState("");
   const [joined, setJoined] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setPlayerLocation] = useState("");
   const [nationality, setNationality] = useState("");
   const [position, setPosition] = useState("");
 
@@ -69,12 +72,14 @@ export default function AdminMyClubUpdate() {
       setBioPreview(URL.createObjectURL(file));
     }
     e.target.value = "";
+    setErrors((prev) => ({ ...prev, bioImage: false }));
   }
 
   // === State giải đấu ===
   const [currentInput, setCurrentInput] = useState({
     id: Date.now(),
     leagueName: "",
+    tournamentId: "",
     matches: "",
     goals: "",
     assists: "",
@@ -97,18 +102,24 @@ export default function AdminMyClubUpdate() {
 
   // === Hoàn tất nhập một dòng ===
   const completeCurrentInput = () => {
-    const { leagueName, matches } = currentInput;
-    if (!leagueName.trim() || matches === "") {
+    const { leagueName, matches, tournamentId } = currentInput;
+    if (!leagueName.trim() || matches === "" || !tournamentId) {
       alert("Vui lòng chọn giải đấu và nhập số trận!");
       return;
     }
-    setCompletedLeagues([
-      ...completedLeagues,
-      { ...currentInput, isEditing: false },
-    ]);
+
+    const newLeague = {
+      ...currentInput,
+      id: tournamentId,
+      isEditing: false,
+    };
+
+    setCompletedLeagues([...completedLeagues, newLeague]);
+
     setCurrentInput({
       id: Date.now(),
       leagueName: "",
+      tournamentId: "",
       matches: "",
       goals: "",
       assists: "",
@@ -134,8 +145,8 @@ export default function AdminMyClubUpdate() {
       !Number.isInteger(Number(number))
     )
       newErrors.number = true;
-    if (!backgroundFile) newErrors.background = true;
-    if (!bioFile) newErrors.bioImage = true;
+    if (!backgroundPreview) newErrors.background = true;
+    if (!bioPreview) newErrors.bioImage = true;
     if (!dob) newErrors.dob = true;
     if (!location.trim()) newErrors.location = true;
     if (!nationality.trim()) newErrors.nationality = true;
@@ -144,7 +155,6 @@ export default function AdminMyClubUpdate() {
 
     setErrors(newErrors);
 
-    // Focus vào ô lỗi đầu tiên
     const firstError = Object.keys(newErrors)[0];
     const focusMap = {
       playerName: playerNameRef,
@@ -168,49 +178,54 @@ export default function AdminMyClubUpdate() {
   };
 
   // === Submit ===
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
-    const pending =
-      currentInput.leagueName.trim() && currentInput.matches !== ""
-        ? [currentInput]
-        : [];
-    const allLeagues = [...completedLeagues, ...pending];
-
-    if (allLeagues.length === 0) {
-      alert("Vui lòng nhập ít nhất 1 giải đấu hợp lệ!");
-      return;
-    }
-
-    const playerData = {
-      playerName: playerName.trim(),
-      bio: bio.trim(),
-      number: number.trim(),
-      backgroundFile: backgroundFile,
-      backgroundName: backgroundName.trim(),
-      bioFile: bioFile,
-      bioName: bioName.trim(),
-      information: {
-        dob,
-        location: location.trim(),
-        nationality: nationality.trim(),
-        joined,
-      },
-      leagues: allLeagues.map((l) => ({
-        leagueName: l.leagueName,
-        matches: parseInt(l.matches) || 0,
-        goals: parseInt(l.goals) || 0,
-        assists: parseInt(l.assists) || 0,
-      })),
+    const playerPayload = {
+      playerName,
+      bio,
+      shirtNumber: number,
+      positionId: parseInt(position),
+      dateOfBirth: dob,
+      location,
+      nationality,
+      joinedClub: joined,
+      stats: completedLeagues
+        .filter((s) => s.tournamentId)
+        .map((s) => ({
+          tournamentId: parseInt(s.tournamentId),
+          matches: parseInt(s.matches) || 0,
+          goals: parseInt(s.goals) || 0,
+          assists: parseInt(s.assists) || 0,
+        })),
     };
 
-    console.log("DỮ LIỆU GỬI ĐI:", playerData);
-    alert("Update cầu thủ thành công!");
+    try {
+      setIsSubmitting(true);
+      const formData = new FormData();
 
-    // CHUYỂN TRANG KHI THÀNH CÔNG
-    navigate("/admin/club/update/question");
+      formData.append(
+        "player",
+        new Blob([JSON.stringify(playerPayload)], { type: "application/json" })
+      );
+      if (bioFile) formData.append("bioImage", bioFile);
+      if (backgroundFile) formData.append("backgroundImage", backgroundFile);
+
+      const res = await api.put(`/api/players/update/${PlayerId}`, formData);
+
+      if (res.data.status === "success") {
+        alert("Cập nhật cầu thủ thành công!");
+        navigate("/admin/club");
+      } else {
+        alert("Cập nhật thất bại, vui lòng thử lại.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi trong quá trình cập nhật!");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const [showStats, setShowStats] = useState(false);
@@ -219,6 +234,180 @@ export default function AdminMyClubUpdate() {
   };
 
   const navigate = useNavigate();
+  const [tournaments, setTournaments] = useState([]);
+  const [tournament, setTournament] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingTournaments, setLoadingTournaments] = useState(true);
+
+  useEffect(() => {
+    const fetchTournaments = async () => {
+      try {
+        const res = await api.get("api/dropdowns/tournaments");
+        setTournaments(res.data.data || []);
+      } catch (err) {
+        console.error("Error fetching tournaments:", err);
+      } finally {
+        setLoadingTournaments(false);
+      }
+    };
+    fetchTournaments();
+  }, []);
+
+  const [positions, setPositions] = useState([]);
+  useEffect(() => {
+    const fetchPositions = async () => {
+      try {
+        const res = await api.get("api/dropdowns/positions");
+        setPositions(res.data.data || []);
+      } catch (err) {
+        console.error("Error fetching positions:", err);
+      }
+    };
+    fetchPositions();
+  }, []);
+
+  const [loading, setLoading] = useState(true);
+  const [playerData, setPlayerData] = useState(null);
+  const locationPlayer = useLocation();
+  const { state } = locationPlayer || {};
+  const PlayerId = state?.playerId;
+  const player = state?.player || null;
+
+  useEffect(() => {
+    if (player) {
+      setPlayerName(player.playerName || "");
+      setBio(player.bio || "");
+      setNumber(player.shirtNumber || "");
+      setDob(player.dateOfBirth || "");
+      setJoined(player.joinedClub || "");
+      setPlayerLocation(player.location || "");
+      setNationality(player.nationality || "");
+      setPosition(player.positionId?.toString() || "");
+
+      if (player.backgroundImage) setBackgroundPreview(player.backgroundImage);
+      if (player.bioImage) setBioPreview(player.bioImage);
+    }
+  }, [player]);
+
+  useEffect(() => {
+    if (playerData?.positionId) {
+      setPosition(playerData.positionId.toString());
+    }
+  }, [playerData]);
+
+  // LẤY DỮ LIỆU CẦU THỦ
+  useEffect(() => {
+    if (!PlayerId) {
+      alert("Không tìm thấy ID người dùng.");
+      navigate("/admin/club");
+      return;
+    }
+
+    const fetchPlayer = async () => {
+      try {
+        const res = await api.get(`/api/players/${PlayerId}/edit`);
+        if (res.data.status === "success") {
+          setPlayerData(res.data.data);
+        } else {
+          alert("Không thể tải dữ liệu người dùng.");
+          navigate("/admin/user");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Lỗi khi tải thông tin người dùng!");
+        navigate("/admin/user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlayer();
+  }, [PlayerId, navigate]);
+
+  // GÁN ẢNH
+  useEffect(() => {
+    if (playerData?.bioImage) {
+      setBioPreview(playerData.bioImage);
+      const parts = playerData.bioImage.split("/");
+      setBioName(parts[parts.length - 1]);
+      setErrors((prev) => ({ ...prev, bioImage: "" }));
+    }
+  }, [playerData]);
+
+  useEffect(() => {
+    if (playerData?.backgroundImage) {
+      setBackgroundPreview(playerData.backgroundImage);
+      const parts = playerData.backgroundImage.split("/");
+      setBackgroundName(parts[parts.length - 1]);
+      setErrors((prev) => ({ ...prev, background: false }));
+    }
+  }, [playerData]);
+
+  // ĐỔ STATS TỪ API
+  // useEffect(() => {
+  //   console.log("🔍 playerData?.stats:", playerData?.stats);
+  // console.log("🔍 tournaments:", tournaments);
+  // console.log("🔍 loadingTournaments:", loadingTournaments);
+  //   if (
+  //     playerData?.stats &&
+  //     Array.isArray(playerData.stats) &&
+  //     tournaments.length > 0 &&
+  //     !loadingTournaments
+  //   ) {
+  //     const mapped = playerData.stats.map((stat) => {
+  //       const tournament = tournaments.find((t) => t.id === stat.tournamentId);
+  //       const leagueName = tournament?.name || "Unknown League";
+
+  //       return {
+  //         id: stat.tournamentId,
+  //         leagueName: leagueName,
+  //         tournamentId: stat.tournamentId?.toString(),
+  //         matches: stat.matches?.toString() || "0",
+  //         goals: stat.goals?.toString() || "0",
+  //         assists: stat.assists?.toString() || "0",
+  //       };
+  //     });
+  //     setCompletedLeagues(mapped);
+  //   }
+  // }, [playerData, tournaments, loadingTournaments]);
+  // ĐỔ STATS - PHIÊN BẢN AN TOÀN
+  useEffect(() => {
+    if (
+      playerData?.stats &&
+      Array.isArray(playerData.stats) &&
+      playerData.stats.length > 0 &&
+      tournaments.length > 0 &&
+      !loadingTournaments
+    ) {
+      const mapped = playerData.stats.map((stat, index) => {
+        // ✅ Ép kiểu cả hai về string để so sánh
+        const tournamentIdStr = String(stat.tournamentId);
+        const tournament = tournaments.find(
+          (t) => String(t.id) === tournamentIdStr
+        );
+
+        return {
+          id: `stat-${tournamentIdStr}-${index}`,
+          leagueName: tournament?.name || `Unknown (ID: ${tournamentIdStr})`,
+          tournamentId: tournamentIdStr,
+          matches: String(stat.matches || 0),
+          goals: String(stat.goals || 0),
+          assists: String(stat.assists || 0),
+        };
+      });
+
+      console.log("✅ Mapped leagues:", mapped);
+      setCompletedLeagues(mapped);
+    }
+  }, [playerData, tournaments, loadingTournaments]);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-gray-600 text-lg">
+        Đang tải dữ liệu người dùng...
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="bg-linear-[var(--colorBg)] flex">
@@ -286,27 +475,29 @@ export default function AdminMyClubUpdate() {
                     ref={numberRef}
                   />
                 </label>
-                <label className="flex flex-col w-26 ml-5 h-14">
+
+                <label className="flex flex-col w-40 ml-5 h-14">
                   Position
                   <select
-                    className={`flex-1 w-26 h-12 rounded-md border ${
+                    className={`flex-1 w-full h-12 rounded-md border ${
                       errors.position ? "border-red-500" : "border-gray-300"
                     }`}
                     value={position}
                     onChange={(e) => {
                       setPosition(e.target.value);
-                      setErrors((prev) => ({ ...prev, position: false })); // Xóa lỗi khi chọn
+                      setErrors((prev) => ({ ...prev, position: false }));
                     }}
-                    ref={positionRef}
                   >
                     <option value="">Choose</option>
-                    <option value="GOALKEEPERS">GOALKEEPERS</option>
-                    <option value="DEFENDERS">DEFENDERS</option>
-                    <option value="MIDIFIELDERS">MIDIFIELDERS</option>
-                    <option value="FORWARD">FORWARD</option>
+                    {positions.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
                   </select>
                 </label>
-                {/* === Background Upload === */}
+
+                {/* Background Upload */}
                 <label className="w-26 flex flex-col items-center text-sm text-[#2B3674]">
                   Background
                   <input
@@ -339,7 +530,7 @@ export default function AdminMyClubUpdate() {
                   )}
                 </label>
 
-                {/* === Bio Image Upload === */}
+                {/* Bio Image Upload */}
                 <label className="w-26 flex flex-col items-center text-sm text-[#2B3674]">
                   Bio Image
                   <input
@@ -359,7 +550,7 @@ export default function AdminMyClubUpdate() {
                       <img
                         src={bioPreview}
                         alt="Bio Preview"
-                        className="object-cover w-24 h-24"
+                        className="object-cover w-24 h-24 rounded-md"
                       />
                     ) : (
                       <p className="text-gray-500">Add</p>
@@ -372,6 +563,7 @@ export default function AdminMyClubUpdate() {
                   )}
                 </label>
               </div>
+
               {/* ==== Thông tin khác ==== */}
               <div className="flex flex-col">
                 <label>Information</label>
@@ -429,7 +621,6 @@ export default function AdminMyClubUpdate() {
                   </label>
                 </div>
 
-                {/* Input Location / Nationality toggle */}
                 <input
                   id="toggleLocation"
                   name="infoType"
@@ -447,10 +638,7 @@ export default function AdminMyClubUpdate() {
                   placeholder="Enter location..."
                   className="border-2 hidden peer-checked/location:block mt-2 w-full text-sm italic"
                   value={location}
-                  onChange={(e) => {
-                    setLocation(e.target.value);
-                    setErrors((prev) => ({ ...prev, location: false }));
-                  }}
+                  onChange={(e) => setPlayerLocation(e.target.value)}
                   ref={locationRef}
                 />
                 <input
@@ -458,10 +646,7 @@ export default function AdminMyClubUpdate() {
                   placeholder="Enter nationality..."
                   className="border-2 hidden peer-checked/nationality:block mt-2 w-full text-sm italic"
                   value={nationality}
-                  onChange={(e) => {
-                    setNationality(e.target.value);
-                    setErrors((prev) => ({ ...prev, nationality: false }));
-                  }}
+                  onChange={(e) => setNationality(e.target.value)}
                   ref={nationalityRef}
                 />
               </div>
@@ -475,36 +660,25 @@ export default function AdminMyClubUpdate() {
               </div>
 
               {showStats && (
-                <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white shadow-2xl w-200 h-100 m-auto mr-50 ">
-                  <div className="flex flex-col w-120 ">
+                <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white shadow-2xl w-200 h-100 m-auto mr-50">
+                  <div className="flex flex-col w-120">
                     <p>Stats</p>
                     <div className="flex rounded-md border-1 h-10">
-                      <span
-                        type="button"
-                        className="w-1/3 flex items-center justify-center gap-1.5"
-                      >
-                        <SvgBall />
-                        Match
+                      <span className="w-1/3 flex items-center justify-center gap-1.5">
+                        <SvgBall /> Match
                       </span>
                       <div className="w-[1px] h-10 border-1"></div>
-                      <span
-                        type="button"
-                        className="w-1/3 flex items-center justify-center gap-1.5"
-                      >
-                        <SvgGoal />
-                        Goal
+                      <span className="w-1/3 flex items-center justify-center gap-1.5">
+                        <SvgGoal /> Goal
                       </span>
                       <div className="w-[1px] h-10 border-1"></div>
-                      <span
-                        type="button"
-                        className="w-1/3 flex items-center justify-center gap-1.5"
-                      >
-                        <SvgBall />
-                        Assists
+                      <span className="w-1/3 flex items-center justify-center gap-1.5">
+                        <SvgBall /> Assists
                       </span>
                     </div>
                   </div>
 
+                  {/* Danh sách stats */}
                   {completedLeagues.map((league) => (
                     <div
                       key={league.id}
@@ -525,21 +699,39 @@ export default function AdminMyClubUpdate() {
                     </div>
                   ))}
 
-                  {/* Dòng nhập */}
+                  {/* Dòng nhập mới */}
                   <div className="flex gap-2 items-center p-2">
-                    <select
-                      value={currentInput.leagueName}
-                      onChange={(e) =>
-                        handleInputChange("leagueName", e.target.value)
-                      }
-                      className="border-2 flex-1 w-30"
-                    >
-                      <option value="">Choose a tournament</option>
-                      <option value="Premier League">Premier League</option>
-                      <option value="Champions League">Champions League</option>
-                      <option value="FA Cup">FA Cup</option>
-                      <option value="Carabao Cup">Carabao Cup</option>
-                    </select>
+                    <label className="flex flex-col w-32 ml-5 h-9">
+                      <select
+                        className={`flex-1 w-full h-12 rounded-md border ${
+                          errors.tournament
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                        value={currentInput.tournamentId}
+                        onChange={(e) => {
+                          const selectedId = e.target.value;
+                          const selectedName =
+                            tournaments.find(
+                              (t) => t.id.toString() === selectedId
+                            )?.name || "";
+                          setCurrentInput((prev) => ({
+                            ...prev,
+                            leagueName: selectedName,
+                            tournamentId: selectedId,
+                          }));
+                          setTournament(selectedId);
+                          setErrors((prev) => ({ ...prev, tournament: false }));
+                        }}
+                      >
+                        <option value="">Choose</option>
+                        {tournaments.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -598,12 +790,14 @@ export default function AdminMyClubUpdate() {
                       className="bg-green-500 text-white px-3 py-1 rounded text-sm w-22"
                       disabled={
                         !currentInput.leagueName.trim() ||
-                        currentInput.matches === ""
+                        currentInput.matches === "" ||
+                        !currentInput.tournamentId
                       }
                     >
                       Completed
                     </button>
                   </div>
+
                   <div
                     className="border-2 cursor-pointer my-10 mx-auto w-25 h-8 flex items-center justify-center bg-green-500 text-white border-1 rounded-md"
                     onClick={hiddenShow}
@@ -612,6 +806,7 @@ export default function AdminMyClubUpdate() {
                   </div>
                 </div>
               )}
+
               <Button
                 type="submit"
                 text={"Update Player"}

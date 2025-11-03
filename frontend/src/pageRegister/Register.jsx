@@ -4,7 +4,6 @@ import Form from "./componentRegister/Form.jsx";
 import Line from "./componentRegister/Line.jsx";
 import BGregister from "./componentRegister/BGregister.jsx";
 import Logoregister from "./componentRegister/Logoregister.jsx";
-import SvgGoogle from "../assets/svg/svgGoogle.jsx";
 import { SvgFacebook } from "../assets/svg/SvgSocialMedia.jsx";
 import { SvgTwitter } from "../assets/svg/SvgSocialMedia.jsx";
 import { SvgInstagram } from "../assets/svg/SvgSocialMedia.jsx";
@@ -20,15 +19,7 @@ export default function Register() {
           <div className="flex flex-col bg-linear-[var(--colorBg)] items-center justify-center h-dvh">
             <Logoregister></Logoregister>
             <p className="text-3xl p-1 m-1">Create an account</p>
-            <button className="flex text-base border border-white items-center gap-4 px-12 m-2 py-2 cursor-pointer hover:outline-2 justify-center rounded-lg">
-              Create account with Google
-              <SvgGoogle></SvgGoogle>
-            </button>
-            <div className="flex justify-center items-center gap-4">
-              <Line></Line>
-              <p>Or</p>
-              <Line></Line>
-            </div>
+
             <Form></Form>
             <label htmlFor="" className="mb-2 text-black font-bold">
               Already have an account?{" "}

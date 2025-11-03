@@ -8,12 +8,123 @@ import { SvgLocation } from "../assets/svg/SvgAdmin.jsx";
 import { SvgNationality } from "../assets/svg/SvgAdmin.jsx";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import api from "../Api/apitoken.js";
 export default function AdminMyClubView() {
   const [showStats, setShowStats] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [playerData, setPlayerData] = useState(null);
+  const { state } = useLocation();
+  const navigate = useNavigate();
+
+  const playerId = state?.playerId;
+  const player = state?.player;
+
+  // 🟩 Toggle popup stats
   const hiddenShow = () => {
     setShowStats((prev) => !prev);
   };
 
+  // 🟦 Gọi API lấy dữ liệu cầu thủ
+  useEffect(() => {
+    if (!playerId) {
+      alert("❌ Không tìm thấy ID cầu thủ.");
+      navigate("/admin/club");
+      return;
+    }
+
+    const fetchPlayer = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get(`/api/players/${playerId}`);
+
+        if (res.data?.status === "success") {
+          setPlayerData(res.data.data);
+        } else {
+          alert("⚠️ Không thể tải dữ liệu cầu thủ!");
+          navigate("/admin/club");
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải thông tin cầu thủ:", err);
+        alert("⚠️ Lỗi khi tải thông tin cầu thủ!");
+        navigate("/admin/club");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlayer();
+  }, [playerId, navigate]);
+  const [bioPreview, setBioPreview] = useState(null);
+  const [bioName, setBioName] = useState("");
+  const [backgroundPreview, setBackgroundPreview] = useState(null);
+  const [backgroundName, setBackgroundName] = useState("");
+  const [completedLeagues, setCompletedLeagues] = useState([]);
+  const [currentInput, setCurrentInput] = useState({
+    id: Date.now(),
+    tournament: "",
+    matches: "",
+    goals: "",
+    assists: "",
+  });
+
+  // 2. Khi load player → đổ stats cũ vào completedLeagues
+  useEffect(() => {
+    if (playerData?.stats) {
+      const formatted = playerData.stats.map((s, index) => ({
+        id: Date.now() + index,
+        tournament: s.tournament || "",
+        matches: s.matches?.toString() || "0",
+        goals: s.goals?.toString() || "0",
+        assists: s.assists?.toString() || "0",
+      }));
+      setCompletedLeagues(formatted);
+    }
+  }, [playerData]);
+
+  useEffect(() => {
+    if (playerData) {
+      if (playerData.bioImage) {
+        setBioPreview(playerData.bioImage);
+
+        const parts = playerData.bioImage.split("/");
+        setBioName(parts[parts.length - 1]);
+
+        // ✅ Xóa cảnh báo lỗi nếu trước đó báo đỏ
+      }
+    }
+  }, [playerData]);
+  useEffect(() => {
+    if (playerData) {
+      if (playerData.backgroundImage) {
+        setBackgroundPreview(playerData.backgroundImage);
+        const parts = playerData.backgroundImage.split("/");
+        setBackgroundName(parts[parts.length - 1]); // ✅ Gán tên file
+      }
+    }
+  }, [playerData]);
+
+  // 🟨 Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-lg text-[#2B3674]">
+        Đang tải dữ liệu cầu thủ...
+      </div>
+    );
+  }
+
+  // 🟥 Nếu không có dữ liệu
+  if (!playerData) {
+    return (
+      <div className="flex items-center justify-center h-screen text-lg text-red-500">
+        Không tìm thấy dữ liệu cầu thủ.
+      </div>
+    );
+  }
+
+  // ✅ Render thông tin cầu thủ
   return (
     <>
       <div className="bg-linear-[var(--colorBg)] flex">
@@ -32,7 +143,8 @@ export default function AdminMyClubView() {
             <div className="flex flex-col gap-2 text-[#2B3674]">
               {/* ==== Thông tin cơ bản ==== */}
               <label className="flex flex-col w-120 mx-auto">
-                PlayerName: <p className="m-auto truncate">Tin Dao</p>
+                PlayerName:{" "}
+                <p className="m-auto truncate">{player.playerName}</p>
               </label>
 
               <div className="w-120 mx-auto">
@@ -41,54 +153,39 @@ export default function AdminMyClubView() {
                 <div className="group mt-1 relative cursor-pointer">
                   {/* Phần hiển thị rút gọn */}
                   <div className="line-clamp-2 text-sm text-[#2B3674] whitespace-pre-wrap">
-                    Bio: Lorem ipsum dolor, sit amet consectetur adipisicing
-                    elit. Quis, culpa eaque? Exercitationem, iusto numquam vel
-                    perferendis in eveniet sed at vero neque ullam saepe nisi
-                    itaque harum qui laboriosam laborum. Lorem ipsum dolor sit
-                    amet, consectetur adipisicing elit. Velit quod accusamus
-                    nemo animi facere ad...
+                    {player.bio}
                   </div>
 
                   {/* Phần full + cuộn khi hover */}
                   <div className="absolute hidden group-hover:block bg-white border border-gray-300 rounded-md shadow-lg p-3 max-h-48 overflow-y-auto z-10 w-full text-sm text-[#2B3674] whitespace-pre-wrap">
-                    Bio: Lorem ipsum dolor, sit amet consectetur adipisicing
-                    elit. Quis, culpa eaque? Exercitationem, iusto numquam vel
-                    perferendis in eveniet sed at vero neque ullam saepe nisi
-                    itaque harum qui laboriosam laborum. Lorem ipsum dolor sit
-                    amet, consectetur adipisicing elit. Velit quod accusamus
-                    nemo animi facere ad labore totam quis, ipsum eius commodi
-                    impedit cum neque, dignissimos iste laboriosam iusto
-                    dolorem. Fugit.
+                    Bio: {player.bio}
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-5 items-center">
-                <label className="flex w-26">
-                  Number:<p className="m-auto">11</p>
+                <label className="flex w-26 flex-col items-center">
+                  Number:<p className="m-auto">{player.shirtNumber}</p>
                 </label>
 
-                <label className="flex w-26">
-                  Position:<p className="m-auto">Attack</p>
+                <label className="flex flex-col items-center w-26">
+                  Position:
+                  <p className="m-auto ">{player.position}</p>
                 </label>
 
                 {/* === Background Upload === */}
-                <label className="w-26  flex flex-col items-center text-sm text-[#2B3674]">
-                  Background
-                  <img
-                    src=""
-                    className="w-24 h-24 border-1 rounded-md cursor-pointer flex items-center justify-center overflow-hidden "
-                  ></img>
-                </label>
+                <img
+                  src={playerData.backgroundImage}
+                  alt="Background"
+                  className="w-24 h-24 border rounded-md cursor-pointer flex items-center justify-center overflow-hidden"
+                />
 
                 {/* === Bio Image Upload === */}
-                <label className="w-26  flex flex-col items-center text-sm text-[#2B3674]">
-                  Bio Image
-                  <img
-                    src=""
-                    className="w-24 h-24 border-1 rounded-md cursor-pointer flex items-center justify-center overflow-hidden "
-                  ></img>
-                </label>
+                <img
+                  src={playerData.bioImage}
+                  alt="Bio"
+                  className="w-24 h-24 border rounded-md cursor-pointer flex items-center justify-center overflow-hidden"
+                />
               </div>
 
               {/* ==== Thông tin khác ==== */}
@@ -96,14 +193,14 @@ export default function AdminMyClubView() {
                 <label>Information</label>
                 <div className="flex w-120 border-1 h-14 rounded-md">
                   <label className="w-30 text-sm flex flex-col items-center justify-center">
-                    Date of birth
+                    Birth: {player.dateOfBirth}
                   </label>
                   <div className="w-[1px] h-13.75 border-1"></div>
                   <label
                     className="w-30 text-sm cursor-pointer peer flex items-center justify-center gap-2"
                     htmlFor="toggleLocation"
                   >
-                    Location
+                    {player.location}
                     <SvgLocation />
                   </label>
                   <div className="w-[1px] h-13.75 border-1"></div>
@@ -111,12 +208,12 @@ export default function AdminMyClubView() {
                     className="w-30 text-sm cursor-pointer flex items-center justify-center gap-2"
                     htmlFor="toggleNationality"
                   >
-                    Nationality
+                    {player.nationality}
                     <SvgNationality />
                   </label>
                   <div className="w-[1px] h-13.75 border-1"></div>
                   <label className="w-30 text-sm flex flex-col items-center justify-center">
-                    Joined club
+                    Join: {player.joinedClub}
                   </label>
                 </div>
               </div>
@@ -160,12 +257,21 @@ export default function AdminMyClubView() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 border-1 p-2 rounded-md bg-gray-50 text-sm w-120 mt-2">
-                    <span className="font-medium"></span>
-                    <span className="text-gray-600">
-                      Match • Goal • Assists
-                    </span>
-                  </div>
+                  {completedLeagues.map((stat) => (
+                    <div
+                      key={stat.id}
+                      className="flex items-center gap-2 border-1 p-2 rounded-md bg-gray-50 text-sm w-120 mt-2"
+                    >
+                      {/* Tên giải đấu */}
+                      <span className="font-medium">{stat.tournament}</span>
+
+                      {/* Số liệu */}
+                      <span className="text-gray-600">
+                        {stat.matches || 0} Match • {stat.goals || 0} Goal •{" "}
+                        {stat.assists || 0} Assists
+                      </span>
+                    </div>
+                  ))}
 
                   {/* Dòng nhập */}
                   <div

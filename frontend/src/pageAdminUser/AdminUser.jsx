@@ -6,7 +6,24 @@ import UserList from "./componentAdminUser/UserList.jsx";
 import SvgAdminOrder from "../assets/svg/SvgAdmin.jsx";
 import { Link } from "react-router-dom";
 import "../pageRegister/Register.css";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function AdminUser() {
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(0);
+  const [, setSearching] = useState(false);
+  const [users, setUsers] = useState([]); // kết quả search
+
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
   return (
     <>
       <div className="bg-linear-[var(--colorBg)] flex">
@@ -17,18 +34,37 @@ export default function AdminUser() {
         </div>
         <div className="flex flex-col w-[78%]">
           <div className="flex justify-between w-full items-center mb-6">
-            <Search />
+            <Search
+              onSearchStart={() => setSearching(true)}
+              onSearchEnd={() => setSearching(false)}
+              endpoint="/api/admin/users/list"
+              onResult={(data) => setUsers(data)}
+            />
+
             <Link to={"/admin/user/add"}>
               <Button text={"Add User"} />
             </Link>
           </div>
           <div className="h-[78%]">
-            <UserList className="" />
+            <UserList
+              currentPage={currentPage}
+              users={users}
+              navigate={navigate}
+            />
           </div>
-          <div className="flex text-center justify-center gap-10">
-            <SvgAdminOrder className="rotate-90 text-amber-50" />
-            <p className="font-bold text-white text-3xs">1</p>
-            <SvgAdminOrder className="rotate-270 text-amber-50" />
+
+          {/* Phân trang - Click mũi tên để chuyển trang */}
+          <div className="flex text-center justify-center gap-10 items-center mt-4">
+            <SvgAdminOrder
+              className="rotate-90 text-amber-50 cursor-pointer hover:text-amber-300 transition"
+              onClick={handlePrevPage}
+              style={{ opacity: currentPage === 0 ? 0.5 : 1 }}
+            />
+            <p className="font-bold text-white text-3xs">{currentPage + 1}</p>
+            <SvgAdminOrder
+              className="rotate-270 text-amber-50 cursor-pointer hover:text-amber-300 transition"
+              onClick={handleNextPage}
+            />
           </div>
         </div>
       </div>

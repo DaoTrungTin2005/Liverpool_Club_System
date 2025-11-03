@@ -8,8 +8,12 @@ import { SvgGoal } from "../assets/svg/SvgAdmin.jsx";
 import { SvgLocation } from "../assets/svg/SvgAdmin.jsx";
 import { SvgNationality } from "../assets/svg/SvgAdmin.jsx";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import api from "../Api/apitoken.js";
 
 export default function AdminMyClubAdd() {
+  const navigate = useNavigate();
+
   // === State chính ===
   const [playerName, setPlayerName] = useState("");
   const [bio, setBio] = useState("");
@@ -31,7 +35,7 @@ export default function AdminMyClubAdd() {
   const [bioFile, setBioFile] = useState(null);
 
   // === Validation errors ===
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({}, { tournament: false });
 
   // === Refs để focus lỗi ===
   const playerNameRef = useRef(null);
@@ -43,34 +47,6 @@ export default function AdminMyClubAdd() {
   const nationalityRef = useRef(null);
   const positionRef = useRef(null);
 
-  // Hàm xử lý ảnh nền
-  function handleBackgroundClick() {
-    backgroundRef.current?.querySelector("input")?.click();
-  }
-  function handleBackgroundChange(e) {
-    const file = e.target.files[0];
-    if (file) {
-      setBackgroundFile(file);
-      setBackgroundName(file.name);
-      setBackgroundPreview(URL.createObjectURL(file));
-    }
-    e.target.value = "";
-  }
-
-  // Hàm xử lý ảnh tiểu sử
-  function handleBioClick() {
-    bioImageRef.current?.querySelector("input")?.click();
-  }
-  function handleBioChange(e) {
-    const file = e.target.files[0];
-    if (file) {
-      setBioFile(file);
-      setBioName(file.name);
-      setBioPreview(URL.createObjectURL(file));
-    }
-    e.target.value = "";
-  }
-
   // === State giải đấu ===
   const [currentInput, setCurrentInput] = useState({
     id: Date.now(),
@@ -81,8 +57,41 @@ export default function AdminMyClubAdd() {
     isEditing: true,
   });
   const [completedLeagues, setCompletedLeagues] = useState([]);
+  const [showStats, setShowStats] = useState(false);
 
-  // === Xử lý thay đổi input ===
+  // === Xử lý ảnh nền ===
+  function handleBackgroundClick() {
+    backgroundRef.current?.querySelector("input")?.click();
+  }
+
+  function handleBackgroundChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setBackgroundFile(file);
+      setBackgroundName(file.name);
+      setBackgroundPreview(URL.createObjectURL(file));
+      setErrors((prev) => ({ ...prev, background: false }));
+    }
+    e.target.value = "";
+  }
+
+  // === Xử lý ảnh tiểu sử ===
+  function handleBioClick() {
+    bioImageRef.current?.querySelector("input")?.click();
+  }
+
+  function handleBioChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setBioFile(file);
+      setBioName(file.name);
+      setBioPreview(URL.createObjectURL(file));
+      setErrors((prev) => ({ ...prev, bioImage: false }));
+    }
+    e.target.value = "";
+  }
+
+  // === Xử lý thay đổi input giải đấu ===
   const handleInputChange = (field, value) => {
     if (["matches", "goals", "assists"].includes(field)) {
       if (value !== "" && (isNaN(value) || Number(value) < 0)) return;
@@ -95,7 +104,7 @@ export default function AdminMyClubAdd() {
     setCurrentInput(updated);
   };
 
-  // === Hoàn tất nhập một dòng ===
+  // === Hoàn tất nhập một dòng giải đấu ===
   const completeCurrentInput = () => {
     const { leagueName, matches } = currentInput;
     if (!leagueName.trim() || matches === "") {
@@ -116,12 +125,17 @@ export default function AdminMyClubAdd() {
     });
   };
 
-  // === Xóa giải đấu ===
+  // === Xóa giải đấu đã hoàn thành ===
   const removeCompletedLeague = (id) => {
     setCompletedLeagues(completedLeagues.filter((l) => l.id !== id));
   };
 
-  // === Validation ===
+  // === Toggle hiển thị Stats popup ===
+  const hiddenShow = () => {
+    setShowStats((prev) => !prev);
+  };
+
+  // === Validation Form ===
   const validateForm = () => {
     const newErrors = {};
 
@@ -167,58 +181,134 @@ export default function AdminMyClubAdd() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // === Submit ===
-  const handleSubmit = (e) => {
+  // === Submit Form ===
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-
-    const pending =
-      currentInput.leagueName.trim() && currentInput.matches !== ""
-        ? [currentInput]
-        : [];
-    const allLeagues = [...completedLeagues, ...pending];
-
-    if (allLeagues.length === 0) {
-      alert("Vui lòng nhập ít nhất 1 giải đấu hợp lệ!");
+    // Validate form
+    if (!validateForm()) {
+      alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
 
-    const playerData = {
-      playerName: playerName.trim(),
-      bio: bio.trim(),
-      number: number.trim(),
-      backgroundFile: backgroundFile,
-      backgroundName: backgroundName.trim(),
-      bioFile: bioFile,
-      bioName: bioName.trim(),
-      information: {
-        dob,
+    // Kiểm tra số áo
+    const shirtNum = parseInt(number, 10);
+    if (isNaN(shirtNum) || shirtNum < 0 || shirtNum > 999) {
+      alert("Số áo không hợp lệ!");
+      return;
+    }
+
+    // Kiểm tra giải đấu
+    const allLeagues = [
+      ...completedLeagues,
+      ...(currentInput.leagueName.trim() ? [currentInput] : []),
+    ];
+    if (allLeagues.length === 0) {
+      alert("Nhập ít nhất 1 giải đấu!");
+      return;
+    }
+
+    try {
+      // Tạo FormData với đúng key mà backend expect
+      const formData = new FormData();
+
+      // Append files với key chính xác
+      if (bioFile) {
+        formData.append("bioImage", bioFile);
+      }
+      if (backgroundFile) {
+        formData.append("backgroundImage", backgroundFile);
+      }
+
+      // Tạo object player
+      const player = {
+        playerName: playerName.trim(),
+        bio: bio.trim(),
+        shirtNumber: shirtNum,
+        positionId: parseInt(position, 10),
+        dateOfBirth: dob,
         location: location.trim(),
         nationality: nationality.trim(),
-        joined,
-      },
-      leagues: allLeagues.map((l) => ({
-        leagueName: l.leagueName,
-        matches: parseInt(l.matches) || 0,
-        goals: parseInt(l.goals) || 0,
-        assists: parseInt(l.assists) || 0,
-      })),
+        joinedClub: joined,
+        stats: allLeagues.map((l) => ({
+          tournamentId: +l.tournamentId, // ✅ Sử dụng ID đã lưu
+          matches: +l.matches || 0,
+          goals: +l.goals || 0,
+          assists: +l.assists || 0,
+        })),
+      };
+
+      // Append player object as JSON string với key "player"
+      formData.append(
+        "player",
+        new Blob([JSON.stringify(player)], { type: "application/json" })
+      );
+
+      // Log để debug
+      console.log("📦 FormData keys:", Array.from(formData.keys()));
+      console.log("📦 Player data:", player);
+
+      // Gửi request với FormData
+      // QUAN TRỌNG: KHÔNG set Content-Type, để axios tự thêm boundary
+      // Gửi request với FormData
+      const response = await api.post("api/players/add", formData);
+      console.log(response);
+
+      // Thành công
+      alert("Thêm cầu thủ thành công!");
+      navigate("/admin/club");
+    } catch (error) {
+      // Xử lý lỗi
+      console.error("Lỗi khi thêm cầu thủ:", error);
+
+      let errorMessage = "Không kết nối được server!";
+
+      if (error.response) {
+        // Server trả về lỗi
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        errorMessage =
+          error.response.data?.message ||
+          error.response.data?.error ||
+          `Lỗi ${error.response.status}: ${error.response.statusText}`;
+      } else if (error.request) {
+        // Request được gửi nhưng không nhận được response
+        errorMessage = "Không nhận được phản hồi từ server!";
+      } else {
+        // Lỗi khác
+        errorMessage = error.message;
+      }
+
+      alert(`Lỗi: ${errorMessage}`);
+    }
+  };
+
+  const [tournaments, setTournaments] = useState([]);
+
+  useEffect(() => {
+    const fetchTournaments = async () => {
+      try {
+        const res = await api.get("api/dropdowns/tournaments");
+        setTournaments(res.data.data); // mảng [{id, name}, ...]
+      } catch (err) {
+        console.error("Error fetching tournaments:", err);
+      }
     };
+    fetchTournaments();
+  }, []);
+  const [positions, setPositions] = useState([]);
 
-    console.log("DỮ LIỆU GỬI ĐI:", playerData);
-    alert("Thêm cầu thủ thành công!");
-
-    // CHUYỂN TRANG KHI THÀNH CÔNG
-    navigate("/admin/club/add/question");
-  };
-
-  const [showStats, setShowStats] = useState(false);
-  const hiddenShow = () => {
-    setShowStats((prev) => !prev);
-  };
-
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchPositions = async () => {
+      try {
+        const res = await api.get("api/dropdowns/positions");
+        setPositions(res.data.data); // Lưu mảng [{id, name}, ...]
+      } catch (err) {
+        console.error("Error fetching positions:", err);
+      }
+    };
+    fetchPositions();
+  }, []);
   return (
     <>
       <div className="bg-linear-[var(--colorBg)] flex">
@@ -286,26 +376,29 @@ export default function AdminMyClubAdd() {
                     ref={numberRef}
                   />
                 </label>
-                <label className="flex flex-col w-26 ml-5 h-14">
+
+                <label className="flex flex-col w-40 ml-5 h-14">
                   Position
                   <select
-                    className={`flex-1 w-26 h-12 rounded-md border ${
+                    className={`flex-1 w-full h-12 rounded-md border ${
                       errors.position ? "border-red-500" : "border-gray-300"
                     }`}
                     value={position}
                     onChange={(e) => {
                       setPosition(e.target.value);
-                      setErrors((prev) => ({ ...prev, position: false })); // Xóa lỗi khi chọn
+                      setErrors((prev) => ({ ...prev, position: false }));
                     }}
                     ref={positionRef}
                   >
                     <option value="">Choose</option>
-                    <option value="GOALKEEPERS">GOALKEEPERS</option>
-                    <option value="DEFENDERS">DEFENDERS</option>
-                    <option value="MIDIFIELDERS">MIDIFIELDERS</option>
-                    <option value="FORWARD">FORWARD</option>
+                    {positions.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
                   </select>
                 </label>
+
                 {/* === Background Upload === */}
                 <label className="w-26 flex flex-col items-center text-sm text-[#2B3674]">
                   Background
@@ -506,9 +599,11 @@ export default function AdminMyClubAdd() {
                     </div>
                   </div>
 
+                  {/* Danh sách giải đấu đã hoàn thành */}
                   {completedLeagues.map((league) => (
                     <div
                       key={league.id}
+                      value={league.leagueName}
                       className="flex items-center gap-2 border-1 p-2 rounded-md bg-gray-50 text-sm w-120 mt-2"
                     >
                       <span className="font-medium">{league.leagueName}</span>
@@ -526,21 +621,40 @@ export default function AdminMyClubAdd() {
                     </div>
                   ))}
 
-                  {/* Dòng nhập */}
+                  {/* Dòng nhập giải đấu mới */}
                   <div className="flex gap-2 items-center p-2">
-                    <select
-                      value={currentInput.leagueName}
-                      onChange={(e) =>
-                        handleInputChange("leagueName", e.target.value)
-                      }
-                      className="border-2 flex-1 w-30"
-                    >
-                      <option value="">Choose a tournament</option>
-                      <option value="Premier League">Premier League</option>
-                      <option value="Champions League">Champions League</option>
-                      <option value="FA Cup">FA Cup</option>
-                      <option value="Carabao Cup">Carabao Cup</option>
-                    </select>
+                    <label className="flex flex-col w-32 ml-5 h-9">
+                      <select
+                        className={`flex-1 w-full h-12 rounded-md border ${
+                          errors.tournament
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                        value={currentInput.tournamentId || ""}
+                        onChange={(e) => {
+                          const selectedId = e.target.value;
+                          const selectedName =
+                            tournaments.find(
+                              (t) => t.id.toString() === selectedId
+                            )?.name || "";
+
+                          // ✅ Gán cả id và name vào currentInput
+                          setCurrentInput((prev) => ({
+                            ...prev,
+                            leagueName: selectedName,
+                            tournamentId: selectedId,
+                          }));
+                          setErrors((prev) => ({ ...prev, tournament: false }));
+                        }}
+                      >
+                        <option value="">Choose</option>
+                        {tournaments.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -605,6 +719,8 @@ export default function AdminMyClubAdd() {
                       Completed
                     </button>
                   </div>
+
+                  {/* Nút đóng popup */}
                   <div
                     className="border-2 cursor-pointer my-10 mx-auto w-25 h-8 flex items-center justify-center bg-green-500 text-white border-1 rounded-md"
                     onClick={hiddenShow}
@@ -613,6 +729,7 @@ export default function AdminMyClubAdd() {
                   </div>
                 </div>
               )}
+
               <Button
                 type="submit"
                 text={"Add Player"}

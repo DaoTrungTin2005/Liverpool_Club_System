@@ -1,6 +1,7 @@
 import Name from "./FormData";
 import "../../output.css";
 import { useState } from "react";
+import SvgGoogle from "../../assets/svg/SvgGoogle.jsx";
 import axios from "axios";
 
 export default function Form() {
@@ -74,7 +75,7 @@ export default function Form() {
     // --- Gọi API ---
     try {
       const res = await axios.post(
-        "https://367a5f36e756.ngrok-free.app/api/accounts/create_account",
+        "https://0d9ffd8a6329.ngrok-free.app/api/accounts/create_account",
         {
           fullname: user.fullName,
           email: user.email,
@@ -115,9 +116,40 @@ export default function Form() {
       }
     }
   };
+  const handleGoogleLogin = async () => {
+    try {
+      // Gọi API để lấy link Google Auth
+      const res = await fetch(
+        "https://0d9ffd8a6329.ngrok-free.app/api/auth/login/google/start",
+        {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        }
+      );
 
+      const data = await res.json();
+      console.log("🔹 Google login start:", data);
+
+      // Nếu có redirect URL thì chuyển hướng
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        alert(" Server không trả về redirectUrl hợp lệ!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API Google Login:", error);
+      alert("Không thể kết nối đến máy chủ Google Login!");
+    }
+  };
   return (
     <>
+      <button
+        onClick={handleGoogleLogin}
+        className="flex text-base border border-white items-center gap-4 px-12 m-2 py-2 cursor-pointer hover:outline-2 justify-center rounded-lg"
+      >
+        Create account with Google
+        <SvgGoogle></SvgGoogle>
+      </button>
+
       <form
         className="flex flex-col gap-4 items-center"
         onSubmit={handleSubmit}

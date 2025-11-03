@@ -7,11 +7,11 @@ export default function BackgroundPlayer({
   numberPlayer,
 }) {
   return (
-    <div className="relative w-full h-screen flex items-center justify-center text-center overflow-hidden">
+    <div className="relative w-full h-screen max-sm:w-dvw flex items-center justify-center text-center overflow-hidden">
       <img
         src={img}
         alt={alt}
-        className="absolute inset-0 w-full h-full object-cover brightness-50 hue-rotate-15 top-20"
+        className="absolute inset-0 w-full h-full object-cover brightness-50 hue-rotate-15 top-20 "
       />
 
       <div className="absolute inset-0 pointer-events-none"></div>
