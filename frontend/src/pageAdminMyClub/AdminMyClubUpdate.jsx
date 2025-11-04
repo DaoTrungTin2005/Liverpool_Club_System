@@ -342,34 +342,6 @@ export default function AdminMyClubUpdate() {
       setErrors((prev) => ({ ...prev, background: false }));
     }
   }, [playerData]);
-
-  // ĐỔ STATS TỪ API
-  // useEffect(() => {
-  //   console.log("🔍 playerData?.stats:", playerData?.stats);
-  // console.log("🔍 tournaments:", tournaments);
-  // console.log("🔍 loadingTournaments:", loadingTournaments);
-  //   if (
-  //     playerData?.stats &&
-  //     Array.isArray(playerData.stats) &&
-  //     tournaments.length > 0 &&
-  //     !loadingTournaments
-  //   ) {
-  //     const mapped = playerData.stats.map((stat) => {
-  //       const tournament = tournaments.find((t) => t.id === stat.tournamentId);
-  //       const leagueName = tournament?.name || "Unknown League";
-
-  //       return {
-  //         id: stat.tournamentId,
-  //         leagueName: leagueName,
-  //         tournamentId: stat.tournamentId?.toString(),
-  //         matches: stat.matches?.toString() || "0",
-  //         goals: stat.goals?.toString() || "0",
-  //         assists: stat.assists?.toString() || "0",
-  //       };
-  //     });
-  //     setCompletedLeagues(mapped);
-  //   }
-  // }, [playerData, tournaments, loadingTournaments]);
   // ĐỔ STATS - PHIÊN BẢN AN TOÀN
   useEffect(() => {
     if (

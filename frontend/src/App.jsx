@@ -9,13 +9,19 @@ import AdminUserUpQuesion from "./pageAdminUser/AdminUserUpQuestion.jsx";
 import AdminDelete from "./pageAdminUser/AdminDelete.jsx";
 import AdminMyClub from "./pageAdminMyClub/AdminMyClub.jsx";
 import AdminMyClubAdd from "./pageAdminMyClub/AdminMyClubAdd.jsx";
-
 import AdminMyClubDelete from "./pageAdminMyClub/AdminMyClubDelete.jsx";
 import AdminMyClubUpdate from "./pageAdminMyClub/AdminMyClubUpdate.jsx";
-
 import AdminMyClubView from "./pageAdminMyClub/AdminMyClubView.jsx";
 import MyClub from "./PageUserView/MyClub.jsx";
+import AdminTicketList from "./pageAdminTicket/AdminTicketList.jsx";
 import ProfilePlayer from "./componentUserView/ProfilePlayer.jsx";
+import AdminTicketUpdate from "./pageAdminTicket/AdminTicketUpdate.jsx";
+import AdminMatch from "./pageAdminMatch/AdminMatch.jsx";
+import AdminMatchAdd from "./pageAdminMatch/AdminMatchAdd.jsx";
+import AdminMatchUpdate from "./pageAdminMatch/AdminMatchUpdate.jsx";
+import AdminMatchView from "./pageAdminMatch/AdminMatchView.jsx";
+import AdminMatchDelete from "./pageAdminMatch/AdminMatchDelete.jsx";
+import AdminBillList from "./pageAdminBill/AdminBillList.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
@@ -49,6 +55,14 @@ function App() {
         <Route path="/admin/club/view" element={<AdminMyClubView />} />
         <Route path="/myclub" element={<MyClub />} />
         <Route path="/myclub/player" element={<ProfilePlayer />} />
+        <Route path="/admin/ticket" element={<AdminTicketList />} />
+        <Route path="/admin/ticket/update" element={<AdminTicketUpdate />} />
+        <Route path="/admin/match" element={<AdminMatch />} />
+        <Route path="/admin/match/add" element={<AdminMatchAdd />} />
+        <Route path="/admin/match/update" element={<AdminMatchUpdate />} />
+        <Route path="/admin/match/view" element={<AdminMatchView />} />
+        <Route path="/admin/match/delete" element={<AdminMatchDelete />} />
+        <Route path="/admin/bill" element={<AdminBillList />} />
       </Routes>
     </BrowserRouter>
   );
