@@ -12,6 +12,11 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/players/**")
                 .addResourceLocations("classpath:/static/uploads/players/");
+    
+
+    // ảnh khán đài
+        registry.addResourceHandler("/uploads/stadium-views/**")
+                .addResourceLocations("classpath:/static/uploads/stadium-views/");
     }
 
 }
