@@ -278,6 +278,38 @@ public MatchAndTicketResponse updateMatchAndTickets(
                 match.getLocation(),
                 ticketResponses);
     }
+    //VIEW MATCH AND TICKET CÓ TOURNAMENT NAME@Transactional(readOnly = true)
+public ViewMatchAndTicketResponse getMatchForView(Long matchId) {
+    Match match = matchRepo.findById(matchId)
+            .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
+
+    String baseUrl = getBaseUrl() + "/uploads/matches/";
+
+    List<TicketSettingResponse> ticketResponses = match.getTicketSettings().stream()
+            .map(ts -> new TicketSettingResponse(
+                    ts.getSection().getId(),
+                    ts.getSection().getName(),
+                    ts.getSection().getStand(),
+                    ts.getSection().getTierName(),
+                    ts.getTotalQuantity(),
+                    ts.getPrice()
+            ))
+            .toList();
+
+    return new ViewMatchAndTicketResponse(
+            match.getId(),
+            match.getTournament().getName(), // trả luôn tên tournament
+            match.getHomeTeam(),
+            match.getAwayTeam(),
+            match.getHomeLogo() != null ? baseUrl + match.getHomeLogo() : null,
+            match.getAwayLogo() != null ? baseUrl + match.getAwayLogo() : null,
+            match.getMatchImage() != null ? baseUrl + match.getMatchImage() : null,
+            match.getMatchDate(),
+            match.getLocation(),
+            ticketResponses
+    );
+}
+
 
     // ================== HÀM PHỤ ==================
     private void deleteOldFile(String uploadDir, String oldFileName) {

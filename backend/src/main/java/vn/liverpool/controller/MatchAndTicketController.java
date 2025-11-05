@@ -11,6 +11,7 @@ import org.springframework.http.MediaType; // ĐÚNG
 import vn.liverpool.util.ApiResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
+import vn.liverpool.domain.dto.matches_and_tickets.ViewMatchAndTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
 import vn.liverpool.service.MatchAndTicketService;
 
@@ -63,5 +64,12 @@ public ResponseEntity<ApiResponse<MatchAndTicketResponse>> getMatchDetail(@PathV
     MatchAndTicketResponse detail = matchAndTicketService.getMatchDetail(id);
     return ResponseEntity.ok(ApiResponse.success("Match detail retrieved successfully", detail));
 }
+
+@GetMapping("/view/{id}")
+public ResponseEntity<ApiResponse<ViewMatchAndTicketResponse>> viewMatch(@PathVariable Long id) {
+    ViewMatchAndTicketResponse view = matchAndTicketService.getMatchForView(id);
+    return ResponseEntity.ok(ApiResponse.success("Match view retrieved successfully", view));
+}
+
 
 }
