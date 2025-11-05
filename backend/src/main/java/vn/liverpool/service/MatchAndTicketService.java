@@ -32,7 +32,7 @@ public class MatchAndTicketService {
     private final HttpServletRequest request;
     private final TournamentRepository tournamentRepo;
 
-    public CreateMatchAndTicketResponse createMatchAndTickets(
+    public MatchAndTicketResponse createMatchAndTickets(
             CreateMatchAndTicketRequest dto,
             MultipartFile homeLogo,
             MultipartFile awayLogo) {
@@ -106,7 +106,7 @@ public class MatchAndTicketService {
                         s.getPrice()))
                 .toList();
 
-        return new CreateMatchAndTicketResponse(
+        return new MatchAndTicketResponse(
                 savedMatch.getId(),
                 savedMatch.getTournament().getId(),
                 savedMatch.getHomeTeam(),

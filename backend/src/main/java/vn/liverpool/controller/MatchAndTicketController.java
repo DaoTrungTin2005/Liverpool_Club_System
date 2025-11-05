@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.liverpool.util.ApiResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
-import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketResponse;
+import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
+import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
 import vn.liverpool.service.MatchAndTicketService;
 
 @RestController
@@ -19,12 +20,12 @@ public class MatchAndTicketController {
     private final MatchAndTicketService matchAndTicketService;
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<CreateMatchAndTicketResponse>> createMatchAndTickets(
+    public ResponseEntity<ApiResponse<MatchAndTicketResponse>> createMatchAndTickets(
             @RequestPart("data") @Valid CreateMatchAndTicketRequest dto,
             @RequestPart(value = "homeLogo", required = false) MultipartFile homeLogo,
             @RequestPart(value = "awayLogo", required = false) MultipartFile awayLogo) {
 
-        CreateMatchAndTicketResponse response = matchAndTicketService.createMatchAndTickets(dto, homeLogo, awayLogo);
+        MatchAndTicketResponse response = matchAndTicketService.createMatchAndTickets(dto, homeLogo, awayLogo);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Match and ticket settings created successfully", response));
     }

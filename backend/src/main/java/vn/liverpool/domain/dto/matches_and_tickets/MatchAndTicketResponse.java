@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record CreateMatchAndTicketResponse(
+public record MatchAndTicketResponse(
     Long matchId,
     Long tournamentId,          // <-- changed to Long
     String homeTeam,
