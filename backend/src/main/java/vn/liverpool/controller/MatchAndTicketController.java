@@ -29,4 +29,15 @@ public class MatchAndTicketController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Match and ticket settings created successfully", response));
     }
+@GetMapping("/list")
+public ResponseEntity<ApiResponse<?>> getAllMatchesWithTickets(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size,
+        @RequestParam(defaultValue = "matchDate") String sort, 
+        @RequestParam(defaultValue = "") String search) {
+
+    var matches = matchAndTicketService.getAllMatches(page, size, sort, search);
+    return ResponseEntity.ok(ApiResponse.success("Fetched matches successfully", matches));
+}
+
 }

@@ -1,6 +1,11 @@
 package vn.liverpool.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -118,6 +123,32 @@ public class MatchAndTicketService {
                 ticketResponses);
 
     }
+
+// ?========================GET ALL MATCHES========================
+@Transactional(readOnly = true)
+public Page<ListMatchResponse> getAllMatches(int page, int size, String sort, String search) {
+
+
+
+    // === Tạo Pageable ===
+    Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+
+    // === Gọi repository ===
+    Page<Match> matchPage = (search == null || search.isBlank())
+            ? matchRepo.findAll(pageable)
+            : matchRepo.searchAllFields(search, pageable);
+
+    // === Map entity -> DTO ===
+    return matchPage.map(match -> new ListMatchResponse(
+            match.getId(),
+            match.getTournament().getId(),
+            match.getHomeTeam(),
+            match.getAwayTeam(),
+            match.getMatchDate(),
+            match.getLocation()
+    ));
+}
+
 
     private String saveFile(MultipartFile file, String dir) {
         if (file == null || file.isEmpty())
