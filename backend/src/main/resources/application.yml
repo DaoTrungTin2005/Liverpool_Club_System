@@ -23,9 +23,16 @@ spring:
         format_sql: true
 
   # =============================
+  # MULTIPART CONFIG (PHẢI Ở ĐÂY!)
+  # =============================
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+
+  # =============================
   # GOOGLE OAuth2 LOGIN
   # =============================
-
   security:
     oauth2:
       client:
@@ -43,12 +50,20 @@ spring:
             user-name-attribute: sub
 
 # =============================
+# SERVER & TOMCAT CONFIG
+# =============================
+server:
+  forward-headers-strategy: framework
+  tomcat:
+    max-swallow-size: 50MB
+
+# =============================
 # JWT CONFIG
 # =============================
 liverpool:
   jwt:
     base64-secret: 8IwUeFe8scxcIi+764aJ0U9afTDnuZtI9vOPGxU9P072FE6EFRoohAYmAJR/zNKeMAb5wPL1aQY7mDoB5K0DDw==
-    token-validity-in-seconds: 8640000  # 100 ngày
+    token-validity-in-seconds: 8640000
 
 # =============================
 # LOGGING
@@ -58,6 +73,3 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     vn.liverpool: DEBUG
-
-server:
-  forward-headers-strategy: framework
