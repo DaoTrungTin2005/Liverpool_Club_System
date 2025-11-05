@@ -1,0 +1,137 @@
+package vn.liverpool.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import vn.liverpool.domain.Match;
+import vn.liverpool.domain.StadiumSection;
+import vn.liverpool.domain.TicketSetting;
+import vn.liverpool.domain.Tournament;
+import vn.liverpool.domain.dto.matches_and_tickets.*;
+import vn.liverpool.repository.MatchRepository;
+import vn.liverpool.repository.StadiumSectionRepository;
+import vn.liverpool.repository.TicketSettingRepository;
+import vn.liverpool.repository.TournamentRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class MatchAndTicketService {
+
+    private final MatchRepository matchRepo;
+    private final StadiumSectionRepository sectionRepo;
+    private final TicketSettingRepository ticketSettingRepo;
+    private final HttpServletRequest request;
+    private final TournamentRepository tournamentRepo;
+
+    public CreateMatchAndTicketResponse createMatchAndTickets(
+            CreateMatchAndTicketRequest dto,
+            MultipartFile homeLogo,
+            MultipartFile awayLogo) {
+
+        // =đường dẫn thư mục mà ảnh sẽ lưu dô
+        String uploadDir = System.getProperty("user.dir") + "/backend/src/main/resources/static/uploads/matches";
+        File dir = new File(uploadDir);
+        if (!dir.exists())
+            dir.mkdirs();
+
+        // xíu gáp dô để truy cập trực tiếp hehe
+        String baseUrl = getBaseUrl() + "/uploads/matches/";
+
+        String homeLogoName = saveFile(homeLogo, uploadDir);
+        String awayLogoName = saveFile(awayLogo, uploadDir);
+
+        // Tạo Match ===
+        Match match = new Match();
+        Tournament tournament = tournamentRepo.findById(dto.tournamentId())
+                .orElseThrow(() -> new IllegalArgumentException("Tournament not found: " + dto.tournamentId()));
+        match.setTournament(tournament);
+        match.setHomeTeam(dto.homeTeam());
+        match.setAwayTeam(dto.awayTeam());
+        match.setHomeLogo(homeLogoName);
+        match.setAwayLogo(awayLogoName);
+        match.setMatchDate(dto.matchDate());
+        match.setLocation(dto.location());
+
+        Match savedMatch = matchRepo.save(match); // Bây giờ OK
+
+        // Tạo TicketSettings ===
+
+        // Tạo một danh sách rỗng để chứa các TicketSetting sẽ lưu vào DB.
+        // Lặp qua từng phần tử trong danh sách ticketSettings được gửi từ client
+        List<TicketSetting> settings = new ArrayList<>();
+        for (TicketSettingRequest ts : dto.ticketSettings()) {
+            StadiumSection section = sectionRepo.findById(ts.sectionId())
+                    .orElseThrow(() -> new IllegalArgumentException("Section not found: " + ts.sectionId()));
+
+            // cái này là entiy thiệt nè (lấy từ request dô entity thiệt mà sài)
+            TicketSetting setting = new TicketSetting();
+            setting.setMatch(savedMatch);
+            setting.setSection(section);
+
+            // Mặc định 500 nếu null hoặc <= 0
+            int totalQty = (ts.totalQuantity() == null || ts.totalQuantity() <= 0)
+                    ? 500
+                    : ts.totalQuantity();
+            setting.setTotalQuantity(totalQty);
+
+            // Mặc định 100.00 nếu null hoặc <= 0
+            BigDecimal price = (ts.price() == null || ts.price().compareTo(BigDecimal.ZERO) <= 0)
+                    ? BigDecimal.valueOf(100.00)
+                    : ts.price();
+            setting.setPrice(price);
+
+            // Mới tạo => soldQuantity = 0
+            setting.setSoldQuantity(0);
+
+            settings.add(setting);
+        }
+        ticketSettingRepo.saveAll(settings);
+
+        List<TicketSettingResponse> ticketResponses = settings.stream()
+                .map(s -> new TicketSettingResponse(
+                        s.getSection().getId(),
+                        s.getSection().getName(),
+                        s.getSection().getStand(),
+                        s.getSection().getTierName(),
+                        s.getTotalQuantity(), // khi mới bán thì số lượng đa bán là 0
+                        s.getPrice()))
+                .toList();
+
+        return new CreateMatchAndTicketResponse(
+                savedMatch.getId(),
+                savedMatch.getTournament().getId(),
+                savedMatch.getHomeTeam(),
+                savedMatch.getAwayTeam(),
+                homeLogoName != null ? baseUrl + homeLogoName : null,
+                awayLogoName != null ? baseUrl + awayLogoName : null,
+                savedMatch.getMatchDate(),
+                savedMatch.getLocation(),
+                ticketResponses);
+
+    }
+
+    private String saveFile(MultipartFile file, String dir) {
+        if (file == null || file.isEmpty())
+            return null;
+        try {
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            file.transferTo(new File(dir, filename));
+            return filename;
+        } catch (IOException e) {
+            throw new RuntimeException("Error saving file: " + e.getMessage(), e);
+        }
+    }
+
+    private String getBaseUrl() {
+        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+    }
+}

@@ -6,7 +6,7 @@ import java.util.List;
 
 public record CreateMatchAndTicketResponse(
     Long matchId,
-    String tournament,
+    Long tournamentId,          // <-- changed to Long
     String homeTeam,
     String awayTeam,
     String homeLogoUrl,
@@ -14,13 +14,4 @@ public record CreateMatchAndTicketResponse(
     LocalDateTime matchDate,
     String location,
     List<TicketSettingResponse> ticketSettings
-) {}
-
-record TicketSettingResponse(
-    Long sectionId,
-    String sectionName,
-    String stand,
-    String tierName,
-    int totalQuantity,
-    BigDecimal price
 ) {}

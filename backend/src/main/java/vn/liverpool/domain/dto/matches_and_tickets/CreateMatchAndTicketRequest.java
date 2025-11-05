@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record CreateMatchAndTicketRequest(
-    @NotBlank String tournament,
+    @NotNull Long tournamentId,
     @NotBlank String homeTeam,
     @NotBlank String awayTeam,
     @NotNull LocalDateTime matchDate,
@@ -15,8 +15,3 @@ public record CreateMatchAndTicketRequest(
     @NotEmpty List<@Valid TicketSettingRequest> ticketSettings
 ) {}
 
-record TicketSettingRequest(
-    @NotNull Long sectionId,
-    @Min(0) int totalQuantity,
-    @NotNull @DecimalMin("0.00") BigDecimal price
-) {}
