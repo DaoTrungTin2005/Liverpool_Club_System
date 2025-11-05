@@ -26,7 +26,7 @@ export default function AdminMatch() {
           </div>
           <div className="flex flex-col bg-white mx-4 h-[80%] rounded-3xl">
             <p className="mx-6 text-[#2B3674] font-bold text-2xl my-2">
-              Ticket List
+              Match List
             </p>
             {/* Header */}
             <div className="grid auto-cols-auto grid-flow-col mx-6 text-[#A3AED0] grid-cols-7 w-full">
@@ -69,6 +69,11 @@ export default function AdminMatch() {
                 </Link>
               </div>
             </div>
+          </div>
+          <div className="flex text-center justify-center gap-10">
+            <SvgAdminOrder className="rotate-90 text-amber-50" />
+            <p className="font-bold text-white text-3xs">1</p>
+            <SvgAdminOrder className="rotate-270 text-amber-50" />
           </div>
         </div>
       </div>

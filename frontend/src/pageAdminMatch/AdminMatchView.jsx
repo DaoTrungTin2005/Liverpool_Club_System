@@ -26,7 +26,7 @@ export default function AdminMatchView() {
         </div>
 
         <div className="w-[80%] bg-white mr-10 ml-10 mt-5 mb-10 shadow-2xl rounded-3xl flex items-center flex-col justify-center gap-3 ">
-          <p className="text-2xl text-[#2B3674] font-bold">Update Match</p>
+          <p className="text-2xl text-[#2B3674] font-bold">View Match</p>
 
           <div className="flex flex-col items-center gap-3 text-[#2B3674] text-sm w-[30%]">
             {/* Tournament - Select Dropdown */}
@@ -53,6 +53,10 @@ export default function AdminMatchView() {
                   <div className="flex flex-col w-50">
                     <img src={Stadium} className="flex flex-col w-full"></img>
                     <p>Home</p>
+                  </div>
+                  <div className="flex flex-col w-50">
+                    <img src={Stadium} className="flex flex-col w-full"></img>
+                    <p>Banner</p>
                   </div>
                   {/* Away Logo */}
                   <div className="flex flex-col w-50">

@@ -220,7 +220,38 @@ export default function AdminMatchUpdate() {
                     </p>
                   )}
                 </div>
-
+                {/* Banner */}
+                <div className="flex flex-col w-[28%]">
+                  <label className="flex flex-col items-center justify-center h-20 border rounded-[10px] cursor-pointer hover:bg-gray-50 relative overflow-hidden">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleFileChange("homeLogo", e.target.files[0])
+                      }
+                      className="hidden"
+                    />
+                    {previewUrls.homeLogo ? (
+                      <img
+                        src={previewUrls.homeLogo}
+                        alt="Banner Preview"
+                        className="w-full h-full object-contain p-2"
+                      />
+                    ) : (
+                      <span className="text-gray-500">Banner</span>
+                    )}
+                    {errors.homeLogo && (
+                      <span className="text-red-500 text-xs absolute top-full left-0 mt-1">
+                        {errors.homeLogo}
+                      </span>
+                    )}
+                  </label>
+                  {formData.homeLogo && (
+                    <p className="text-xs text-gray-600 mt-2 text-center truncate">
+                      {formData.homeLogo.name}
+                    </p>
+                  )}
+                </div>
                 {/* Away Logo */}
                 <div className="flex flex-col w-[28%]">
                   <label className="flex flex-col items-center justify-center h-20 border rounded-[10px] cursor-pointer hover:bg-gray-50 relative overflow-hidden">
@@ -852,35 +883,38 @@ export default function AdminMatchUpdate() {
                 ></Button>
                 {showStatsIn && (
                   <div className="w-100 h-50 bg-amber-50 shadow-2xl rounded-3xl flex items-center flex-col justify-center gap-3 absolute z-100 inset-0 m-auto">
-                    <div className="flex gap-20">
-                      <label className="flex flex-col justify-center w-30 gap-5 relative">
-                        Quantity:
-                        <input
-                          type="number"
-                          className={`border rounded-[10px] h-10 px-2 ${
-                            errors.quantity ? "border-red-500" : ""
-                          }`}
-                        />
-                        {errors.quantity && (
-                          <span className="text-red-500 text-xs absolute top-full left-0 mt-1 whitespace-nowrap">
-                            {errors.quantity}
-                          </span>
-                        )}
-                      </label>
-                      <label className="flex flex-col justify-center w-30 gap-5 relative">
-                        Price(VND):
-                        <input
-                          type="number"
-                          className={`border rounded-[10px] h-10 px-2 ${
-                            errors.price ? "border-red-500" : ""
-                          }`}
-                        />
-                        {errors.price && (
-                          <span className="text-red-500 text-xs absolute top-full left-0 mt-1 whitespace-nowrap">
-                            {errors.price}
-                          </span>
-                        )}
-                      </label>
+                    <div className="flex flex-col gap-1 items-center justify-center">
+                      <p>KD1A</p>
+                      <div className="flex gap-20">
+                        <label className="flex flex-col justify-center w-30 gap-5 relative">
+                          Quantity:
+                          <input
+                            type="number"
+                            className={`border rounded-[10px] h-10 px-2 ${
+                              errors.quantity ? "border-red-500" : ""
+                            }`}
+                          />
+                          {errors.quantity && (
+                            <span className="text-red-500 text-xs absolute top-full left-0 mt-1 whitespace-nowrap">
+                              {errors.quantity}
+                            </span>
+                          )}
+                        </label>
+                        <label className="flex flex-col justify-center w-30 gap-5 relative">
+                          Price(VND):
+                          <input
+                            type="number"
+                            className={`border rounded-[10px] h-10 px-2 ${
+                              errors.price ? "border-red-500" : ""
+                            }`}
+                          />
+                          {errors.price && (
+                            <span className="text-red-500 text-xs absolute top-full left-0 mt-1 whitespace-nowrap">
+                              {errors.price}
+                            </span>
+                          )}
+                        </label>
+                      </div>
                     </div>
                     <Button text="Ok" onClick={hiddenShowIn}></Button>
                   </div>

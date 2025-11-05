@@ -55,6 +55,11 @@ export default function AdminTicketList() {
               </div>
             </div>
           </div>
+          <div className="flex text-center justify-center gap-10">
+            <SvgAdminOrder className="rotate-90 text-amber-50" />
+            <p className="font-bold text-white text-3xs">1</p>
+            <SvgAdminOrder className="rotate-270 text-amber-50" />
+          </div>
         </div>
       </div>
     </>
