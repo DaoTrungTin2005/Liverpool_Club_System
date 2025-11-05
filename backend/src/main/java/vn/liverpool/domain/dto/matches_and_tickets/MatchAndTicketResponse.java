@@ -11,6 +11,7 @@ public record MatchAndTicketResponse(
     String awayTeam,
     String homeLogoUrl,
     String awayLogoUrl,
+    String matchImageUrl,
     LocalDateTime matchDate,
     String location,
     List<TicketSettingResponse> ticketSettings

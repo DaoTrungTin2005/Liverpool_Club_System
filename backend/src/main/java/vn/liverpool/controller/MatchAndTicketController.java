@@ -23,9 +23,10 @@ public class MatchAndTicketController {
     public ResponseEntity<ApiResponse<MatchAndTicketResponse>> createMatchAndTickets(
             @RequestPart("data") @Valid CreateMatchAndTicketRequest dto,
             @RequestPart(value = "homeLogo", required = false) MultipartFile homeLogo,
-            @RequestPart(value = "awayLogo", required = false) MultipartFile awayLogo) {
+            @RequestPart(value = "awayLogo", required = false) MultipartFile awayLogo,
+            @RequestPart(value = "matchImage", required = false) MultipartFile matchImage) {
 
-        MatchAndTicketResponse response = matchAndTicketService.createMatchAndTickets(dto, homeLogo, awayLogo);
+        MatchAndTicketResponse response = matchAndTicketService.createMatchAndTickets(dto, homeLogo, awayLogo, matchImage);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Match and ticket settings created successfully", response));
     }

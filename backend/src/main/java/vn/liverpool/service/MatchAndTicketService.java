@@ -40,7 +40,8 @@ public class MatchAndTicketService {
     public MatchAndTicketResponse createMatchAndTickets(
             CreateMatchAndTicketRequest dto,
             MultipartFile homeLogo,
-            MultipartFile awayLogo) {
+            MultipartFile awayLogo,
+            MultipartFile matchImage) {
 
         // =đường dẫn thư mục mà ảnh sẽ lưu dô
         String uploadDir = System.getProperty("user.dir") + "/backend/src/main/resources/static/uploads/matches";
@@ -53,6 +54,7 @@ public class MatchAndTicketService {
 
         String homeLogoName = saveFile(homeLogo, uploadDir);
         String awayLogoName = saveFile(awayLogo, uploadDir);
+        String matchImageName = saveFile(matchImage, uploadDir);
 
         // Tạo Match ===
         Match match = new Match();
@@ -63,6 +65,7 @@ public class MatchAndTicketService {
         match.setAwayTeam(dto.awayTeam());
         match.setHomeLogo(homeLogoName);
         match.setAwayLogo(awayLogoName);
+        match.setMatchImage(matchImageName);
         match.setMatchDate(dto.matchDate());
         match.setLocation(dto.location());
 
@@ -118,6 +121,7 @@ public class MatchAndTicketService {
                 savedMatch.getAwayTeam(),
                 homeLogoName != null ? baseUrl + homeLogoName : null,
                 awayLogoName != null ? baseUrl + awayLogoName : null,
+                matchImageName != null ? baseUrl + matchImageName : null,
                 savedMatch.getMatchDate(),
                 savedMatch.getLocation(),
                 ticketResponses);

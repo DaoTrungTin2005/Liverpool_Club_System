@@ -43,6 +43,10 @@ public class Match {
     @Column(name = "away_logo")
     private String awayLogo;
 
+    @Column(name = "match_image")
+    private String matchImage;
+
+
     @Column(name = "match_date", nullable = false)
     private LocalDateTime matchDate;
 
