@@ -27,7 +27,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -131,32 +133,29 @@ public class MatchAndTicketService {
 
     }
 
-// ?========================GET ALL MATCHES========================
-@Transactional(readOnly = true)
-public Page<ListMatchResponse> getAllMatches(int page, int size, String sort, String search) {
+    // ?========================GET ALL MATCHES========================
+    @Transactional(readOnly = true)
+    public Page<ListMatchResponse> getAllMatches(int page, int size, String sort, String search) {
 
+        // === Tạo Pageable ===
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
 
+        // === Gọi repository ===
+        Page<Match> matchPage = (search == null || search.isBlank())
+                ? matchRepo.findAll(pageable)
+                : matchRepo.searchAllFields(search, pageable);
 
-    // === Tạo Pageable ===
-    Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        // === Map entity -> DTO ===
+        return matchPage.map(match -> new ListMatchResponse(
+                match.getId(),
+                match.getTournament().getId(),
+                match.getHomeTeam(),
+                match.getAwayTeam(),
+                match.getMatchDate(),
+                match.getLocation()));
+    }
 
-    // === Gọi repository ===
-    Page<Match> matchPage = (search == null || search.isBlank())
-            ? matchRepo.findAll(pageable)
-            : matchRepo.searchAllFields(search, pageable);
-
-    // === Map entity -> DTO ===
-    return matchPage.map(match -> new ListMatchResponse(
-            match.getId(),
-            match.getTournament().getId(),
-            match.getHomeTeam(),
-            match.getAwayTeam(),
-            match.getMatchDate(),
-            match.getLocation()
-    ));
-}
-
-
+    // ==UPDATE===============
 
 @Transactional
 public MatchAndTicketResponse updateMatchAndTickets(
@@ -166,83 +165,73 @@ public MatchAndTicketResponse updateMatchAndTickets(
         MultipartFile awayLogo,
         MultipartFile matchImage) {
 
-    // === Tìm match cần update =====
     Match match = matchRepo.findById(matchId)
             .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
 
-    // ====Đường dẫn upload =====
     String uploadDir = System.getProperty("user.dir") + "/backend/src/main/resources/static/uploads/matches";
     File dir = new File(uploadDir);
     if (!dir.exists()) dir.mkdirs();
-
     String baseUrl = getBaseUrl() + "/uploads/matches/";
 
-    // =====Upload nếu có file mới và xóa file cũ =====
+    // === Upload file mới (nếu có) ===
     if (homeLogo != null && !homeLogo.isEmpty()) {
         deleteOldFile(uploadDir, match.getHomeLogo());
-        String newHomeLogo = saveFile(homeLogo, uploadDir);
-        match.setHomeLogo(newHomeLogo);
+        match.setHomeLogo(saveFile(homeLogo, uploadDir));
     }
-
     if (awayLogo != null && !awayLogo.isEmpty()) {
         deleteOldFile(uploadDir, match.getAwayLogo());
-        String newAwayLogo = saveFile(awayLogo, uploadDir);
-        match.setAwayLogo(newAwayLogo);
+        match.setAwayLogo(saveFile(awayLogo, uploadDir));
     }
-
     if (matchImage != null && !matchImage.isEmpty()) {
         deleteOldFile(uploadDir, match.getMatchImage());
-        String newMatchImage = saveFile(matchImage, uploadDir);
-        match.setMatchImage(newMatchImage);
+        match.setMatchImage(saveFile(matchImage, uploadDir));
     }
 
-    // =====Update thông tin cơ bản =====
+    // === Update Match info ===
     Tournament tournament = tournamentRepo.findById(dto.tournamentId())
-            .orElseThrow(() -> new IllegalArgumentException("Tournament not found: " + dto.tournamentId()));
-
+            .orElseThrow(() -> new IllegalArgumentException("Tournament not found"));
     match.setTournament(tournament);
     match.setHomeTeam(dto.homeTeam());
     match.setAwayTeam(dto.awayTeam());
     match.setMatchDate(dto.matchDate());
     match.setLocation(dto.location());
 
-    Match updatedMatch = matchRepo.save(match);
+    // === XÓA HẾT ticketSettings cũ TRONG RAM ===
+    match.getTicketSettings().clear();
 
-    // ===== Xử lý update Ticket Settings =====
-    ticketSettingRepo.deleteAll(match.getTicketSettings());
-
-    List<TicketSetting> newSettings = new ArrayList<>();
-    for (TicketSettingRequest ts : dto.ticketSettings()) {
-        StadiumSection section = sectionRepo.findById(ts.sectionId())
-                .orElseThrow(() -> new IllegalArgumentException("Section not found: " + ts.sectionId()));
+    // === Thêm mới từ request ===
+    for (TicketSettingRequest req : dto.ticketSettings()) {
+        StadiumSection section = sectionRepo.findById(req.sectionId())
+                .orElseThrow(() -> new IllegalArgumentException("Section not found: " + req.sectionId()));
 
         TicketSetting setting = new TicketSetting();
-        setting.setMatch(updatedMatch);
+        setting.setMatch(match);
         setting.setSection(section);
         setting.setTotalQuantity(
-                (ts.totalQuantity() == null || ts.totalQuantity() <= 0)
-                        ? 500
-                        : ts.totalQuantity()
+            req.totalQuantity() == null || req.totalQuantity() <= 0 ? 500 : req.totalQuantity()
         );
         setting.setPrice(
-                (ts.price() == null || ts.price().compareTo(BigDecimal.ZERO) <= 0)
-                        ? BigDecimal.valueOf(100.00)
-                        : ts.price()
+            req.price() == null || req.price().compareTo(BigDecimal.ZERO) <= 0
+                ? BigDecimal.valueOf(100.00) : req.price()
         );
-        setting.setSoldQuantity(0);
-        newSettings.add(setting);
-    }
-    ticketSettingRepo.saveAll(newSettings);
+        setting.setSoldQuantity(0); // mới tạo
 
-    // =====Map về Response =====
-    List<TicketSettingResponse> ticketResponses = newSettings.stream()
+        match.getTicketSettings().add(setting); // ← Hibernate sẽ tự INSERT
+    }
+
+    // === LƯU MATCH → Hibernate tự sync ticketSettings ===
+    Match updatedMatch = matchRepo.save(match);
+
+    // === Response ===
+    List<TicketSettingResponse> ticketResponses = updatedMatch.getTicketSettings().stream()
             .map(s -> new TicketSettingResponse(
                     s.getSection().getId(),
                     s.getSection().getName(),
                     s.getSection().getStand(),
                     s.getSection().getTierName(),
                     s.getTotalQuantity(),
-                    s.getPrice()))
+                    s.getPrice()
+            ))
             .toList();
 
     return new MatchAndTicketResponse(
@@ -259,17 +248,48 @@ public MatchAndTicketResponse updateMatchAndTickets(
     );
 }
 
-// ================== HÀM PHỤ ==================
-private void deleteOldFile(String uploadDir, String oldFileName) {
-    if (oldFileName == null || oldFileName.isBlank()) return;
-    try {
-        Path oldFilePath = Paths.get(uploadDir, oldFileName);
-        Files.deleteIfExists(oldFilePath);
-    } catch (IOException e) {
-        System.err.println("⚠️ Could not delete old file: " + oldFileName);
-    }
-}
+    //ĐỔ DỮ LIỆU CŨ KHI UPDATE
+    @Transactional(readOnly = true)
+    public MatchAndTicketResponse getMatchDetail(Long matchId) {
+        Match match = matchRepo.findById(matchId)
+                .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
 
+        String baseUrl = getBaseUrl() + "/uploads/matches/";
+
+        List<TicketSettingResponse> ticketResponses = match.getTicketSettings().stream()
+                .map(ts -> new TicketSettingResponse(
+                        ts.getSection().getId(),
+                        ts.getSection().getName(),
+                        ts.getSection().getStand(),
+                        ts.getSection().getTierName(),
+                        ts.getTotalQuantity(),
+                        ts.getPrice()))
+                .toList();
+
+        return new MatchAndTicketResponse(
+                match.getId(),
+                match.getTournament().getId(),
+                match.getHomeTeam(),
+                match.getAwayTeam(),
+                match.getHomeLogo() != null ? baseUrl + match.getHomeLogo() : null,
+                match.getAwayLogo() != null ? baseUrl + match.getAwayLogo() : null,
+                match.getMatchImage() != null ? baseUrl + match.getMatchImage() : null,
+                match.getMatchDate(),
+                match.getLocation(),
+                ticketResponses);
+    }
+
+    // ================== HÀM PHỤ ==================
+    private void deleteOldFile(String uploadDir, String oldFileName) {
+        if (oldFileName == null || oldFileName.isBlank())
+            return;
+        try {
+            Path oldFilePath = Paths.get(uploadDir, oldFileName);
+            Files.deleteIfExists(oldFilePath);
+        } catch (IOException e) {
+            System.err.println("⚠️ Could not delete old file: " + oldFileName);
+        }
+    }
 
     private String saveFile(MultipartFile file, String dir) {
         if (file == null || file.isEmpty())
@@ -286,7 +306,5 @@ private void deleteOldFile(String uploadDir, String oldFileName) {
     private String getBaseUrl() {
         return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
     }
-
-
 
 }

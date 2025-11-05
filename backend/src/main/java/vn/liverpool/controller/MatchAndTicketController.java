@@ -57,4 +57,11 @@ public ResponseEntity<ApiResponse<MatchAndTicketResponse>> updateMatchAndTickets
     return ResponseEntity.ok(ApiResponse.success("Match updated successfully", updated));
 }
 
+//ĐỔ DỮ LIỆU CŨ DÔ THẰNG MUỐN UPDATE
+@GetMapping("/detail/{id}")
+public ResponseEntity<ApiResponse<MatchAndTicketResponse>> getMatchDetail(@PathVariable Long id) {
+    MatchAndTicketResponse detail = matchAndTicketService.getMatchDetail(id);
+    return ResponseEntity.ok(ApiResponse.success("Match detail retrieved successfully", detail));
+}
+
 }
