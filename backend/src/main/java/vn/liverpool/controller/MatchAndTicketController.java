@@ -46,30 +46,36 @@ public class MatchAndTicketController {
         return ResponseEntity.ok(ApiResponse.success("Fetched matches successfully", matches));
     }
 
-@PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ResponseEntity<ApiResponse<MatchAndTicketResponse>> updateMatchAndTickets(
-        @PathVariable Long id,
-        @RequestPart("data") @Valid CreateMatchAndTicketRequest dto,
-        @RequestPart(value = "homeLogo", required = false) MultipartFile homeLogo,
-        @RequestPart(value = "awayLogo", required = false) MultipartFile awayLogo,
-        @RequestPart(value = "matchImage", required = false) MultipartFile matchImage) {
+    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<MatchAndTicketResponse>> updateMatchAndTickets(
+            @PathVariable Long id,
+            @RequestPart("data") @Valid CreateMatchAndTicketRequest dto,
+            @RequestPart(value = "homeLogo", required = false) MultipartFile homeLogo,
+            @RequestPart(value = "awayLogo", required = false) MultipartFile awayLogo,
+            @RequestPart(value = "matchImage", required = false) MultipartFile matchImage) {
 
-    MatchAndTicketResponse updated = matchAndTicketService.updateMatchAndTickets(id, dto, homeLogo, awayLogo, matchImage);
-    return ResponseEntity.ok(ApiResponse.success("Match updated successfully", updated));
-}
+        MatchAndTicketResponse updated = matchAndTicketService.updateMatchAndTickets(id, dto, homeLogo, awayLogo,
+                matchImage);
+        return ResponseEntity.ok(ApiResponse.success("Match updated successfully", updated));
+    }
 
-//ĐỔ DỮ LIỆU CŨ DÔ THẰNG MUỐN UPDATE
-@GetMapping("/detail/{id}")
-public ResponseEntity<ApiResponse<MatchAndTicketResponse>> getMatchDetail(@PathVariable Long id) {
-    MatchAndTicketResponse detail = matchAndTicketService.getMatchDetail(id);
-    return ResponseEntity.ok(ApiResponse.success("Match detail retrieved successfully", detail));
-}
+    // ĐỔ DỮ LIỆU CŨ DÔ THẰNG MUỐN UPDATE
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ApiResponse<MatchAndTicketResponse>> getMatchDetail(@PathVariable Long id) {
+        MatchAndTicketResponse detail = matchAndTicketService.getMatchDetail(id);
+        return ResponseEntity.ok(ApiResponse.success("Match detail retrieved successfully", detail));
+    }
 
-@GetMapping("/view/{id}")
-public ResponseEntity<ApiResponse<ViewMatchAndTicketResponse>> viewMatch(@PathVariable Long id) {
-    ViewMatchAndTicketResponse view = matchAndTicketService.getMatchForView(id);
-    return ResponseEntity.ok(ApiResponse.success("Match view retrieved successfully", view));
-}
+    @GetMapping("/view/{id}")
+    public ResponseEntity<ApiResponse<ViewMatchAndTicketResponse>> viewMatch(@PathVariable Long id) {
+        ViewMatchAndTicketResponse view = matchAndTicketService.getMatchForView(id);
+        return ResponseEntity.ok(ApiResponse.success("Match view retrieved successfully", view));
+    }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteMatch(@PathVariable Long id) {
+        matchAndTicketService.deleteMatchAndTicket(id);
+        return ResponseEntity.ok(ApiResponse.success("Match deleted successfully", null));
+    }
 
 }

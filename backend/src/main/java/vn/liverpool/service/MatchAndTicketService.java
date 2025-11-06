@@ -157,98 +157,96 @@ public class MatchAndTicketService {
 
     // ==UPDATE===============
 
-@Transactional
-public MatchAndTicketResponse updateMatchAndTickets(
-        Long matchId,
-        CreateMatchAndTicketRequest dto,
-        MultipartFile homeLogo,
-        MultipartFile awayLogo,
-        MultipartFile matchImage) {
+    @Transactional
+    public MatchAndTicketResponse updateMatchAndTickets(
+            Long matchId,
+            CreateMatchAndTicketRequest dto,
+            MultipartFile homeLogo,
+            MultipartFile awayLogo,
+            MultipartFile matchImage) {
 
-    Match match = matchRepo.findById(matchId)
-            .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
+        Match match = matchRepo.findById(matchId)
+                .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
 
-    String uploadDir = System.getProperty("user.dir") + "/backend/src/main/resources/static/uploads/matches";
-    File dir = new File(uploadDir);
-    if (!dir.exists()) dir.mkdirs();
-    String baseUrl = getBaseUrl() + "/uploads/matches/";
+        String uploadDir = System.getProperty("user.dir") + "/backend/src/main/resources/static/uploads/matches";
+        File dir = new File(uploadDir);
+        if (!dir.exists())
+            dir.mkdirs();
+        String baseUrl = getBaseUrl() + "/uploads/matches/";
 
-    // === Upload file mới (nếu có) ===
-    if (homeLogo != null && !homeLogo.isEmpty()) {
-        deleteOldFile(uploadDir, match.getHomeLogo());
-        match.setHomeLogo(saveFile(homeLogo, uploadDir));
+        // === Upload file mới (nếu có) ===
+        if (homeLogo != null && !homeLogo.isEmpty()) {
+            deleteOldFile(uploadDir, match.getHomeLogo());
+            match.setHomeLogo(saveFile(homeLogo, uploadDir));
+        }
+        if (awayLogo != null && !awayLogo.isEmpty()) {
+            deleteOldFile(uploadDir, match.getAwayLogo());
+            match.setAwayLogo(saveFile(awayLogo, uploadDir));
+        }
+        if (matchImage != null && !matchImage.isEmpty()) {
+            deleteOldFile(uploadDir, match.getMatchImage());
+            match.setMatchImage(saveFile(matchImage, uploadDir));
+        }
+
+        // === Update Match info ===
+        Tournament tournament = tournamentRepo.findById(dto.tournamentId())
+                .orElseThrow(() -> new IllegalArgumentException("Tournament not found"));
+        match.setTournament(tournament);
+        match.setHomeTeam(dto.homeTeam());
+        match.setAwayTeam(dto.awayTeam());
+        match.setMatchDate(dto.matchDate());
+        match.setLocation(dto.location());
+
+        // === XÓA HẾT ticketSettings cũ TRONG RAM ===
+        match.getTicketSettings().clear();
+
+        // === Thêm mới từ request ===
+        for (TicketSettingRequest req : dto.ticketSettings()) {
+            StadiumSection section = sectionRepo.findById(req.sectionId())
+                    .orElseThrow(() -> new IllegalArgumentException("Section not found: " + req.sectionId()));
+
+            TicketSetting setting = new TicketSetting();
+            setting.setMatch(match);
+            setting.setSection(section);
+            setting.setTotalQuantity(
+                    req.totalQuantity() == null || req.totalQuantity() <= 0 ? 500 : req.totalQuantity());
+            setting.setPrice(
+                    req.price() == null || req.price().compareTo(BigDecimal.ZERO) <= 0
+                            ? BigDecimal.valueOf(100.00)
+                            : req.price());
+            setting.setSoldQuantity(0); // mới tạo
+
+            match.getTicketSettings().add(setting); // ← Hibernate sẽ tự INSERT
+        }
+
+        // === LƯU MATCH → Hibernate tự sync ticketSettings ===
+        Match updatedMatch = matchRepo.save(match);
+
+        // === Response ===
+        List<TicketSettingResponse> ticketResponses = updatedMatch.getTicketSettings().stream()
+                .map(s -> new TicketSettingResponse(
+                        s.getSection().getId(),
+                        s.getSection().getName(),
+                        s.getSection().getStand(),
+                        s.getSection().getTierName(),
+                        s.getTotalQuantity(),
+                        s.getPrice()))
+                .toList();
+
+        return new MatchAndTicketResponse(
+                updatedMatch.getId(),
+                updatedMatch.getTournament().getId(),
+                updatedMatch.getHomeTeam(),
+                updatedMatch.getAwayTeam(),
+                updatedMatch.getHomeLogo() != null ? baseUrl + updatedMatch.getHomeLogo() : null,
+                updatedMatch.getAwayLogo() != null ? baseUrl + updatedMatch.getAwayLogo() : null,
+                updatedMatch.getMatchImage() != null ? baseUrl + updatedMatch.getMatchImage() : null,
+                updatedMatch.getMatchDate(),
+                updatedMatch.getLocation(),
+                ticketResponses);
     }
-    if (awayLogo != null && !awayLogo.isEmpty()) {
-        deleteOldFile(uploadDir, match.getAwayLogo());
-        match.setAwayLogo(saveFile(awayLogo, uploadDir));
-    }
-    if (matchImage != null && !matchImage.isEmpty()) {
-        deleteOldFile(uploadDir, match.getMatchImage());
-        match.setMatchImage(saveFile(matchImage, uploadDir));
-    }
 
-    // === Update Match info ===
-    Tournament tournament = tournamentRepo.findById(dto.tournamentId())
-            .orElseThrow(() -> new IllegalArgumentException("Tournament not found"));
-    match.setTournament(tournament);
-    match.setHomeTeam(dto.homeTeam());
-    match.setAwayTeam(dto.awayTeam());
-    match.setMatchDate(dto.matchDate());
-    match.setLocation(dto.location());
-
-    // === XÓA HẾT ticketSettings cũ TRONG RAM ===
-    match.getTicketSettings().clear();
-
-    // === Thêm mới từ request ===
-    for (TicketSettingRequest req : dto.ticketSettings()) {
-        StadiumSection section = sectionRepo.findById(req.sectionId())
-                .orElseThrow(() -> new IllegalArgumentException("Section not found: " + req.sectionId()));
-
-        TicketSetting setting = new TicketSetting();
-        setting.setMatch(match);
-        setting.setSection(section);
-        setting.setTotalQuantity(
-            req.totalQuantity() == null || req.totalQuantity() <= 0 ? 500 : req.totalQuantity()
-        );
-        setting.setPrice(
-            req.price() == null || req.price().compareTo(BigDecimal.ZERO) <= 0
-                ? BigDecimal.valueOf(100.00) : req.price()
-        );
-        setting.setSoldQuantity(0); // mới tạo
-
-        match.getTicketSettings().add(setting); // ← Hibernate sẽ tự INSERT
-    }
-
-    // === LƯU MATCH → Hibernate tự sync ticketSettings ===
-    Match updatedMatch = matchRepo.save(match);
-
-    // === Response ===
-    List<TicketSettingResponse> ticketResponses = updatedMatch.getTicketSettings().stream()
-            .map(s -> new TicketSettingResponse(
-                    s.getSection().getId(),
-                    s.getSection().getName(),
-                    s.getSection().getStand(),
-                    s.getSection().getTierName(),
-                    s.getTotalQuantity(),
-                    s.getPrice()
-            ))
-            .toList();
-
-    return new MatchAndTicketResponse(
-            updatedMatch.getId(),
-            updatedMatch.getTournament().getId(),
-            updatedMatch.getHomeTeam(),
-            updatedMatch.getAwayTeam(),
-            updatedMatch.getHomeLogo() != null ? baseUrl + updatedMatch.getHomeLogo() : null,
-            updatedMatch.getAwayLogo() != null ? baseUrl + updatedMatch.getAwayLogo() : null,
-            updatedMatch.getMatchImage() != null ? baseUrl + updatedMatch.getMatchImage() : null,
-            updatedMatch.getMatchDate(),
-            updatedMatch.getLocation(),
-            ticketResponses
-    );
-}
-
-    //ĐỔ DỮ LIỆU CŨ KHI UPDATE
+    // ĐỔ DỮ LIỆU CŨ KHI UPDATE
     @Transactional(readOnly = true)
     public MatchAndTicketResponse getMatchDetail(Long matchId) {
         Match match = matchRepo.findById(matchId)
@@ -278,38 +276,54 @@ public MatchAndTicketResponse updateMatchAndTickets(
                 match.getLocation(),
                 ticketResponses);
     }
-    //VIEW MATCH AND TICKET CÓ TOURNAMENT NAME@Transactional(readOnly = true)
-public ViewMatchAndTicketResponse getMatchForView(Long matchId) {
-    Match match = matchRepo.findById(matchId)
-            .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
 
-    String baseUrl = getBaseUrl() + "/uploads/matches/";
+    // VIEW MATCH AND TICKET CÓ TOURNAMENT NAME
+    @Transactional(readOnly = true)
+    public ViewMatchAndTicketResponse getMatchForView(Long matchId) {
+        Match match = matchRepo.findById(matchId)
+                .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
 
-    List<TicketSettingResponse> ticketResponses = match.getTicketSettings().stream()
-            .map(ts -> new TicketSettingResponse(
-                    ts.getSection().getId(),
-                    ts.getSection().getName(),
-                    ts.getSection().getStand(),
-                    ts.getSection().getTierName(),
-                    ts.getTotalQuantity(),
-                    ts.getPrice()
-            ))
-            .toList();
+        String baseUrl = getBaseUrl() + "/uploads/matches/";
 
-    return new ViewMatchAndTicketResponse(
-            match.getId(),
-            match.getTournament().getName(), // trả luôn tên tournament
-            match.getHomeTeam(),
-            match.getAwayTeam(),
-            match.getHomeLogo() != null ? baseUrl + match.getHomeLogo() : null,
-            match.getAwayLogo() != null ? baseUrl + match.getAwayLogo() : null,
-            match.getMatchImage() != null ? baseUrl + match.getMatchImage() : null,
-            match.getMatchDate(),
-            match.getLocation(),
-            ticketResponses
-    );
-}
+        List<TicketSettingResponse> ticketResponses = match.getTicketSettings().stream()
+                .map(ts -> new TicketSettingResponse(
+                        ts.getSection().getId(),
+                        ts.getSection().getName(),
+                        ts.getSection().getStand(),
+                        ts.getSection().getTierName(),
+                        ts.getTotalQuantity(),
+                        ts.getPrice()))
+                .toList();
 
+        return new ViewMatchAndTicketResponse(
+                match.getId(),
+                match.getTournament().getName(), // trả luôn tên tournament
+                match.getHomeTeam(),
+                match.getAwayTeam(),
+                match.getHomeLogo() != null ? baseUrl + match.getHomeLogo() : null,
+                match.getAwayLogo() != null ? baseUrl + match.getAwayLogo() : null,
+                match.getMatchImage() != null ? baseUrl + match.getMatchImage() : null,
+                match.getMatchDate(),
+                match.getLocation(),
+                ticketResponses);
+    }
+
+    // XÓA MATCH VÀ TICKET
+    @Transactional
+    public void deleteMatchAndTicket(Long matchId) {
+        Match match = matchRepo.findById(matchId)
+                .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
+
+        String uploadDir = System.getProperty("user.dir") + "/backend/src/main/resources/static/uploads/matches";
+
+        // Xóa các file ảnh trong local (nếu tồn tại)
+        deleteOldFile(uploadDir, match.getHomeLogo());
+        deleteOldFile(uploadDir, match.getAwayLogo());
+        deleteOldFile(uploadDir, match.getMatchImage());
+
+        // Xóa Match → tự động xóa TicketSettings nhờ cascade + orphanRemoval
+        matchRepo.delete(match);
+    }
 
     // ================== HÀM PHỤ ==================
     private void deleteOldFile(String uploadDir, String oldFileName) {
