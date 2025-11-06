@@ -2,6 +2,8 @@ package vn.liverpool.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType; // ĐÚNG
 import vn.liverpool.util.ApiResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
+import vn.liverpool.domain.dto.matches_and_tickets.ListTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.ViewMatchAndTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
@@ -35,7 +38,7 @@ public class MatchAndTicketController {
                 .body(ApiResponse.success("Match and ticket settings created successfully", response));
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list/matches_and_tickets")
     public ResponseEntity<ApiResponse<?>> getAllMatchesWithTickets(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
@@ -76,6 +79,20 @@ public class MatchAndTicketController {
     public ResponseEntity<ApiResponse<Void>> deleteMatch(@PathVariable Long id) {
         matchAndTicketService.deleteMatchAndTicket(id);
         return ResponseEntity.ok(ApiResponse.success("Match deleted successfully", null));
+    }
+
+    @GetMapping("/list/tickets")
+    public ResponseEntity<Page<ListTicketResponse>> getTicketList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String sectionName,
+            @RequestParam(required = false) String matchSearch,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        Page<ListTicketResponse> result = matchAndTicketService.getAllTicketList(
+                page, size, sectionName, matchSearch, sortBy);
+
+        return ResponseEntity.ok(result);
     }
 
 }

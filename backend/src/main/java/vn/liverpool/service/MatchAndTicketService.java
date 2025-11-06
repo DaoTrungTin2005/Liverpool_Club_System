@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import vn.liverpool.repository.MatchRepository;
 import vn.liverpool.repository.StadiumSectionRepository;
 import vn.liverpool.repository.TicketSettingRepository;
 import vn.liverpool.repository.TournamentRepository;
+import jakarta.persistence.ManyToOne;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
@@ -335,6 +337,40 @@ public class MatchAndTicketService {
         } catch (IOException e) {
             System.err.println("⚠️ Could not delete old file: " + oldFileName);
         }
+    }
+
+    // List tickets
+    @Transactional(readOnly = true)
+    public Page<ListTicketResponse> getAllTicketList(
+            int page,
+            int size,
+            String sectionName,
+            String matchSearch,
+            String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+
+        Page<TicketSetting> ticketPage = (sectionName == null && matchSearch == null)
+                ? ticketSettingRepo.findAll(pageable)
+                : ticketSettingRepo.searchTickets(sectionName, matchSearch, pageable);
+
+        // Vì ts (TicketSetting) có quan hệ @ManyToOne với Match và StadiumSection
+        // Hibernate tự động JOIN và lấy dữ liệu liên quan khi gọi ts.getMatch() hay
+        // ts.getSection().
+        return ticketPage.map(ts -> {
+            Match m = ts.getMatch();
+            String matchDisplay = m.getHomeTeam() + " vs " + m.getAwayTeam();
+
+            String sectionFullName = ts.getSection().getName();
+
+            return new ListTicketResponse(
+                    sectionFullName,
+                    matchDisplay,
+                    ts.getTotalQuantity(),
+                    ts.getSoldQuantity(),
+
+                    ts.getPrice());
+        });
     }
 
     private String saveFile(MultipartFile file, String dir) {
