@@ -375,34 +375,48 @@ public class MatchAndTicketService {
     }
 
     // === UPDATE TICKET SETTING (chỉ sửa quantity + price) ===
-@Transactional
-public ListTicketResponse updateTicketSetting(Long ticketSettingId, UpdateTicketRequest request) {
-    TicketSetting ts = ticketSettingRepo.findById(ticketSettingId)
-            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé với ID: " + ticketSettingId));
+    @Transactional
+    public ListTicketResponse updateTicketSetting(Long ticketSettingId, UpdateTicketRequest request) {
+        TicketSetting ts = ticketSettingRepo.findById(ticketSettingId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé với ID: " + ticketSettingId));
 
-    if (request.totalQuantity() != null) {
-        if (request.totalQuantity() < ts.getSoldQuantity()) {
-            throw new IllegalArgumentException(
-                "Số lượng vé không được nhỏ hơn số đã bán (" + ts.getSoldQuantity() + ")");
+        if (request.totalQuantity() != null) {
+            if (request.totalQuantity() < ts.getSoldQuantity()) {
+                throw new IllegalArgumentException(
+                        "Số lượng vé không được nhỏ hơn số đã bán (" + ts.getSoldQuantity() + ")");
+            }
+            ts.setTotalQuantity(request.totalQuantity());
         }
-        ts.setTotalQuantity(request.totalQuantity());
+
+        if (request.price() != null && request.price().compareTo(BigDecimal.ZERO) > 0) {
+            ts.setPrice(request.price());
+        }
+
+        TicketSetting saved = ticketSettingRepo.save(ts);
+
+        return new ListTicketResponse(
+                saved.getId(),
+                saved.getSection().getName(),
+                saved.getMatch().getHomeTeam() + " vs " + saved.getMatch().getAwayTeam(),
+                saved.getTotalQuantity(),
+                saved.getSoldQuantity(),
+                saved.getPrice());
     }
 
-    if (request.price() != null && request.price().compareTo(BigDecimal.ZERO) > 0) {
-        ts.setPrice(request.price());
+    // ĐỔ DỮ LIỆU CŨ VÀO KHI UPDATE TICKET SETTING
+    @Transactional(readOnly = true)
+    public ListTicketResponse getTicketSettingDetail(Long ticketSettingId) {
+        TicketSetting ts = ticketSettingRepo.findById(ticketSettingId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé với ID: " + ticketSettingId));
+
+        return new ListTicketResponse(
+                ts.getId(),
+                ts.getSection().getName(),
+                ts.getMatch().getHomeTeam() + " vs " + ts.getMatch().getAwayTeam(),
+                ts.getTotalQuantity(),
+                ts.getSoldQuantity(),
+                ts.getPrice());
     }
-
-    TicketSetting saved = ticketSettingRepo.save(ts);
-
-    return new ListTicketResponse(
-            saved.getId(),
-            saved.getSection().getName(),
-            saved.getMatch().getHomeTeam() + " vs " + saved.getMatch().getAwayTeam(),
-            saved.getTotalQuantity(),
-            saved.getSoldQuantity(),
-            saved.getPrice()
-    );
-}
 
     private String saveFile(MultipartFile file, String dir) {
         if (file == null || file.isEmpty())

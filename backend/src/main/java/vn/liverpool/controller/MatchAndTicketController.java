@@ -63,8 +63,8 @@ public class MatchAndTicketController {
         return ResponseEntity.ok(ApiResponse.success("Match updated successfully", updated));
     }
 
-    // ĐỔ DỮ LIỆU CŨ DÔ THẰNG MUỐN UPDATE
-    @GetMapping("/detail/{id}")
+    // ĐỔ DỮ LIỆU CŨ DÔ THẰNG Match MUỐN UPDATE
+    @GetMapping("/detail/match/{id}")
     public ResponseEntity<ApiResponse<MatchAndTicketResponse>> getMatchDetail(@PathVariable Long id) {
         MatchAndTicketResponse detail = matchAndTicketService.getMatchDetail(id);
         return ResponseEntity.ok(ApiResponse.success("Match detail retrieved successfully", detail));
@@ -82,6 +82,7 @@ public class MatchAndTicketController {
         return ResponseEntity.ok(ApiResponse.success("Match deleted successfully", null));
     }
 
+    // lấy danh sách ticket setting có phân trang
     @GetMapping("/list/tickets")
     public ResponseEntity<Page<ListTicketResponse>> getTicketList(
             @RequestParam(defaultValue = "0") int page,
@@ -96,16 +97,24 @@ public class MatchAndTicketController {
         return ResponseEntity.ok(result);
     }
 
-    // Trong MatchAndTicketController.java
-@PutMapping("/update/ticket/{id}")
-public ResponseEntity<ApiResponse<ListTicketResponse>> updateTicketSetting(
-        @PathVariable Long id,
-        @RequestBody UpdateTicketRequest request) {
+    // cập nhật tiket setting
+    @PutMapping("/update/ticket/{id}")
+    public ResponseEntity<ApiResponse<ListTicketResponse>> updateTicketSetting(
+            @PathVariable Long id,
+            @RequestBody UpdateTicketRequest request) {
 
-    ListTicketResponse updated = matchAndTicketService.updateTicketSetting(id, request);
+        ListTicketResponse updated = matchAndTicketService.updateTicketSetting(id, request);
 
-    return ResponseEntity.ok(ApiResponse.success("Cập nhật vé thành công!", updated));
-}
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật vé thành công!", updated));
+    }
 
+    // Đổ dữ liệu cũ của setting setting khi cập nhât
+
+    // lấy chi tiết ticket setting
+    @GetMapping("detail/ticket/{id}")
+    public ResponseEntity<ApiResponse<ListTicketResponse>> getTicketSetting(@PathVariable Long id) {
+        ListTicketResponse ticket = matchAndTicketService.getTicketSettingDetail(id);
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin vé thành công!", ticket));
+    }
 
 }
