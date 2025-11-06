@@ -327,18 +327,6 @@ public class MatchAndTicketService {
         matchRepo.delete(match);
     }
 
-    // ================== HÀM PHỤ ==================
-    private void deleteOldFile(String uploadDir, String oldFileName) {
-        if (oldFileName == null || oldFileName.isBlank())
-            return;
-        try {
-            Path oldFilePath = Paths.get(uploadDir, oldFileName);
-            Files.deleteIfExists(oldFilePath);
-        } catch (IOException e) {
-            System.err.println("⚠️ Could not delete old file: " + oldFileName);
-        }
-    }
-
     // List tickets
     @Transactional(readOnly = true)
     public Page<ListTicketResponse> getAllTicketList(
@@ -418,6 +406,23 @@ public class MatchAndTicketService {
                 ts.getPrice());
     }
 
+    // === LẤY TOÀN BỘ 110 KHU VỰC ANFIELD ===
+    @Transactional(readOnly = true)
+    public List<StadiumSectionResponse> getAllStadiumSections() {
+        return sectionRepo.findAll().stream()
+        // map từ entity StadiumSection sang DTO StadiumSectionResponse
+                .map(section -> new StadiumSectionResponse(
+                        section.getId(),
+                        section.getName(),
+                        section.getStand(),
+                        section.getTierName(),
+                        section.getView()))
+                .sorted((a, b) -> a.id().compareTo(b.id())) // sắp xếp theo ID cho đẹp, thằng nào nhỏ hơn lên trước
+                .toList();
+    }
+
+    //HÀM PHỤ
+
     private String saveFile(MultipartFile file, String dir) {
         if (file == null || file.isEmpty())
             return null;
@@ -427,6 +432,18 @@ public class MatchAndTicketService {
             return filename;
         } catch (IOException e) {
             throw new RuntimeException("Error saving file: " + e.getMessage(), e);
+        }
+    }
+
+    // ================== HÀM PHỤ ==================
+    private void deleteOldFile(String uploadDir, String oldFileName) {
+        if (oldFileName == null || oldFileName.isBlank())
+            return;
+        try {
+            Path oldFilePath = Paths.get(uploadDir, oldFileName);
+            Files.deleteIfExists(oldFilePath);
+        } catch (IOException e) {
+            System.err.println("Could not delete old file: " + oldFileName);
         }
     }
 

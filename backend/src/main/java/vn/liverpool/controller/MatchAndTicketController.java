@@ -3,6 +3,8 @@ package vn.liverpool.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import vn.liverpool.util.ApiResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.ListTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
+import vn.liverpool.domain.dto.matches_and_tickets.StadiumSectionResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.UpdateTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.ViewMatchAndTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
@@ -111,10 +114,12 @@ public class MatchAndTicketController {
     // Đổ dữ liệu cũ của setting setting khi cập nhât
 
     // lấy chi tiết ticket setting
-    @GetMapping("detail/ticket/{id}")
-    public ResponseEntity<ApiResponse<ListTicketResponse>> getTicketSetting(@PathVariable Long id) {
-        ListTicketResponse ticket = matchAndTicketService.getTicketSettingDetail(id);
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin vé thành công!", ticket));
-    }
+// === LẤY TOÀN BỘ KHU VỰC SÂN ANFIELD (110 ô) ===
+@GetMapping("/stadium/sections")
+public ResponseEntity<ApiResponse<List<StadiumSectionResponse>>> getAllStadiumSections() {
+    List<StadiumSectionResponse> sections = matchAndTicketService.getAllStadiumSections();
+    return ResponseEntity.ok(ApiResponse.success("Lấy danh sách khu vực Anfield thành công", sections));
+}
+
 
 }
