@@ -24,6 +24,7 @@ import AdminMatchDelete from "./pageAdminMatch/AdminMatchDelete.jsx";
 import AdminBillList from "./pageAdminBill/AdminBillList.jsx";
 import Match from "./PageUserView/Match.jsx";
 import Ticket from "./PageUserView/Ticket.jsx";
+import Payment from "./PageUserView/Payment.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
         <Route path="/admin/bill" element={<AdminBillList />} />
         <Route path="/match" element={<Match />} />
         <Route path="/ticket" element={<Ticket />} />
+        <Route path="/payment" element={<Payment />} />
       </Routes>
     </BrowserRouter>
   );

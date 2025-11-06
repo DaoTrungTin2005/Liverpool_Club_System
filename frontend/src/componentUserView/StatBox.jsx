@@ -1,7 +1,7 @@
 import "../output.css";
 export default function StatBox({ label, value, img, big = false }) {
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center Kanit">
       {img && <img src={img} alt={label} className="h-10 mb-2 opacity-80" />}
       <span className="text-3xl text-white font-bold whitespace-nowrap">
         {label}

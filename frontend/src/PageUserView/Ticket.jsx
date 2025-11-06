@@ -21,8 +21,12 @@ export default function Ticket() {
   const hiddenShow = () => {
     setShowStats((prev) => !prev);
   };
+  const [showStatsCancel, setShowStatsCancel] = useState(false);
+  const hiddenShowCancel = () => {
+    setShowStatsCancel((prev) => !prev);
+  };
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col Prosto">
       <Header />
       <div className="relative w-full h-screen overflow-hidden">
         <img
@@ -57,14 +61,14 @@ export default function Ticket() {
       <div className="bg-white w-full h-full m-auto flex flex-col pt-20 pb-50 items-center">
         <div className="flex flex-col items-center justify-center gap-10">
           <p className="text-black text-4xl text-center">CHAMPION LEAGUE</p>
-          <div className="w-200 flex items-center justify-between gap-15 text-4xl bg-[#EEEEEE]">
+          <div className="w-200 flex items-center justify-between gap-15 text-2xl bg-[#EEEEEE]">
             <img src={C1} alt="" className="w-15 h-15" />
             <p className="w-70">Liverpool</p>
             <img src={Carabaocup} alt="" className="w-15 h-15" />
             <p className="w-70">Real Madrid</p>
             <img src={CupFA} alt="" className="w-15 h-15" />
           </div>
-          <div className="flex text-2xl gap-10 items-center justify-center">
+          <div className="flex text-xl gap-10 items-center justify-center">
             <p>28TH MAY 2026</p>
             <div className="w-[1px] h-6 border border-1 border-black"></div>
             <p>20:00 PM</p>
@@ -518,6 +522,7 @@ export default function Ticket() {
                 viewBox="0 0 47 76"
                 fill="none"
                 className="pt-4"
+                onClick={hiddenShowCancel}
               >
                 <path
                   d="M46.1123 25.1436V75.3115H0V0H16.1162L46.1123 25.1436Z"
@@ -651,8 +656,21 @@ export default function Ticket() {
               <Button text="Back" onClick={hiddenShow} className="mb-20" />
             </div>
           )}
+          {showStatsCancel && (
+            <div className="w-70 h-40 bg-[#CECCCC] shadow-2xl rounded-3xl flex items-center flex-col justify-center absolute z-50 inset-0 m-auto">
+              <div className="flex items-center justify-center mt-20">
+                <img src={Cancel} className=" w-10 h-10" />
+                <p>THERE ARE ONLY X SEATS IN THIS SECTION</p>
+              </div>
+              <Button
+                text="Back"
+                onClick={hiddenShowCancel}
+                className="mb-20"
+              />
+            </div>
+          )}
         </div>
-        <div className="grid grid-cols-8 gap-10 m-30 text-xs border border-1 p-10">
+        <div className="grid grid-cols-8 gap-10 m-30 text-xs border border-1 p-10 Kanit">
           <div className="bg-[#B722A8] w-10 h-10"></div>
           <p className="my-auto">Longside Lower Tier</p>
           <div className="bg-[#C4A924] w-10 h-10"></div>

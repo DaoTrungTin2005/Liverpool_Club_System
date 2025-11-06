@@ -97,7 +97,7 @@ export default function MyClub() {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col Kanit">
       <Header />
       <div className="relative w-full h-80 overflow-hidden max-sm:h-50">
         <img

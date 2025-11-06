@@ -12,7 +12,7 @@ import TotvsLiver from "../assets/img/TotvsLiv.png";
 
 export default function Match() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col Pridi">
       <Header />
       <div className="relative w-full h-screen overflow-hidden">
         <img
