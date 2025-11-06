@@ -364,6 +364,7 @@ public class MatchAndTicketService {
             String sectionFullName = ts.getSection().getName();
 
             return new ListTicketResponse(
+                    ts.getId(),
                     sectionFullName,
                     matchDisplay,
                     ts.getTotalQuantity(),
@@ -372,6 +373,36 @@ public class MatchAndTicketService {
                     ts.getPrice());
         });
     }
+
+    // === UPDATE TICKET SETTING (chỉ sửa quantity + price) ===
+@Transactional
+public ListTicketResponse updateTicketSetting(Long ticketSettingId, UpdateTicketRequest request) {
+    TicketSetting ts = ticketSettingRepo.findById(ticketSettingId)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé với ID: " + ticketSettingId));
+
+    if (request.totalQuantity() != null) {
+        if (request.totalQuantity() < ts.getSoldQuantity()) {
+            throw new IllegalArgumentException(
+                "Số lượng vé không được nhỏ hơn số đã bán (" + ts.getSoldQuantity() + ")");
+        }
+        ts.setTotalQuantity(request.totalQuantity());
+    }
+
+    if (request.price() != null && request.price().compareTo(BigDecimal.ZERO) > 0) {
+        ts.setPrice(request.price());
+    }
+
+    TicketSetting saved = ticketSettingRepo.save(ts);
+
+    return new ListTicketResponse(
+            saved.getId(),
+            saved.getSection().getName(),
+            saved.getMatch().getHomeTeam() + " vs " + saved.getMatch().getAwayTeam(),
+            saved.getTotalQuantity(),
+            saved.getSoldQuantity(),
+            saved.getPrice()
+    );
+}
 
     private String saveFile(MultipartFile file, String dir) {
         if (file == null || file.isEmpty())

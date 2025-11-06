@@ -14,6 +14,7 @@ import vn.liverpool.util.ApiResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.ListTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
+import vn.liverpool.domain.dto.matches_and_tickets.UpdateTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.ViewMatchAndTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
 import vn.liverpool.service.MatchAndTicketService;
@@ -49,7 +50,7 @@ public class MatchAndTicketController {
         return ResponseEntity.ok(ApiResponse.success("Fetched matches successfully", matches));
     }
 
-    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/match/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<MatchAndTicketResponse>> updateMatchAndTickets(
             @PathVariable Long id,
             @RequestPart("data") @Valid CreateMatchAndTicketRequest dto,
@@ -94,5 +95,17 @@ public class MatchAndTicketController {
 
         return ResponseEntity.ok(result);
     }
+
+    // Trong MatchAndTicketController.java
+@PutMapping("/update/ticket/{id}")
+public ResponseEntity<ApiResponse<ListTicketResponse>> updateTicketSetting(
+        @PathVariable Long id,
+        @RequestBody UpdateTicketRequest request) {
+
+    ListTicketResponse updated = matchAndTicketService.updateTicketSetting(id, request);
+
+    return ResponseEntity.ok(ApiResponse.success("Cập nhật vé thành công!", updated));
+}
+
 
 }
