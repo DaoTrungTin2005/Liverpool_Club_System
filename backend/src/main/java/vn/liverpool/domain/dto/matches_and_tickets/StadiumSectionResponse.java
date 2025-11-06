@@ -6,6 +6,6 @@ public record StadiumSectionResponse(
         String name, // CE1, L3, 102, v.v.
         String stand, // Sir Kenny Dalglish Stand, The Kop, v.v.
         String tierName, // Longside Upper Tier, The Kop, v.v.
-        String image // ce1.jpg
+        String imageUrl // ce1.jpg
 ) {
 }

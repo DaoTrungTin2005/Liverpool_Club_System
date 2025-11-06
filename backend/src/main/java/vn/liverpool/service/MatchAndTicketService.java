@@ -407,21 +407,28 @@ public class MatchAndTicketService {
     }
 
     // === LẤY TOÀN BỘ 110 KHU VỰC ANFIELD ===
+    // Trong MatchAndTicketService.java
+
+
+    // === LẤY TOÀN BỘ 110 KHU VỰC ANFIELD – TRẢ LUÔN FULL URL ===
     @Transactional(readOnly = true)
     public List<StadiumSectionResponse> getAllStadiumSections() {
+        String baseUrl = getBaseUrl() + "/uploads/stadium-views/"; // thư mục ảnh khu vực
+
         return sectionRepo.findAll().stream()
-        // map từ entity StadiumSection sang DTO StadiumSectionResponse
                 .map(section -> new StadiumSectionResponse(
                         section.getId(),
                         section.getName(),
                         section.getStand(),
                         section.getTierName(),
-                        section.getView()))
-                .sorted((a, b) -> a.id().compareTo(b.id())) // sắp xếp theo ID cho đẹp, thằng nào nhỏ hơn lên trước
+                        section.getView() != null
+                                ? baseUrl + section.getView()
+                                : null))
+                .sorted((a, b) -> a.id().compareTo(b.id()))
                 .toList();
     }
 
-    //HÀM PHỤ
+    // HÀM PHỤ
 
     private String saveFile(MultipartFile file, String dir) {
         if (file == null || file.isEmpty())
