@@ -494,6 +494,26 @@ public class MatchAndTicketService {
                                 match.getLocation());
         }
 
+        // HIỆN CÁI POP UP KHI CHỌN KHU VỰC SÂN
+        @Transactional(readOnly = true)
+        public SectionPopupResponse getSectionPopupData(Long matchId, Long sectionId) {
+                String baseUrl = getBaseUrl() + "/uploads/stadium-views/";
+
+                TicketSetting ts = ticketSettingRepo.findByMatchIdAndSectionId(matchId, sectionId)
+                                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé cho khu vực này"));
+
+                StadiumSection section = ts.getSection();
+                int available = ts.getTotalQuantity() - ts.getSoldQuantity();
+
+                return new SectionPopupResponse(
+                                section.getName(),
+                                section.getTierName(),
+                                section.getStand(),
+                                section.getView() != null ? baseUrl + section.getView() : null,
+                                ts.getPrice(),
+                                available);
+        }
+
         // HÀM PHỤ
 
         private String saveFile(MultipartFile file, String dir) {

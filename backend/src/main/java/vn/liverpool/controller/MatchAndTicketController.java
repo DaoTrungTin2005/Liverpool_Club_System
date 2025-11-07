@@ -18,6 +18,7 @@ import vn.liverpool.domain.dto.matches_and_tickets.HomeMatchesGroupedResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.ListTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchHeaderResponse;
+import vn.liverpool.domain.dto.matches_and_tickets.SectionPopupResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.StadiumSectionResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.UpdateTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.ViewMatchAndTicketResponse;
@@ -135,5 +136,15 @@ public class MatchAndTicketController {
     public ResponseEntity<ApiResponse<MatchHeaderResponse>> getMatchHeader(@PathVariable Long matchId) {
         return ResponseEntity.ok(ApiResponse.success("information of match ok òi",
                 matchAndTicketService.getMatchHeader(matchId)));
+    }
+
+    // HIỆN CÁI POP UO KHI CHỊN SƠ ĐÒ SÂN
+    @GetMapping("/match/{matchId}/section/{sectionId}/popup")
+    public ResponseEntity<ApiResponse<SectionPopupResponse>> getSectionPopup(
+            @PathVariable Long matchId,
+            @PathVariable Long sectionId) {
+
+        SectionPopupResponse popup = matchAndTicketService.getSectionPopupData(matchId, sectionId);
+        return ResponseEntity.ok(ApiResponse.success("Popup data ready!", popup));
     }
 }
