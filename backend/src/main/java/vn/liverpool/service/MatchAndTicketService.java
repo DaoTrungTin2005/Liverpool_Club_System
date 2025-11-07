@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -435,6 +436,43 @@ public class MatchAndTicketService {
                                                                 : null))
                                 .sorted((a, b) -> a.id().compareTo(b.id()))
                                 .toList();
+        }
+
+        // ĐỔ DỮ LIỆU CỦA MẤY CÁI MATCHES VÀ THỜI GIAN COUNTDOWN
+        @Transactional(readOnly = true)
+        public HomeMatchesGroupedResponse getHomeMatches() {
+                String baseUrl = getBaseUrl() + "/uploads/matches/";
+
+                // Lấy tất cả matches có matchDate >= hiện tại, sắp xếp theo matchDate tăng dần
+                List<Match> upcomingMatches = matchRepo.findByMatchDateAfterOrderByMatchDateAsc(LocalDateTime.now());
+
+                // Tìm trận đấu gần nhất (để FE countdown)
+                LocalDateTime nextMatchDate = upcomingMatches.isEmpty()
+                                ? null
+                                : upcomingMatches.get(0).getMatchDate();
+
+                // Group matches theo tournament name
+                Map<String, List<HomeMatchResponse>> matchesByTournament = upcomingMatches.stream()
+                                .map(match -> new HomeMatchResponse(
+                                                match.getId(),
+                                                match.getTournament().getName(),
+                                                match.getHomeTeam(),
+                                                match.getAwayTeam(),
+                                                match.getHomeLogo() != null ? baseUrl + match.getHomeLogo() : null,
+                                                match.getAwayLogo() != null ? baseUrl + match.getAwayLogo() : null,
+                                                match.getMatchImage() != null ? baseUrl + match.getMatchImage() : null,
+                                                match.getMatchDate(),
+                                                match.getLocation()))
+                                .collect(Collectors.groupingBy(HomeMatchResponse::tournamentName));
+
+                // Map<String, List<HomeMatchResponse>>
+                // {
+                // "Premier League" -> [match1, match2, match3],
+                // "UEFA Champions League" -> [match4, match5],
+                // "FA Cup" -> [match6]
+                // }
+
+                return new HomeMatchesGroupedResponse(nextMatchDate, matchesByTournament);
         }
 
         // HÀM PHỤ

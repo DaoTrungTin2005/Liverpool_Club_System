@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType; // ĐÚNG
 import vn.liverpool.util.ApiResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
+import vn.liverpool.domain.dto.matches_and_tickets.HomeMatchesGroupedResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.ListTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.StadiumSectionResponse;
@@ -121,5 +122,11 @@ public ResponseEntity<ApiResponse<List<StadiumSectionResponse>>> getAllStadiumSe
     return ResponseEntity.ok(ApiResponse.success("Lấy danh sách khu vực Anfield thành công", sections));
 }
 
+//ĐỔ DỮ LIỆU CỦA MẤY CÁI MATCHES VÀ THỜI GIAN COUNTDOWN
+@GetMapping("/home-matches")
+public ResponseEntity<ApiResponse<HomeMatchesGroupedResponse>> getHomeMatches() {
+    HomeMatchesGroupedResponse response = matchAndTicketService.getHomeMatches();
+    return ResponseEntity.ok(ApiResponse.success("lấy danh sách trận đấu trang chủ thành công", response));
+}
 
 }
