@@ -103,6 +103,14 @@ public class MatchAndTicketController {
         return ResponseEntity.ok(result);
     }
 
+    // ĐỔ DỮ LIỆU CŨ CỦA TICKET KHI MUỐN UPDATE
+    // LẤY CHI TIẾT MỘT TICKET SETTING ĐỂ ĐỔ DỮ LIỆU KHI UPDATE
+    @GetMapping("/detail/ticket/{id}")
+    public ResponseEntity<ApiResponse<ListTicketResponse>> getTicketSettingDetail(@PathVariable Long id) {
+        ListTicketResponse detail = matchAndTicketService.getTicketSettingDetail(id);
+        return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết vé thành công", detail));
+    }
+
     // cập nhật tiket setting
     @PutMapping("/update/ticket/{id}")
     public ResponseEntity<ApiResponse<ListTicketResponse>> updateTicketSetting(
