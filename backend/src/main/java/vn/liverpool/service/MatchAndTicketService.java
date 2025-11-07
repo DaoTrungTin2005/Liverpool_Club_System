@@ -475,6 +475,25 @@ public class MatchAndTicketService {
                 return new HomeMatchesGroupedResponse(nextMatchDate, matchesByTournament);
         }
 
+        // HIỂN THỊ THÔNG TIN TRẬN ĐẤU PHÍA TRÊN CÁI SÂN CỦA TRANG NGƯỜI DÙNG
+        @Transactional(readOnly = true)
+        public MatchHeaderResponse getMatchHeader(Long matchId) {
+                String baseUrl = getBaseUrl() + "/uploads/matches/";
+
+                Match match = matchRepo.findById(matchId)
+                                .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
+
+                return new MatchHeaderResponse(
+                                match.getTournament().getName(),
+                                match.getHomeTeam(),
+                                match.getAwayTeam(),
+                                match.getHomeLogo() != null ? baseUrl + match.getHomeLogo() : null,
+                                match.getAwayLogo() != null ? baseUrl + match.getAwayLogo() : null,
+                                match.getMatchImage() != null ? baseUrl + match.getMatchImage() : null,
+                                match.getMatchDate(),
+                                match.getLocation());
+        }
+
         // HÀM PHỤ
 
         private String saveFile(MultipartFile file, String dir) {

@@ -17,6 +17,7 @@ import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.HomeMatchesGroupedResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.ListTicketResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
+import vn.liverpool.domain.dto.matches_and_tickets.MatchHeaderResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.StadiumSectionResponse;
 import vn.liverpool.domain.dto.matches_and_tickets.UpdateTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.ViewMatchAndTicketResponse;
@@ -115,18 +116,24 @@ public class MatchAndTicketController {
     // Đổ dữ liệu cũ của setting setting khi cập nhât
 
     // lấy chi tiết ticket setting
-// === LẤY TOÀN BỘ KHU VỰC SÂN ANFIELD (110 ô) ===
-@GetMapping("/stadium/sections")
-public ResponseEntity<ApiResponse<List<StadiumSectionResponse>>> getAllStadiumSections() {
-    List<StadiumSectionResponse> sections = matchAndTicketService.getAllStadiumSections();
-    return ResponseEntity.ok(ApiResponse.success("Lấy danh sách khu vực Anfield thành công", sections));
-}
+    // === LẤY TOÀN BỘ KHU VỰC SÂN ANFIELD (110 ô) ===
+    @GetMapping("/stadium/sections")
+    public ResponseEntity<ApiResponse<List<StadiumSectionResponse>>> getAllStadiumSections() {
+        List<StadiumSectionResponse> sections = matchAndTicketService.getAllStadiumSections();
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách khu vực Anfield thành công", sections));
+    }
 
-//ĐỔ DỮ LIỆU CỦA MẤY CÁI MATCHES VÀ THỜI GIAN COUNTDOWN
-@GetMapping("/home-matches")
-public ResponseEntity<ApiResponse<HomeMatchesGroupedResponse>> getHomeMatches() {
-    HomeMatchesGroupedResponse response = matchAndTicketService.getHomeMatches();
-    return ResponseEntity.ok(ApiResponse.success("lấy danh sách trận đấu trang chủ thành công", response));
-}
+    // ĐỔ DỮ LIỆU CỦA MẤY CÁI MATCHES VÀ THỜI GIAN COUNTDOWN
+    @GetMapping("/home-matches")
+    public ResponseEntity<ApiResponse<HomeMatchesGroupedResponse>> getHomeMatches() {
+        HomeMatchesGroupedResponse response = matchAndTicketService.getHomeMatches();
+        return ResponseEntity.ok(ApiResponse.success("lấy danh sách trận đấu trang chủ thành công", response));
+    }
 
+    // HIỂN THI THÔNG TIN TRẬN ĐẤU PHÍA TRÊN CÁI SÂN BÊN TRANG NGƯỜI DÙNG
+    @GetMapping("/match/{matchId}/header")
+    public ResponseEntity<ApiResponse<MatchHeaderResponse>> getMatchHeader(@PathVariable Long matchId) {
+        return ResponseEntity.ok(ApiResponse.success("information of match ok òi",
+                matchAndTicketService.getMatchHeader(matchId)));
+    }
 }
