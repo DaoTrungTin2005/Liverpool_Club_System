@@ -19,6 +19,10 @@ public class OrderTicket {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false) // hoặc nullable = true nếu cho guest
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
     private Match match;
 
@@ -35,7 +39,6 @@ public class OrderTicket {
     @Column(nullable = false)
     private String customerPhone;
 
-    // ✅ THÊM TRƯỜNG ADDRESS (NULLABLE)
     @Column(length = 255)
     private String customerAddress;
 
@@ -46,17 +49,27 @@ public class OrderTicket {
     private BigDecimal totalPrice;
 
     @Column(nullable = false, length = 50)
-    private String orderCode; // Mã đơn hàng duy nhất
+    private String orderCode;
+
+    // ========== PAYMENT TRANSACTION IDs ==========
+    @Column(length = 50)
+    private String vnpayTransactionNo; // VNPay
 
     @Column(length = 50)
-    private String vnpayTransactionNo; // Mã giao dịch VNPay
+    private String momoTransactionId; // Momo
+
+    @Column(length = 100)
+    private String zaloPayAppTransId; // ZaloPay - ✅ THÊM DÒNG NÀY
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
     @Column(length = 20)
-    private String paymentMethod; // VNPay bank code
+    private String paymentMethod; // Bank code (VNPay) hoặc payment provider
+
+    @Column(length = 20)
+    private String paymentType; // "VNPAY", "MOMO", "ZALOPAY" - ✅ THÊM DÒNG NÀY
 
     @Column(columnDefinition = "TEXT")
     private String note;

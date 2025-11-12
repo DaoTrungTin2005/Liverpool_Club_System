@@ -17,5 +17,9 @@ public record OrderTicketResponse(
     BigDecimal totalPrice,
     OrderStatus status,
     String paymentUrl,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+
+    // THÊM 2 TRƯỜNG
+    Long accountId,
+    String accountEmail
 ) {}

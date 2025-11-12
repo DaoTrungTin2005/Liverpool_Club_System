@@ -78,6 +78,27 @@ vnpay:
   order-type: other
 
 # =============================
+# MOMO PAYMENT CONFIG
+# =============================
+momo:
+  partner-code: MOMO
+  access-key: F8590A51A5AFCC5A
+  secret-key: I6Er3EIrg84ViNO95HiO7g5Havi12g5d
+  endpoint: https://test-payment.momo.vn/v2/gateway/api/create
+  return-url: https://8c9550b36ed5.ngrok-free.app/api/payment/momo-return
+  notify-url: https://8c9550b36ed5.ngrok-free.app/api/payment/momo-notify
+
+# =============================
+# ZALOPAY PAYMENT CONFIG - ✅ THÊM SECTION NÀY
+# =============================
+zalopay:
+  app-id: "553"
+  key1: 9phuBg69KkgfxPKBjVrQHWj7Vtetdzq1
+  key2: Uat5fAacbErBcrVQbZ0FSpcJHiynzCqA
+  endpoint: https://sandbox.zalopay.com.vn/api/v2/create
+  return-url: https://8c9550b36ed5.ngrok-free.app/api/payment/zalopay-return
+  callback-url: https://8c9550b36ed5.ngrok-free.app/api/payment/zalopay-callback
+# =============================
 # LOGGING
 # =============================
 logging:
