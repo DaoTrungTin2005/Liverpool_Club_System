@@ -34,7 +34,7 @@ public class PaymentController {
 
     // ========== PAYMENT METHOD SELECTION ==========
     
-    // ✅ TẠO LINK VNPAY
+    //  TẠO LINK VNPAY
     @PostMapping("/create-vnpay/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createVNPayUrl(
             @PathVariable Long orderId) {
@@ -45,8 +45,7 @@ public class PaymentController {
         
         return ResponseEntity.ok(ApiResponse.success("Tạo link VNPay thành công!", data));
     }
-
-    // ✅ TẠO LINK MOMO
+    //  TẠO LINK MOMO
     @PostMapping("/create-momo/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createMomoUrl(
             @PathVariable Long orderId) {
@@ -58,7 +57,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success("Tạo link Momo thành công!", data));
     }
 
-    // ✅ TẠO LINK ZALOPAY - THÊM ENDPOINT NÀY
+    //  TẠO LINK ZALOPAY - THÊM ENDPOINT NÀY
     @PostMapping("/create-zalopay/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createZaloPayUrl(
             @PathVariable Long orderId) {
@@ -72,7 +71,7 @@ public class PaymentController {
 
     // ========== CALLBACK URLs ==========
     
-    // ✅ VNPAY CALLBACK
+    //  VNPAY CALLBACK
     @GetMapping("/vnpay-return")
     public ResponseEntity<ApiResponse<OrderTicketResponse>> vnpayReturn(HttpServletRequest request) {
         Map<String, String> params = new HashMap<>();
@@ -91,7 +90,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
-    // ✅ MOMO CALLBACK - RETURN
+    //  MOMO CALLBACK - RETURN
     @GetMapping("/momo-return")
     public ResponseEntity<ApiResponse<OrderTicketResponse>> momoReturn(
             @RequestParam String orderId,
@@ -116,7 +115,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(responseMessage, response));
     }
 
-    // ✅ MOMO CALLBACK - NOTIFY (Server-to-Server)
+    //  MOMO CALLBACK - NOTIFY (Server-to-Server)
     @PostMapping("/momo-notify")
     public ResponseEntity<Map<String, Object>> momoNotify(
             @RequestBody Map<String, String> params) {
@@ -138,7 +137,7 @@ public class PaymentController {
         }
     }
 
-    // ✅ ZALOPAY CALLBACK - RETURN - THÊM ENDPOINT NÀY
+    //  ZALOPAY CALLBACK - RETURN - THÊM ENDPOINT NÀY
     @GetMapping("/zalopay-return")
     public ResponseEntity<ApiResponse<OrderTicketResponse>> zaloPayReturn(
             HttpServletRequest request) {
@@ -160,7 +159,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
-    // ✅ ZALOPAY CALLBACK - NOTIFY (Server-to-Server) - THÊM ENDPOINT NÀY
+    //  ZALOPAY CALLBACK - NOTIFY (Server-to-Server) - THÊM ENDPOINT NÀY
     @PostMapping("/zalopay-callback")
     public ResponseEntity<Map<String, Object>> zaloPayCallback(
             @RequestBody Map<String, String> params) {
