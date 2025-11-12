@@ -66,6 +66,18 @@ liverpool:
     token-validity-in-seconds: 8640000
 
 # =============================
+# VNPAY CONFIG
+# =============================
+vnpay:
+  tmn-code: V47H1UFP
+  hash-secret: GCXFR9H3H5XT3IH3XTWU6PQXAONP969P
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: https://8c9550b36ed5.ngrok-free.app/api/payment/vnpay-return
+  version: 2.1.0
+  command: pay
+  order-type: other
+
+# =============================
 # LOGGING
 # =============================
 logging:
