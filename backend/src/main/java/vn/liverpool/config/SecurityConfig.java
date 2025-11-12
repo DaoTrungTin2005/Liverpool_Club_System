@@ -54,7 +54,8 @@ public class SecurityConfig {
                                 "/error",
                                 "/api/auth/login/google",
                                 "/api/auth/login/google/start",
-                                "/oauth2-success.html" // Cho phép hiển thị trang lỗi
+                                "/oauth2-success.html", // Cho phép hiển thị trang lỗi
+                                "/api/payment/**" // ← THÊM DÒNG NÀY
                         ).permitAll()
                         .anyRequest().authenticated())
 
