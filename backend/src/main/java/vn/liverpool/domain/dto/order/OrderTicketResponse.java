@@ -12,9 +12,10 @@ public record OrderTicketResponse(
     String customerName,
     String customerEmail,
     String customerPhone,
+    String customerAddress, // ✅ THÊM
     Integer quantity,
     BigDecimal totalPrice,
     OrderStatus status,
-    String paymentUrl,  // URL thanh toán VNPay
+    String paymentUrl,
     LocalDateTime createdAt
 ) {}

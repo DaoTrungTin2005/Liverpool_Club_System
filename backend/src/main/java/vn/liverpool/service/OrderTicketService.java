@@ -30,22 +30,21 @@ public class OrderTicketService {
     public OrderTicketResponse createOrder(CreateOrderTicketRequest dto) {
         // 1. Kiểm tra Match và Section
         Match match = matchRepo.findById(dto.matchId())
-            .orElseThrow(() -> new IllegalArgumentException("Match not found: " + dto.matchId()));
-        
+                .orElseThrow(() -> new IllegalArgumentException("Match not found: " + dto.matchId()));
+
         StadiumSection section = sectionRepo.findById(dto.sectionId())
-            .orElseThrow(() -> new IllegalArgumentException("Section not found: " + dto.sectionId()));
+                .orElseThrow(() -> new IllegalArgumentException("Section not found: " + dto.sectionId()));
 
         // 2. Lấy TicketSetting
         TicketSetting ticketSetting = ticketSettingRepo
-            .findByMatchIdAndSectionId(dto.matchId(), dto.sectionId())
-            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé cho khu vực này"));
+                .findByMatchIdAndSectionId(dto.matchId(), dto.sectionId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé cho khu vực này"));
 
         // 3. Kiểm tra số lượng vé còn lại
         int available = ticketSetting.getTotalQuantity() - ticketSetting.getSoldQuantity();
         if (dto.quantity() > available) {
             throw new IllegalArgumentException(
-                String.format("Chỉ còn %d vé cho khu vực này. Bạn đang chọn %d vé.", available, dto.quantity())
-            );
+                    String.format("Chỉ còn %d vé cho khu vực này. Bạn đang chọn %d vé.", available, dto.quantity()));
         }
 
         // 4. Tính tổng tiền
@@ -56,18 +55,19 @@ public class OrderTicketService {
 
         // 6. Tạo OrderTicket
         OrderTicket order = OrderTicket.builder()
-            .match(match)
-            .section(section)
-            .customerName(dto.customerName())
-            .customerEmail(dto.customerEmail())
-            .customerPhone(dto.customerPhone())
-            .quantity(dto.quantity())
-            .totalPrice(totalPrice)
-            .orderCode(orderCode)
-            .status(OrderStatus.PENDING)
-            .note(dto.note())
-            .createdAt(LocalDateTime.now())
-            .build();
+                .match(match)
+                .section(section)
+                .customerName(dto.customerName())
+                .customerEmail(dto.customerEmail())
+                .customerPhone(dto.customerPhone())
+                .customerAddress(dto.customerAddress()) // ✅ THÊM DÒNG NÀY
+                .quantity(dto.quantity())
+                .totalPrice(totalPrice)
+                .orderCode(orderCode)
+                .status(OrderStatus.PENDING)
+                .note(dto.note())
+                .createdAt(LocalDateTime.now())
+                .build();
 
         OrderTicket savedOrder = orderRepo.save(order);
 
@@ -75,29 +75,28 @@ public class OrderTicketService {
         String matchInfo = match.getHomeTeam() + " vs " + match.getAwayTeam();
         String orderInfo = String.format("Thanh toan ve %s - %s", matchInfo, section.getName());
         String ipAddress = getClientIP();
-        
+
         String paymentUrl = vnPayService.createPaymentUrl(
-            orderCode,
-            totalPrice.longValue(),
-            orderInfo,
-            ipAddress
-        );
+                orderCode,
+                totalPrice.longValue(),
+                orderInfo,
+                ipAddress);
 
         // 8. Return response
         return new OrderTicketResponse(
-            savedOrder.getId(),
-            savedOrder.getOrderCode(),
-            matchInfo,
-            section.getName(),
-            savedOrder.getCustomerName(),
-            savedOrder.getCustomerEmail(),
-            savedOrder.getCustomerPhone(),
-            savedOrder.getQuantity(),
-            savedOrder.getTotalPrice(),
-            savedOrder.getStatus(),
-            paymentUrl,
-            savedOrder.getCreatedAt()
-        );
+                savedOrder.getId(),
+                savedOrder.getOrderCode(),
+                matchInfo,
+                section.getName(),
+                savedOrder.getCustomerName(),
+                savedOrder.getCustomerEmail(),
+                savedOrder.getCustomerPhone(),
+                savedOrder.getCustomerAddress(),
+                savedOrder.getQuantity(),
+                savedOrder.getTotalPrice(),
+                savedOrder.getStatus(),
+                paymentUrl,
+                savedOrder.getCreatedAt());
     }
 
     @Transactional
@@ -116,7 +115,7 @@ public class OrderTicketService {
 
         // 3. Tìm order
         OrderTicket order = orderRepo.findByOrderCode(orderCode)
-            .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderCode));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderCode));
 
         // 4. Xử lý theo response code
         if ("00".equals(responseCode)) {
@@ -128,12 +127,12 @@ public class OrderTicketService {
 
             // Cập nhật soldQuantity trong TicketSetting
             TicketSetting ticketSetting = ticketSettingRepo
-                .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
-                .orElseThrow();
-            
+                    .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
+                    .orElseThrow();
+
             ticketSetting.setSoldQuantity(ticketSetting.getSoldQuantity() + order.getQuantity());
             ticketSettingRepo.save(ticketSetting);
-            
+
         } else {
             // Thanh toán thất bại
             order.setStatus(OrderStatus.FAILED);
@@ -144,19 +143,19 @@ public class OrderTicketService {
         // 5. Return response
         String matchInfo = order.getMatch().getHomeTeam() + " vs " + order.getMatch().getAwayTeam();
         return new OrderTicketResponse(
-            updatedOrder.getId(),
-            updatedOrder.getOrderCode(),
-            matchInfo,
-            order.getSection().getName(),
-            updatedOrder.getCustomerName(),
-            updatedOrder.getCustomerEmail(),
-            updatedOrder.getCustomerPhone(),
-            updatedOrder.getQuantity(),
-            updatedOrder.getTotalPrice(),
-            updatedOrder.getStatus(),
-            null,
-            updatedOrder.getCreatedAt()
-        );
+                updatedOrder.getId(),
+                updatedOrder.getOrderCode(),
+                matchInfo,
+                order.getSection().getName(),
+                updatedOrder.getCustomerName(),
+                updatedOrder.getCustomerEmail(),
+                updatedOrder.getCustomerPhone(),
+                updatedOrder.getCustomerAddress(),
+                updatedOrder.getQuantity(),
+                updatedOrder.getTotalPrice(),
+                updatedOrder.getStatus(),
+                null,
+                updatedOrder.getCreatedAt());
     }
 
     private String generateOrderCode() {
