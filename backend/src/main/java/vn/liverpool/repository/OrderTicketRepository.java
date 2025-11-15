@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import vn.liverpool.domain.OrderTicket;
 import vn.liverpool.domain.OrderTicket.OrderStatus;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +19,6 @@ public interface OrderTicketRepository extends JpaRepository<OrderTicket, Long> 
     Page<OrderTicket> findByStatus(OrderStatus status, Pageable pageable);
     
     Page<OrderTicket> findByCustomerEmailContaining(String email, Pageable pageable);
+
+    List<OrderTicket> findByStatusAndCreatedAtBefore(OrderStatus status, LocalDateTime createdAt);
 }

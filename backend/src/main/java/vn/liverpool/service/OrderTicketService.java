@@ -2,6 +2,8 @@ package vn.liverpool.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.liverpool.domain.*;
@@ -15,6 +17,7 @@ import vn.liverpool.repository.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -331,4 +334,31 @@ public class OrderTicketService {
         }
         return xfHeader.split(",")[0];
     }
+
+    // THÊM VÀO CUỐI CLASS, TRƯỚC DẤU }
+@Scheduled(fixedRate = 30000) // Chạy mỗi 60 giây
+@Transactional
+public void cancelExpiredPendingOrders() {
+    LocalDateTime expireTime = LocalDateTime.now().minusMinutes(5); // 5 PHÚT
+
+    List<OrderTicket> expiredOrders = orderRepo.findByStatusAndCreatedAtBefore(
+        OrderStatus.PENDING, expireTime);
+
+    for (OrderTicket order : expiredOrders) {
+        order.setStatus(OrderStatus.CANCELLED);
+
+        // HOÀN VÉ VỀ KHO
+        TicketSetting setting = ticketSettingRepo
+            .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
+            .orElse(null);
+
+        if (setting != null) {
+            int newSold = setting.getSoldQuantity() - order.getQuantity();
+            setting.setSoldQuantity(Math.max(0, newSold));
+            ticketSettingRepo.save(setting);
+        }
+
+        orderRepo.save(order);
+    }
+}
 }

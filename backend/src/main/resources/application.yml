@@ -72,7 +72,7 @@ vnpay:
   tmn-code: V47H1UFP
   hash-secret: GCXFR9H3H5XT3IH3XTWU6PQXAONP969P
   url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  return-url: https://8c9550b36ed5.ngrok-free.app/api/payment/vnpay-return
+  return-url:     https://3378a757b4d7.ngrok-free.app/api/payment/vnpay-return
   version: 2.1.0
   command: pay
   order-type: other
@@ -85,8 +85,8 @@ momo:
   access-key: klm05TvNBzhg7h7j
   secret-key: at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa
   endpoint: https://test-payment.momo.vn/v2/gateway/api/create
-  return-url: https://8c9550b36ed5.ngrok-free.app/api/payment/momo-return
-  notify-url: https://8c9550b36ed5.ngrok-free.app/api/payment/momo-notify
+  return-url:   https://3378a757b4d7.ngrok-free.app/api/payment/momo-return
+  notify-url: https://3378a757b4d7.ngrok-free.app/api/payment/momo-notify
 
 # =============================
 # ZALOPAY PAYMENT CONFIG - ✅ THÊM SECTION NÀY
@@ -96,8 +96,8 @@ zalopay:
   key1: 9phuBg69KkgfxPKBjVrQHWj7Vtetdzq1
   key2: Uat5fAacbErBcrVQbZ0FSpcJHiynzCqA
   endpoint: https://sandbox.zalopay.com.vn/api/v2/create
-  return-url: https://8c9550b36ed5.ngrok-free.app/api/payment/zalopay-return
-  callback-url: https://8c9550b36ed5.ngrok-free.app/api/payment/zalopay-callback
+  return-url: https://3378a757b4d7.ngrok-free.app/api/payment/zalopay-return
+  callback-url: https://3378a757b4d7.ngrok-free.app/api/payment/zalopay-callback
 # =============================
 # LOGGING
 # =============================
