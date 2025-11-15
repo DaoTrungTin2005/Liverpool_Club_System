@@ -12,14 +12,13 @@ public record OrderTicketResponse(
     String customerName,
     String customerEmail,
     String customerPhone,
-    String customerAddress, // ✅ THÊM
+    String customerAddress,
     Integer quantity,
     BigDecimal totalPrice,
     OrderStatus status,
     String paymentUrl,
     LocalDateTime createdAt,
 
-    // THÊM 2 TRƯỜNG
     Long accountId,
     String accountEmail
 ) {}

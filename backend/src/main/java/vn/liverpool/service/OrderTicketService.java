@@ -8,6 +8,8 @@ import vn.liverpool.domain.*;
 import vn.liverpool.domain.OrderTicket.OrderStatus;
 import vn.liverpool.domain.dto.order.CreateOrderTicketRequest;
 import vn.liverpool.domain.dto.order.OrderTicketResponse;
+import vn.liverpool.domain.dto.order.ValidateSelectionRequest;
+import vn.liverpool.domain.dto.order.ValidateSelectionResponse;
 import vn.liverpool.repository.*;
 
 import java.math.BigDecimal;
@@ -25,9 +27,39 @@ public class OrderTicketService {
     private final TicketSettingRepository ticketSettingRepo;
     private final VNPayService vnPayService;
     private final MomoService momoService;
-    private final ZaloPayService zaloPayService; // ✅ THÊM DÒNG NÀY
+    private final ZaloPayService zaloPayService;
     private final HttpServletRequest request;
     private final UserContextService userContextService;
+
+    // Validate lựa chọn vé
+    public ValidateSelectionResponse validateSelection(ValidateSelectionRequest dto) {
+        Match match = matchRepo.findById(dto.matchId())
+                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+
+        StadiumSection section = sectionRepo.findById(dto.sectionId())
+                .orElseThrow(() -> new IllegalArgumentException("Section not found"));
+
+        TicketSetting setting = ticketSettingRepo
+                .findByMatchIdAndSectionId(dto.matchId(), dto.sectionId())
+                .orElseThrow(() -> new IllegalArgumentException("Seat isn't available"));
+
+        int available = setting.getTotalQuantity() - setting.getSoldQuantity();
+        if (dto.quantity() > available) {
+            // CHỈ TRẢ VỀ MESSAGE GỌN – FE HIỆN NGAY
+            throw new IllegalArgumentException(
+                    String.format("THERE ARE ONLY %d SEATS IN THIS SECTION", available));
+        }
+
+        BigDecimal totalPrice = setting.getPrice().multiply(BigDecimal.valueOf(dto.quantity()));
+
+        return new ValidateSelectionResponse(
+                available,
+                setting.getPrice(),
+                totalPrice,
+                section.getName(),
+                "THERE ARE " + available + " SEATS AVAILABLE" + " ,SỐ LƯỢNG OK RỒI ĐÓ, HỢP LỆ ĐÓ, CHUYỂN QUA TRANG THANH TOÁN ĐI"// FE hiện dòng này nếu OK
+        );
+    }
 
     // ========== CREATE ORDER ==========
     @Transactional
@@ -40,17 +72,17 @@ public class OrderTicketService {
 
         TicketSetting ticketSetting = ticketSettingRepo
                 .findByMatchIdAndSectionId(dto.matchId(), dto.sectionId())
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vé cho khu vực này"));
+                .orElseThrow(() -> new IllegalArgumentException("Ticket not found for this section"));
 
         Account currentAccount = userContextService.getCurrentAccount();
         if (currentAccount == null) {
-            throw new IllegalArgumentException("Bạn cần đăng nhập để đặt vé!");
+            throw new IllegalArgumentException("You must be logged in to place an order.");
         }
 
         int available = ticketSetting.getTotalQuantity() - ticketSetting.getSoldQuantity();
         if (dto.quantity() > available) {
             throw new IllegalArgumentException(
-                    String.format("Chỉ còn %d vé cho khu vực này. Bạn đang chọn %d vé.", available, dto.quantity()));
+                    String.format("There are only %d seats in this section", available, dto.quantity()));
         }
 
         BigDecimal totalPrice = ticketSetting.getPrice().multiply(BigDecimal.valueOf(dto.quantity()));

@@ -59,7 +59,7 @@ public class OrderTicket {
     private String momoTransactionId; // Momo
 
     @Column(length = 100)
-    private String zaloPayAppTransId; // ZaloPay - ✅ THÊM DÒNG NÀY
+    private String zaloPayAppTransId; // ZaloPay 
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
