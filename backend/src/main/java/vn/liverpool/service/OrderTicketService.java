@@ -226,7 +226,7 @@ public class OrderTicketService {
     // ========== MOMO CALLBACK ==========
     @Transactional
     public OrderTicketResponse handleMomoReturn(java.util.Map<String, String> params) {
-        boolean isValid = momoService.verifyPaymentSignature(params);
+        boolean isValid = momoService.verifySignature(params);
         if (!isValid) {
             throw new IllegalArgumentException("Chữ ký Momo không hợp lệ!");
         }
