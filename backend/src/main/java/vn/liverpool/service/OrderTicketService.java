@@ -143,6 +143,12 @@ public class OrderTicketService {
         OrderTicket order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
 
+        if (order.getStatus() == OrderStatus.PAID) {
+            throw new IllegalStateException("Đơn hàng đã được thanh toán rồi!");
+        } else if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Đơn hàng đã bị hủy!");
+        }
+
         String matchInfo = order.getMatch().getHomeTeam() + " vs " + order.getMatch().getAwayTeam();
         String orderInfo = String.format("Thanh toan ve %s - %s", matchInfo, order.getSection().getName());
         String ipAddress = getClientIP();
@@ -165,6 +171,12 @@ public class OrderTicketService {
         OrderTicket order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
 
+        if (order.getStatus() == OrderStatus.PAID) {
+            throw new IllegalStateException("Đơn hàng đã được thanh toán rồi!");
+        } else if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Đơn hàng đã bị hủy!");
+        }
+
         String matchInfo = order.getMatch().getHomeTeam() + " vs " + order.getMatch().getAwayTeam();
         String orderInfo = String.format("Thanh toan ve %s - %s", matchInfo, order.getSection().getName());
 
@@ -184,6 +196,12 @@ public class OrderTicketService {
     public String createZaloPayPaymentUrl(Long orderId) {
         OrderTicket order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
+
+        if (order.getStatus() == OrderStatus.PAID) {
+            throw new IllegalStateException("Đơn hàng đã được thanh toán rồi!");
+        } else if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Đơn hàng đã bị hủy!");
+        }
 
         String matchInfo = order.getMatch().getHomeTeam() + " vs " + order.getMatch().getAwayTeam();
         String orderInfo = String.format("Thanh toan ve %s - %s", matchInfo, order.getSection().getName());
@@ -342,7 +360,8 @@ public class OrderTicketService {
         for (OrderTicket order : expiredOrders) {
             order.setStatus(OrderStatus.CANCELLED);
 
-         // tìm ticket_setting tương ứng để trừ số lượng vé đã đặt trong đơn hàng ra khỏi sold_quantity
+            // tìm ticket_setting tương ứng để trừ số lượng vé đã đặt trong đơn hàng ra khỏi
+            // sold_quantity
             TicketSetting setting = ticketSettingRepo
                     .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
                     .orElse(null);
