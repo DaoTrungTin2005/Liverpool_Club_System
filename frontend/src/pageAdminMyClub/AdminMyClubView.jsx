@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import api from "../Api/apitoken.js";
+import "../output.css";
+import { logout } from "../Api/logout.js";
 export default function AdminMyClubView() {
   const [showStats, setShowStats] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -132,7 +134,7 @@ export default function AdminMyClubView() {
         <div className="container flex flex-col shadow-3xl w-[20%] h-dvh items-center justify-center bg-white">
           <ImgAdminUser01Component />
           <LinkGoPage />
-          <Button text={"Log Out"} />
+          <Button text={"Log Out"} onClick={logout} />
         </div>
 
         {/* ==== MAIN CONTENT ==== */}

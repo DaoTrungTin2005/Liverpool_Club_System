@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import "../pageRegister/Register.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../Api/logout.js";
 
 export default function AdminUser() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function AdminUser() {
         <div className="container flex flex-col shadow-3xl w-[20%] h-dvh items-center justify-center bg-white">
           <ImgAdminUser01Component />
           <LinkGoPage />
-          <Button text={"Log Out"} />
+          <Button text={"Log Out"} onClick={logout} />
         </div>
         <div className="flex flex-col w-[78%]">
           <div className="flex justify-between w-full items-center mb-6">

@@ -12,6 +12,7 @@ export default function Search({
   onResult,
   onSearchStart,
   onSearchEnd,
+  class_name,
 }) {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,9 @@ export default function Search({
   };
 
   return (
-    <div className="flex gap-2 m-4 p-2 rounded-3xl w-sm bg-white items-center justify-around h-10 mt-10">
+    <div
+      className={`flex items-center justify-around gap-2 m-4 mt-10 p-2 h-10 w-sm bg-white rounded-3xl ${class_name}`}
+    >
       <form
         className="flex items-center gap-2 h-7 w-3xs rounded-2xl bg-[#F4F7FE]"
         onSubmit={handleSearch}

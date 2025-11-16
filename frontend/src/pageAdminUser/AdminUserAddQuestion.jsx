@@ -5,73 +5,41 @@ import Button from "./componentAdminUser/Button.jsx";
 import FrameX from "../assets/img/FrameX.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import Options from "./componentAdminUser/options.jsx";
-import axios from "axios";
+import api from "../Api/apitoken.js";
 
 export default function AddUserAddQuestion() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const userData = location.state?.userData;
-
-  // Bảo vệ: nếu không có dữ liệu → quay lại
-  if (!userData) {
-    navigate("/admin/user/add");
-    return null;
-  }
+  const { state } = useLocation();
+  const userData = state?.userData;
 
   const handleYes = async () => {
-    if (!userData?.email) {
-      alert("Invalid email.");
-      navigate("/admin/user/add");
-      return;
-    }
-
     try {
-      const token = localStorage.getItem("authToken");
+      await api.post("/api/admin/users/add", {
+        fullName: userData?.fullName?.trim(),
+        email: userData?.email?.trim(),
+        role: (userData?.role || "USER").toUpperCase(),
+        password: userData?.password,
+      });
 
-      // BƯỚC 1: KIỂM TRA EMAIL TRÙNG (nếu backend có API)
-      // Nếu không có → vẫn gửi API và bắt lỗi 409/400
-      const res = await axios.post(
-        "https://0d9ffd8a6329.ngrok-free.app/api/admin/users/add",
-        {
-          fullName: userData.fullName?.trim(),
-          email: userData.email?.trim(),
-          role: (userData.role || "USER").toUpperCase(),
-          password: userData.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
-      );
-
-      if (res.status === 201 || res.data.success) {
-        alert("User added successfully!");
-        navigate("/admin/user");
-      }
+      alert("Thêm người dùng thành công!");
+      navigate("/admin/user");
     } catch (err) {
-      console.error("API Error:", err);
       const msg = err.response?.data?.message || err.message;
 
-      // BẮT LỖI TRÙNG EMAIL
-      if (
-        msg?.includes("Duplicate entry") ||
-        msg?.includes("already exists") ||
-        err.response?.status === 409
-      ) {
-        alert("Lỗi: Email này đã được sử dụng!");
+      if (err.response?.status === 401) {
+        alert("Phiên hết hạn rồi nha!");
+        return;
+      }
+
+      if (err.response?.status === 409 || /duplicate|exists/i.test(msg)) {
+        alert("Email này đã được dùng rồi!");
       } else {
-        alert("Thêm người dùng thất bại: " + msg);
-        navigate("/admin/user/add");
+        alert("Lỗi: " + (msg || "Không thêm được user"));
       }
     }
   };
 
-  const handleNo = () => {
-    navigate("/admin/user/add");
-  };
+  const handleNo = () => navigate(-1);
   return (
     <>
       <div className="bg-linear-[var(--colorBg)] flex min-h-screen">

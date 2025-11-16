@@ -1,5 +1,5 @@
 // src/componentUserView/CardTour.jsx
-export default function CardTour({ image, name }) {
+export default function CardTour({ image, name, onViewMore }) {
   return (
     <div
       className="
@@ -45,14 +45,17 @@ export default function CardTour({ image, name }) {
       {/* Nút VIEW MORE – KHÔNG BLUR, luôn rõ */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
         <button
-          onClick={(e) => e.stopPropagation()}
+          onClick={() => {
+            if (onViewMore) onViewMore(name); // gọi hàm từ Match.jsx
+          }}
           className="
             px-6 py-2 bg-white/20 backdrop-blur-sm 
-            text-black font-bold text-sm tracking-wider 
+            text-black font-bold text-xs tracking-wider 
             rounded-full border border-white/50 
             shadow-lg transition-all duration-300
             group-hover:bg-black group-hover:scale-110
-            group-hover:text-white
+            group-hover:text-white shadow-red-500
+            ring-red-500 group-hover:shadow-yellow-50 cursor-pointer
           "
         >
           VIEW MORE

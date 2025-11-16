@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 
 export default function CountDown({ targetDate }) {
@@ -48,19 +46,19 @@ export default function CountDown({ targetDate }) {
         rel="stylesheet"
       />
 
-      <div className="bg-gradient-to-b from-zinc-900 to-black px-8 py-20 my-20 rounded-md border border-white shadow-[0_0_20px_rgba(255, 255, 255, 1)] font-sans">
-        <div className="flex items-center gap-6 text-white font-bold uppercase tracking-widest text-sm justify-center">
+      <div className="bg-gradient-to-b from-zinc-900 to-black px-8 py-20 my-20 rounded-md border border-white shadow-[0_0_20px_rgba(255, 255, 255, 1)] font-sans max-sm:py-10 max-sm:px-2">
+        <div className="flex items-center gap-6 text-white font-bold uppercase tracking-widest text-sm justify-center max-sm:gap-1">
           {/* NEXT MATCH : */}
-          <span className="text-4xl whitespace-nowrap font-[Pridi]">
+          <span className="text-4xl max-sm:text-xs whitespace-nowrap font-[Pridi]">
             NEXT MATCH :
           </span>
 
           {/* Countdown */}
-          <div className="flex gap-15 text-white">
+          <div className="flex gap-15 max-sm:gap-5 text-white">
             {/* DAYS */}
             <div className="text-center">
               <div
-                className="text-7xl font-bold"
+                className="text-7xl max-sm:text-xs font-bold"
                 style={{
                   fontFamily: '"Protest Guerrilla", sans-serif',
                   textShadow: "0 0 10px rgba(255, 255, 255, 1)",
@@ -68,15 +66,15 @@ export default function CountDown({ targetDate }) {
               >
                 {format(timeLeft.days)}
               </div>
-              <div className="text-5xl text-gray-500 mt-1 tracking-wider">
+              <div className="text-5xl max-sm:text-xs text-gray-500 mt-1 tracking-wider">
                 DAYS
               </div>
             </div>
-            <p className="my-auto text-8xl">:</p>
+            <p className="my-auto text-8xl max-sm:text-xs">:</p>
             {/* HOURS */}
             <div className="text-center">
               <div
-                className="text-7xl font-bold"
+                className="text-7xl max-sm:text-xs font-bold"
                 style={{
                   fontFamily: '"Protest Guerrilla", sans-serif',
                   textShadow: "0 0 10px rgba(255, 255, 255, 1)",
@@ -84,15 +82,15 @@ export default function CountDown({ targetDate }) {
               >
                 {format(timeLeft.hours)}
               </div>
-              <div className="text-4xl text-gray-500 mt-1 tracking-wider">
+              <div className="text-4xl max-sm:text-xs text-gray-500 mt-1 tracking-wider">
                 HOURS
               </div>
             </div>
-            <p className="my-auto text-8xl">:</p>
+            <p className="my-auto text-8xl max-sm:text-xs">:</p>
             {/* MINUTES */}
             <div className="text-center">
               <div
-                className="text-7xl font-bold"
+                className="text-7xl  max-sm:text-xs font-bold"
                 style={{
                   fontFamily: '"Protest Guerrilla", sans-serif',
                   textShadow: "0 0 10px rgba(255, 255, 255, 1)",
@@ -100,16 +98,16 @@ export default function CountDown({ targetDate }) {
               >
                 {format(timeLeft.minutes)}
               </div>
-              <div className="text-4xl text-gray-500 mt-1 tracking-wider">
+              <div className="text-4xl max-sm:text-xs text-gray-500 mt-1 tracking-wider">
                 MINS
               </div>
             </div>
-            <p className="my-auto text-8xl">:</p>
+            <p className="my-auto text-8xl max-sm:text-xs">:</p>
 
             {/* SECONDS */}
             <div className="text-center">
               <div
-                className="text-7xl font-bold"
+                className="text-7xl max-sm:text-xs font-bold"
                 style={{
                   fontFamily: '"Protest Guerrilla", sans-serif',
                   textShadow: "0 0 10px rgba(255, 255, 255, 1)",
@@ -117,7 +115,7 @@ export default function CountDown({ targetDate }) {
               >
                 {format(timeLeft.seconds)}
               </div>
-              <div className="text-4xl text-gray-500 mt-1 tracking-wider">
+              <div className="text-4xl max-sm:text-xs text-gray-500 mt-1 tracking-wider">
                 SECS
               </div>
             </div>

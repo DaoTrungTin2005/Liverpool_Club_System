@@ -2,7 +2,7 @@ import Name from "./FormData";
 import "../../output.css";
 import { useState } from "react";
 import SvgGoogle from "../../assets/svg/SvgGoogle.jsx";
-import axios from "axios";
+import api from "../../Api/apitoken.js";
 
 export default function Form() {
   const handleFocus = (e) => {
@@ -74,17 +74,11 @@ export default function Form() {
 
     // --- Gọi API ---
     try {
-      const res = await axios.post(
-        "https://0d9ffd8a6329.ngrok-free.app/api/accounts/create_account",
-        {
-          fullname: user.fullName,
-          email: user.email,
-          password: user.password,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const res = await api.post("/api/accounts/create_account", {
+        fullname: user.fullName,
+        email: user.email,
+        password: user.password,
+      });
 
       //  Nếu API trả thành công
       console.log(res.data);
@@ -118,28 +112,21 @@ export default function Form() {
   };
   const handleGoogleLogin = async () => {
     try {
-      // Gọi API để lấy link Google Auth
-      const res = await fetch(
-        "https://0d9ffd8a6329.ngrok-free.app/api/auth/login/google/start",
-        {
-          headers: { "ngrok-skip-browser-warning": "true" },
-        }
-      );
+      const res = await api.get("/api/auth/login/google/start");
 
-      const data = await res.json();
-      console.log("🔹 Google login start:", data);
+      console.log("Google login start:", res.data);
 
-      // Nếu có redirect URL thì chuyển hướng
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl;
+      if (res.data.redirectUrl) {
+        window.location.href = res.data.redirectUrl; // Chỉ redirect 1 lần
       } else {
-        alert(" Server không trả về redirectUrl hợp lệ!");
+        alert("Server không trả về redirectUrl hợp lệ!");
       }
     } catch (error) {
       console.error("Lỗi khi gọi API Google Login:", error);
       alert("Không thể kết nối đến máy chủ Google Login!");
     }
   };
+
   return (
     <>
       <button

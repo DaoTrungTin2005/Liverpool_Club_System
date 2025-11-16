@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import api from "../Api/apitoken";
 import { logout } from "../Api/logout.js";
 
-export default function AdminBillList() {
+export default function AdminContact() {
   const [bills, setBills] = useState([]);
   const [, setLoading] = useState(true);
 
@@ -18,7 +18,7 @@ export default function AdminBillList() {
 
   const loadBills = async () => {
     try {
-      const res = await api.get("/api/payment/admin/tickets/orders", {
+      const res = await api.get("api/contact/admin/messages", {
         params: {
           page: 0,
           size: 10000,
@@ -36,11 +36,11 @@ export default function AdminBillList() {
     const text = filterText.toLowerCase();
 
     return (
-      bill.orderCode?.toString().toLowerCase().includes(text) ||
-      bill.customerName?.toLowerCase().includes(text) ||
-      bill.customerEmail?.toLowerCase().includes(text) ||
-      bill.customerPhone?.toLowerCase().includes(text) ||
-      bill.status?.toLowerCase().includes(text)
+      bill.id?.toString().toLowerCase().includes(text) ||
+      bill.fullName?.toLowerCase().includes(text) ||
+      bill.email?.toLowerCase().includes(text) ||
+      bill.phone?.toLowerCase().includes(text) ||
+      bill.content?.toLowerCase().includes(text)
     );
   });
   return (
@@ -73,68 +73,33 @@ export default function AdminBillList() {
                     className="border border-dashed border-gray-300 rounded-lg p-4 bg-gray-300 relative"
                   >
                     <div className="text-sm font-semibold text-gray-700 mb-3">
-                      PaymentID: {bill.orderCode}
+                      PaymentID: {bill.id}
                     </div>
 
                     <div className="grid grid-cols-3 gap-x-6 gap-y-1 text-sm mb-6">
                       <div>
                         <span className="font-medium">FullName:</span>{" "}
-                        {bill.customerName}
+                        {bill.fullName}
                       </div>
                       <div>
                         <span className="font-medium">Email:</span>{" "}
                         <span className="text-blue-600 underline">
-                          {bill.customerEmail}
+                          {bill.email}
                         </span>
                       </div>
                       <div>
-                        <span className="font-medium">Number:</span>{" "}
-                        {bill.customerPhone}
+                        <span className="font-medium">Phone:</span> {bill.phone}
                       </div>
-                      <div>
-                        <span className="font-medium">Address:</span>{" "}
-                        {bill.customerAddress}
+                      <div className="flex flex-col gap-10">
+                        <div>
+                          <span className="font-medium">Message:</span>{" "}
+                          {bill.content}
+                        </div>
+                        <div>
+                          <span className="font-medium">Time:</span>{" "}
+                          {new Date(bill.createdAt).toLocaleString()}
+                        </div>
                       </div>
-                      <div>
-                        <span className="font-medium">TicketArea:</span>{" "}
-                        {bill.sectionName}
-                      </div>
-                      <div>
-                        <span className="font-medium">Match:</span>{" "}
-                        {bill.matchInfo}
-                      </div>
-                      <div>
-                        <span className="font-medium">Quantity:</span>{" "}
-                        {bill.quantity}
-                      </div>
-                      <div>
-                        <span className="font-medium">Total:</span>{" "}
-                        {bill.totalPrice}
-                      </div>
-
-                      <div>
-                        <span className="font-medium">Time:</span>{" "}
-                        {new Date(bill.createdAt).toLocaleString()}
-                      </div>
-                      <div className="col-span-3">
-                        <span className="font-medium">Message:</span>{" "}
-                        {bill.note}
-                      </div>
-                    </div>
-
-                    {/* Nút góc phải dưới */}
-                    <div className="absolute bottom-4 right-4 flex gap-3">
-                      <button
-                        className={`px-5 py-2 rounded-lg text-white font-medium text-sm shadow-sm transition-all hover:shadow-md ${
-                          bill.status === "PAID"
-                            ? "bg-green-500 hover:bg-green-600"
-                            : bill.status === "CANCELLED"
-                            ? "bg-red-500 hover:bg-red-600"
-                            : "bg-blue-600 hover:bg-blue-700"
-                        }`}
-                      >
-                        {bill.status}
-                      </button>
                     </div>
                   </div>
                 ))}

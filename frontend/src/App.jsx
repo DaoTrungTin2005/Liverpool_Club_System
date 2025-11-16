@@ -25,52 +25,218 @@ import AdminBillList from "./pageAdminBill/AdminBillList.jsx";
 import Match from "./PageUserView/Match.jsx";
 import Ticket from "./PageUserView/Ticket.jsx";
 import Payment from "./PageUserView/Payment.jsx";
+import Contact from "./PageUserView/Contact.jsx";
+import AdminContact from "./pageAdminContact/AdminContact.jsx";
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import AdminRoute from "./AdminRoute.jsx"; // ⭐ THÊM DÒNG NÀY
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/register" />} />
+
+        {/* Auth */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin/user" element={<AdminUser />} />
-        <Route path="/admin/user/add" element={<AdminUserAddUser />} />
+
+        {/* ADMIN — ĐÃ BẢO VỆ */}
+        <Route
+          path="/admin/user"
+          element={
+            <AdminRoute>
+              <AdminUser />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/notification"
+          element={
+            <AdminRoute>
+              <AdminContact />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/user/add"
+          element={
+            <AdminRoute>
+              <AdminUserAddUser />
+            </AdminRoute>
+          }
+        />
+
         <Route
           path="/admin/user/add/question"
-          element={<AddUserAddQuestion />}
+          element={
+            <AdminRoute>
+              <AddUserAddQuestion />
+            </AdminRoute>
+          }
         />
-        <Route path="/admin/user/update" element={<AdminUserUpdate />} />
+
+        <Route
+          path="/admin/user/update"
+          element={
+            <AdminRoute>
+              <AdminUserUpdate />
+            </AdminRoute>
+          }
+        />
+
         <Route
           path="/admin/user/update/question"
-          element={<AdminUserUpQuesion />}
+          element={
+            <AdminRoute>
+              <AdminUserUpQuesion />
+            </AdminRoute>
+          }
         />
+
         <Route
           path="/admin/user/delete"
-          element={<AdminDelete></AdminDelete>}
-        ></Route>
-        <Route path="/admin/club" element={<AdminMyClub />} />
-        <Route path="/admin/club/add" element={<AdminMyClubAdd />} />
+          element={
+            <AdminRoute>
+              <AdminDelete />
+            </AdminRoute>
+          }
+        />
 
-        <Route path="/admin/club/delete" element={<AdminMyClubDelete />} />
-        <Route path="/admin/club/update" element={<AdminMyClubUpdate />} />
+        <Route
+          path="/admin/club"
+          element={
+            <AdminRoute>
+              <AdminMyClub />
+            </AdminRoute>
+          }
+        />
 
-        <Route path="/admin/club/view" element={<AdminMyClubView />} />
+        <Route
+          path="/admin/club/add"
+          element={
+            <AdminRoute>
+              <AdminMyClubAdd />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/club/delete"
+          element={
+            <AdminRoute>
+              <AdminMyClubDelete />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/club/update"
+          element={
+            <AdminRoute>
+              <AdminMyClubUpdate />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/club/view"
+          element={
+            <AdminRoute>
+              <AdminMyClubView />
+            </AdminRoute>
+          }
+        />
+
+        {/* USER PAGE */}
         <Route path="/myclub" element={<MyClub />} />
         <Route path="/myclub/player" element={<ProfilePlayer />} />
-        <Route path="/admin/ticket" element={<AdminTicketList />} />
-        <Route path="/admin/ticket/update" element={<AdminTicketUpdate />} />
-        <Route path="/admin/match" element={<AdminMatch />} />
-        <Route path="/admin/match/add" element={<AdminMatchAdd />} />
-        <Route path="/admin/match/update" element={<AdminMatchUpdate />} />
-        <Route path="/admin/match/view" element={<AdminMatchView />} />
-        <Route path="/admin/match/delete" element={<AdminMatchDelete />} />
-        <Route path="/admin/bill" element={<AdminBillList />} />
+
+        {/* ADMIN TICKET */}
+        <Route
+          path="/admin/ticket"
+          element={
+            <AdminRoute>
+              <AdminTicketList />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/ticket/update"
+          element={
+            <AdminRoute>
+              <AdminTicketUpdate />
+            </AdminRoute>
+          }
+        />
+
+        {/* ADMIN MATCH */}
+        <Route
+          path="/admin/match"
+          element={
+            <AdminRoute>
+              <AdminMatch />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/match/add"
+          element={
+            <AdminRoute>
+              <AdminMatchAdd />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/match/update"
+          element={
+            <AdminRoute>
+              <AdminMatchUpdate />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/match/view"
+          element={
+            <AdminRoute>
+              <AdminMatchView />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/match/delete"
+          element={
+            <AdminRoute>
+              <AdminMatchDelete />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/bill"
+          element={
+            <AdminRoute>
+              <AdminBillList />
+            </AdminRoute>
+          }
+        />
+
+        {/* USER ROUTES */}
         <Route path="/match" element={<Match />} />
         <Route path="/ticket" element={<Ticket />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/contact" element={<Contact />} />
+
+        {/* Nếu ai tự gõ /admin → CHẶN LUÔN */}
+        <Route path="/admin" element={<Navigate to="/match" />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
 export default App;

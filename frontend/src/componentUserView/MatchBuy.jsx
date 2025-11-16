@@ -1,22 +1,35 @@
 import "../output.css";
 import Button from "../pageAdminUser/componentAdminUser/Button";
+import { useNavigate } from "react-router-dom";
 export default function MatchBuy(props) {
+  const navigate = useNavigate();
+
+  const handleViewMore = () => {
+    // Truyền matchId sang trang Ticket
+    navigate("/ticket", {
+      state: { matchId: props.id }, // props.id là match.id từ API
+    });
+  };
   return (
     <>
-      <div className="h-full relative text-white group">
-        <img src={props.img} alt={props.img} className="w-full h-full" />
+      <div className="h-full relative text-white group rounded-3xl">
+        <img
+          src={props.img}
+          alt={props.img}
+          className="w-full h-full rounded-3xl"
+        />
         <div className="absolute z-50 inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <p
-            className="text-4xl text-transparent drop-shadow-lg font-light uppercase tracking-widest"
+            className="text-4xl text-transparent drop-shadow-lg font-light uppercase tracking-widest text-center"
             style={{
               WebkitTextStroke: "0.3px #FFFF",
             }}
           >
             {props.home}
           </p>
-          <p className="font-[Russo One] text-3xl">VS</p>
+          <p className="font-[Russo One] text-3xl text-center">VS</p>
           <p
-            className="text-4xl text-transparent drop-shadow-lg font-light uppercase tracking-widest"
+            className="text-4xl text-transparent drop-shadow-lg font-light uppercase tracking-widest text-center"
             style={{
               WebkitTextStroke: "0.5px #FFFF",
             }}
@@ -31,7 +44,7 @@ export default function MatchBuy(props) {
               <p>{props.date}</p>
             </label>
           </fieldset>
-          <Button text="View More" />
+          <Button text="View More" onClick={handleViewMore} />
         </div>
       </div>
     </>

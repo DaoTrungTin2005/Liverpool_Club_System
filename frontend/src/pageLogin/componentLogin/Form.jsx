@@ -1,37 +1,66 @@
 import { useState, useEffect } from "react";
 import SvgGoogle from "../../assets/svg/SvgGoogle.jsx";
 import "../../output.css";
-import axios from "axios";
+import api from "../../Api/apitoken.js";
 
 export default function Form() {
   const [user, setUser] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "" });
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Kiểm tra token từ URL (Google callback) và chuyển hướng
+  //  FIX: Xử lý Google callback và redirect đúng
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tokenFromUrl = urlParams.get("token");
+    const handleAuth = async () => {
+      const url = new URL(window.location.href);
+      const tokenFromUrl = url.searchParams.get("token");
 
-    if (tokenFromUrl) {
-      localStorage.setItem("authToken", tokenFromUrl);
-      setIsLoggedIn(true);
-      // Xóa token khỏi URL
-      window.history.replaceState({}, document.title, "/");
-      // Chuyển hướng đến /admin/user
-      window.location.href = "/admin/user";
-    } else {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        setIsLoggedIn(true);
-        // Nếu đã có token (trước đó), vẫn chuyển hướng đến /admin/user
-        window.location.href = "/admin/user";
+      //  Xử lý Google Login callback
+      if (tokenFromUrl) {
+        localStorage.setItem("authToken", tokenFromUrl);
+        localStorage.setItem("tokenTime", Date.now().toString());
+        window.history.replaceState({}, "", "/");
+
+        try {
+          //  GỌI API LẤY THÔNG TIN USER
+          const userRes = await api.post("/api/auth/login");
+          const role = userRes.data?.data?.role || userRes.data?.role || "USER";
+          const data = userRes.data?.data;
+          const userInfo = {
+            id: data?.id,
+            email: data?.email,
+            fullname: data?.fullname,
+            role: data?.role,
+          };
+
+          localStorage.setItem("userRole", role);
+
+          if (userInfo) {
+            localStorage.setItem("user", JSON.stringify(userInfo));
+          }
+
+          console.log("✅ Google login success - Role:", role);
+
+          // ✅ Redirect dựa vào role
+          window.location.href = role === "ADMIN" ? "/admin/user" : "/match";
+        } catch (err) {
+          console.error("❌ Lỗi lấy thông tin user:", err);
+          alert("Không thể lấy thông tin người dùng!");
+          window.location.href = "/login";
+        }
+        return;
       }
-    }
+
+      // ✅ Kiểm tra token hiện tại
+      const token = localStorage.getItem("authToken");
+      const role = localStorage.getItem("userRole");
+
+      if (token && role) {
+        window.location.href = role === "ADMIN" ? "/admin/user" : "/match";
+      }
+    };
+
+    handleAuth();
   }, []);
 
-  // Nếu đang ở trang login mà đã có token → không render form
-  // (vì useEffect sẽ tự redirect)
   const handleFocus = (e) => (e.target.placeholder = "");
   const handleBlur = (e) => {
     if (!e.target.value)
@@ -60,85 +89,61 @@ export default function Form() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      const res = await axios.post(
-        "https://0d9ffd8a6329.ngrok-free.app/api/auth/login",
-        {
-          email: user.email,
-          password: user.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
-      );
+      const res = await api.post("/api/auth/login", {
+        email: user.email,
+        password: user.password,
+      });
+      // Lấy đúng structure từ backend
+      const token = res.data?.data?.token || res.data?.token;
+      const role = res.data?.data?.role || res.data?.role || "USER";
+      const data = res.data?.data;
 
-      const token = res.data?.data?.token;
+      const userInfo = {
+        id: data?.id,
+        email: data?.email,
+        fullname: data?.fullname,
+        role: data?.role,
+      };
 
       if (token) {
+        // Lưu đầy đủ thông tin
         localStorage.setItem("authToken", token);
-        setIsLoggedIn(true);
+        localStorage.setItem("userRole", role);
+        localStorage.setItem("tokenTime", Date.now().toString());
+
+        if (userInfo) {
+          localStorage.setItem("user", JSON.stringify(userInfo));
+        }
         setUser({ email: "", password: "" });
-        // Chuyển hướng đến /admin/user
-        window.location.href = "/admin/user";
+
+        //  Redirect dựa vào role
+        window.location.href = role === "ADMIN" ? "/admin/user" : "/match";
       } else {
         alert("Server didn't return a valid token.");
       }
     } catch (err) {
-      console.error("Error:", err);
       if (err.response) {
         const msg = err.response.data.message || "Login failed";
-        alert(` ${msg}`);
+        alert(`${msg}`);
       } else {
         alert("Cannot connect to server. Please try again later.");
       }
     }
   };
 
-  // 🔹 Login với Google
-  // Login với Google
   const handleGoogleLogin = async () => {
     try {
-      const res = await fetch(
-        "https://0d9ffd8a6329.ngrok-free.app/api/auth/login/google/start",
-        {
-          headers: { "ngrok-skip-browser-warning": "true" },
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl;
+      const res = await api.get("/api/auth/login/google/start");
+      if (res.data.redirectUrl) {
+        window.location.href = res.data.redirectUrl;
       } else {
         alert("Server không trả về redirectUrl hợp lệ!");
       }
     } catch (error) {
-      console.error("Lỗi khi gọi API Google Login:", error);
-      alert("Không thể kết nối đến máy chủ Google Login!");
+      console.error("❌ Lỗi khi gọi API Google Login:", error);
+      alert("Cannot connect to the Google Login server!");
     }
   };
-  //  Nếu đã đăng nhập → hiển thị trang logged-in
-  if (isLoggedIn) {
-    return (
-      <div className="flex flex-col items-center mt-10 text-center">
-        <h2 className="text-xl font-semibold text-green-500">
-          You are logged in!
-        </h2>
-        <button
-          onClick={() => {
-            localStorage.removeItem("authToken");
-            setIsLoggedIn(false);
-            alert("🚪 Logged out successfully!");
-          }}
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-        >
-          Logout
-        </button>
-      </div>
-    );
-  }
 
   const formFields = [
     {

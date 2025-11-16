@@ -5,6 +5,7 @@ import Button from "./componentAdminUser/Button.jsx";
 import Form from "./componentAdminUser/Form.jsx";
 import { useNavigate } from "react-router-dom";
 import "../pageRegister/Register.css";
+import { logout } from "../Api/logout.js";
 
 export default function AdminUserAddUser() {
   const [validateSignal, setValidateSignal] = useState(0);
@@ -35,7 +36,7 @@ export default function AdminUserAddUser() {
         <div className="container flex flex-col shadow-3xl w-[20%] h-dvh items-center justify-center bg-white">
           <ImgAdminUser01Component />
           <LinkGoPage />
-          <Button text={"Log Out"} />
+          <Button text={"Log Out"} onClick={logout} />
         </div>
         <div className="w-[80%] bg-white mr-10 ml-10 mt-15 mb-10 shadow-2xl rounded-3xl flex items-center flex-col justify-center gap-5">
           <p className="text-2xl text-[#2B3674] font-bold">Add User</p>

@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../Api/apitoken.js";
+import { logout } from "../Api/logout.js";
 
 export default function AdminMyClubUpdate() {
   // === State chính ===
@@ -387,7 +388,7 @@ export default function AdminMyClubUpdate() {
         <div className="container flex flex-col shadow-3xl w-[20%] h-dvh items-center justify-center bg-white">
           <ImgAdminUser01Component />
           <LinkGoPage />
-          <Button text={"Log Out"} />
+          <Button text={"Log Out"} onClick={logout} />
         </div>
 
         {/* ==== MAIN CONTENT ==== */}
@@ -432,7 +433,7 @@ export default function AdminMyClubUpdate() {
               </label>
 
               <div className="flex items-center gap-4">
-                <label className="flex flex-col w-26">
+                <label className="flex flex-col w-20">
                   Number
                   <input
                     type="text"
@@ -448,7 +449,7 @@ export default function AdminMyClubUpdate() {
                   />
                 </label>
 
-                <label className="flex flex-col w-40 ml-5 h-14">
+                <label className="flex flex-col w-32 ml-5 h-14">
                   Position
                   <select
                     className={`flex-1 w-full h-12 rounded-md border ${
@@ -537,7 +538,7 @@ export default function AdminMyClubUpdate() {
               </div>
 
               {/* ==== Thông tin khác ==== */}
-              <div className="flex flex-col">
+              <div className="flex flex-col items-center justify-center">
                 <label>Information</label>
                 <div
                   className={`flex w-120 border-1 h-14 rounded-md ${
@@ -625,7 +626,7 @@ export default function AdminMyClubUpdate() {
 
               {/* ==== Stats popup ==== */}
               <div
-                className="border-1 flex items-center justify-center cursor-pointer rounded-md"
+                className="border-1 flex items-center justify-center cursor-pointer rounded-md w-120 m-auto"
                 onClick={hiddenShow}
               >
                 Stats
