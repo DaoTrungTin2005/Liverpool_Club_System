@@ -24,16 +24,16 @@ public class PaymentController {
 
     private final OrderTicketService orderService;
 
-    // Validate đơn hàng
+    // lúc nhấn nút buy now thì ktra coi có lố số lượng ko, lố thì báo lỗi
     @PostMapping("/tickets/buy-now")
     public ResponseEntity<ApiResponse<ValidateSelectionResponse>> validateSelection(
             @RequestBody @Valid ValidateSelectionRequest request) {
 
         ValidateSelectionResponse response = orderService.validateSelection(request);
-        return ResponseEntity.ok(ApiResponse.success("Kiểm tra thành công!", response));
+        return ResponseEntity.ok(ApiResponse.success("QUANTITY OK", response));
     }
 
-    // ========== TẠO ĐƠN HÀNG ==========
+    // tạo đơn hàng
     @PostMapping("/create-order")
     public ResponseEntity<ApiResponse<OrderTicketResponse>> createOrder(
             @RequestBody @Valid CreateOrderTicketRequest request) {
@@ -43,9 +43,8 @@ public class PaymentController {
                 .body(ApiResponse.success("Tạo đơn hàng thành công!", response));
     }
 
-    // ========== PAYMENT METHOD SELECTION ==========
 
-    // TẠO LINK VNPAY
+    // tạo link VNPAY
     @PostMapping("/create-vnpay/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createVNPayUrl(
             @PathVariable Long orderId) {
@@ -57,7 +56,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success("Tạo link VNPay thành công!", data));
     }
 
-    // TẠO LINK MOMO
+    // tạo link MOMO
     @PostMapping("/create-momo/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createMomoUrl(
             @PathVariable Long orderId) {
@@ -69,7 +68,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success("Tạo link Momo thành công!", data));
     }
 
-    // TẠO LINK ZALOPAY - THÊM ENDPOINT NÀY
+    // tạo link ZALOPAY
     @PostMapping("/create-zalopay/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createZaloPayUrl(
             @PathVariable Long orderId) {
@@ -80,8 +79,6 @@ public class PaymentController {
 
         return ResponseEntity.ok(ApiResponse.success("Tạo link ZaloPay thành công!", data));
     }
-
-    // ========== CALLBACK URLs ==========
 
     // VNPAY CALLBACK
     @GetMapping("/vnpay-return")
@@ -102,7 +99,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
-    // MOMO CALLBACK - RETURN
+    // MOMO CALLBACK 
     @GetMapping("/momo-return")
     public ResponseEntity<ApiResponse<OrderTicketResponse>> momoReturn(
             @RequestParam String orderId,
@@ -127,7 +124,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(responseMessage, response));
     }
 
-    // MOMO CALLBACK - NOTIFY (Server-to-Server)
+    // MOMO CALLBACK
     @PostMapping("/momo-notify")
     public ResponseEntity<Map<String, Object>> momoNotify(
             @RequestBody Map<String, String> params) {
@@ -149,7 +146,7 @@ public class PaymentController {
         }
     }
 
-    // ZALOPAY CALLBACK - RETURN - THÊM ENDPOINT NÀY
+    // ZALOPAY CALLBACK - RETURN
     @GetMapping("/zalopay-return")
     public ResponseEntity<ApiResponse<OrderTicketResponse>> zaloPayReturn(
             HttpServletRequest request) {
@@ -171,7 +168,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
-    // ZALOPAY CALLBACK - NOTIFY (Server-to-Server) - THÊM ENDPOINT NÀY
+    // ZALOPAY CALLBACK
     @PostMapping("/zalopay-callback")
     public ResponseEntity<Map<String, Object>> zaloPayCallback(
             @RequestBody Map<String, String> params) {

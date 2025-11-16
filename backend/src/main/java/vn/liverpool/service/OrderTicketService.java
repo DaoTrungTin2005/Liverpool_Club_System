@@ -34,7 +34,7 @@ public class OrderTicketService {
     private final HttpServletRequest request;
     private final UserContextService userContextService;
 
-    // Validate lựa chọn vé
+    // khi nhấn buy now ktra số lượng hợp lệ chưa
     public ValidateSelectionResponse validateSelection(ValidateSelectionRequest dto) {
         Match match = matchRepo.findById(dto.matchId())
                 .orElseThrow(() -> new IllegalArgumentException("Match not found"));
@@ -48,7 +48,6 @@ public class OrderTicketService {
 
         int available = setting.getTotalQuantity() - setting.getSoldQuantity();
         if (dto.quantity() > available) {
-            // CHỈ TRẢ VỀ MESSAGE GỌN – FE HIỆN NGAY
             throw new IllegalArgumentException(
                     String.format("THERE ARE ONLY %d SEATS IN THIS SECTION", available));
         }
@@ -171,7 +170,7 @@ public class OrderTicketService {
         return paymentUrl;
     }
 
-    // ========== ZALOPAY PAYMENT URL - ✅ THÊM PHƯƠNG THỨC NÀY ==========
+    // ========== ZALOPAY PAYMENT URL 
     @Transactional
     public String createZaloPayPaymentUrl(Long orderId) {
         OrderTicket order = orderRepo.findById(orderId)

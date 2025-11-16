@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Getter  // ✅ ĐẢM BẢO CÓ ANNOTATION NÀY
+@Getter // ✅ ĐẢM BẢO CÓ ANNOTATION NÀY
 public class ZaloPayConfig {
 
     @Value("${zalopay.app-id}")
@@ -21,7 +21,7 @@ public class ZaloPayConfig {
     private String endpoint;
 
     @Value("${zalopay.return-url}")
-    private String returnUrl;  // ✅ TÊN FIELD PHẢI LÀ returnUrl
+    private String returnUrl;
 
     @Value("${zalopay.callback-url}")
     private String callbackUrl;
