@@ -221,11 +221,6 @@ public class OrderTicketService {
             order.setVnpayTransactionNo(transactionNo);
             order.setPaymentMethod(bankCode);
 
-            TicketSetting ticketSetting = ticketSettingRepo
-                    .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
-                    .orElseThrow();
-            ticketSetting.setSoldQuantity(ticketSetting.getSoldQuantity() + order.getQuantity());
-            ticketSettingRepo.save(ticketSetting);
         } else {
             order.setStatus(OrderStatus.CANCELLED);
         }
@@ -255,11 +250,6 @@ public class OrderTicketService {
             order.setMomoTransactionId(transactionId);
             order.setPaymentMethod("MOMO");
 
-            TicketSetting ticketSetting = ticketSettingRepo
-                    .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
-                    .orElseThrow();
-            ticketSetting.setSoldQuantity(ticketSetting.getSoldQuantity() + order.getQuantity());
-            ticketSettingRepo.save(ticketSetting);
         } else {
             order.setStatus(OrderStatus.CANCELLED);
         }
@@ -268,7 +258,7 @@ public class OrderTicketService {
         return buildOrderResponse(updatedOrder);
     }
 
-    // ========== ZALOPAY CALLBACK - ✅ THÊM PHƯƠNG THỨC NÀY ==========
+    // ========== ZALOPAY CALLBACK =========
     @Transactional
     public OrderTicketResponse handleZaloPayReturn(java.util.Map<String, String> params) {
         boolean isValid = zaloPayService.verifyPaymentSignature(params);
@@ -291,11 +281,6 @@ public class OrderTicketService {
             order.setPaidAt(LocalDateTime.now());
             order.setPaymentMethod("ZALOPAY");
 
-            TicketSetting ticketSetting = ticketSettingRepo
-                    .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
-                    .orElseThrow();
-            ticketSetting.setSoldQuantity(ticketSetting.getSoldQuantity() + order.getQuantity());
-            ticketSettingRepo.save(ticketSetting);
         } else {
             order.setStatus(OrderStatus.CANCELLED);
         }
