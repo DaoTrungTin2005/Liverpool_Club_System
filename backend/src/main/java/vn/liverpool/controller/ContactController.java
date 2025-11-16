@@ -2,6 +2,8 @@ package vn.liverpool.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,17 +17,29 @@ import vn.liverpool.util.ApiResponse;
 @RequiredArgsConstructor
 public class ContactController {
 
-    private final ContactMessageService contactService;
+  private final ContactMessageService contactService;
 
-    // User gửi tin nhắn
-    @PostMapping("/send")
-    public ResponseEntity<ApiResponse<ContactMessageResponse>> sendMessage(
-            @RequestBody @Valid ContactMessageRequest request) {
+  // User gửi tin nhắn
+  @PostMapping("/send")
+  public ResponseEntity<ApiResponse<ContactMessageResponse>> sendMessage(
+      @RequestBody @Valid ContactMessageRequest request) {
 
-        ContactMessageResponse response = contactService.createMessage(request);
+    ContactMessageResponse response = contactService.createMessage(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Sent message successfully!", response));
-    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResponse.success("Sent message successfully!", response));
+  }
+
+  @GetMapping("/admin/messages")
+  public ResponseEntity<Page<ContactMessageResponse>> getMessagesForAdmin(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(defaultValue = "createdAt") String sortBy) {
+
+    Page<ContactMessageResponse> result = contactService.getMessagesForAdmin(
+        page, size, keyword, sortBy);
+
+    return ResponseEntity.ok(result);
+  }
 }
-
