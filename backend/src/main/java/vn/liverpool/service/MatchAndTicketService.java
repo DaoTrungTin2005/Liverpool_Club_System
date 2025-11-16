@@ -53,7 +53,16 @@ public class MatchAndTicketService {
 
                 // =đường dẫn thư mục mà ảnh sẽ lưu dô
                 String uploadDir = System.getProperty("user.dir")
-                                + "/backend/src/main/resources/static/uploads/matches";
+                                + "/src/main/resources/static/uploads/matches";
+
+                // ========= THÊM LOG ĐỂ DEBUG =========
+                System.out.println("========================================");
+                System.out.println("USER.DIR: " + System.getProperty("user.dir"));
+                System.out.println("UPLOAD DIR: " + uploadDir);
+                System.out.println("DIR EXISTS: " + new File(uploadDir).exists());
+                System.out.println("ABSOLUTE PATH: " + new File(uploadDir).getAbsolutePath());
+                System.out.println("========================================");
+
                 File dir = new File(uploadDir);
                 if (!dir.exists())
                         dir.mkdirs();
@@ -175,7 +184,7 @@ public class MatchAndTicketService {
                                 .orElseThrow(() -> new IllegalArgumentException("Match not found: " + matchId));
 
                 String uploadDir = System.getProperty("user.dir")
-                                + "/backend/src/main/resources/static/uploads/matches";
+                                + "/src/main/resources/static/uploads/matches";
                 File dir = new File(uploadDir);
                 if (!dir.exists())
                         dir.mkdirs();
