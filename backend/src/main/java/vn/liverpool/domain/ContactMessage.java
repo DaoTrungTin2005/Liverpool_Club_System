@@ -31,6 +31,10 @@ public class ContactMessage {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -15,5 +15,7 @@ public class ContactMessageResponse {
     private String phone;
     private String email;
     private String content;
+    private Long accountId;
+    private String accountEmail;
     private LocalDateTime createdAt;
 }

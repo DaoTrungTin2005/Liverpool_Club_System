@@ -11,7 +11,7 @@ import vn.liverpool.domain.Account;
 @RequiredArgsConstructor
 public class UserContextService {
 
-    public Account getCurrentAccount() {
+    public static Account getCurrentAccount() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
             return null;

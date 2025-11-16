@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;  // ← SỬA CÁI NÀY
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.liverpool.domain.Account;
 import vn.liverpool.domain.ContactMessage;
 import vn.liverpool.domain.dto.contact.ContactMessageRequest;
 import vn.liverpool.domain.dto.contact.ContactMessageResponse;
+import vn.liverpool.repository.AccountRepository;
 import vn.liverpool.repository.ContactMessageRepository;
 
 @Service
@@ -18,15 +20,20 @@ import vn.liverpool.repository.ContactMessageRepository;
 public class ContactMessageService {
 
     private final ContactMessageRepository contactRepo;
+    private final AccountRepository accountRepo;
 
     // Thêm tin nhắn vào database
     @Transactional
     public ContactMessageResponse createMessage(ContactMessageRequest request) {
+
+        Account currentAccount = UserContextService.getCurrentAccount();
+
         ContactMessage message = ContactMessage.builder()
                 .fullName(request.getFullName())
                 .phone(request.getPhone())
                 .email(request.getEmail())
                 .content(request.getContent())
+                .account(currentAccount)
                 .build();
 
         ContactMessage saved = contactRepo.save(message);
@@ -37,8 +44,9 @@ public class ContactMessageService {
                 saved.getPhone(),
                 saved.getEmail(),
                 saved.getContent(),
-                saved.getCreatedAt()
-        );
+                saved.getAccount() != null ? saved.getAccount().getId() : null,
+                saved.getAccount() != null ? saved.getAccount().getEmail() : null,
+                saved.getCreatedAt());
     }
 
     // Lấy danh sách tin nhắn cho admin (có phân trang + search)
@@ -61,6 +69,9 @@ public class ContactMessageService {
                 message.getPhone(),
                 message.getEmail(),
                 message.getContent(),
+                message.getAccount() != null ? message.getAccount().getId() : null,
+                message.getAccount() != null ? message.getAccount().getEmail() : null,
                 message.getCreatedAt()));
     }
+
 }
