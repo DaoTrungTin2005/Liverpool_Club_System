@@ -12,13 +12,15 @@ import vn.liverpool.domain.ContactMessage;
 public interface ContactMessageRepository extends JpaRepository<ContactMessage, Long> {
 
     @Query("""
-        SELECT c FROM ContactMessage c
-        WHERE :keyword IS NULL OR :keyword = '' OR
-              LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-              LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-              LOWER(c.phone) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-              LOWER(c.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        """)
+            SELECT c FROM ContactMessage c
+            JOIN c.account a
+            WHERE :keyword IS NULL OR :keyword = '' OR
+                  LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  LOWER(c.phone) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  LOWER(c.content) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  LOWER(a.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            """)
     Page<ContactMessage> searchMessages(
             @Param("keyword") String keyword,
             Pageable pageable);
