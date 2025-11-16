@@ -59,8 +59,8 @@ public class OrderTicketService {
                 setting.getPrice(),
                 totalPrice,
                 section.getName(),
-                "THERE ARE " + available + " SEATS AVAILABLE" + " ,SỐ LƯỢNG OK RỒI ĐÓ, HỢP LỆ ĐÓ, CHUYỂN QUA TRANG THANH TOÁN ĐI"// FE hiện dòng này nếu OK
-        );
+                "THERE ARE " + available + " SEATS AVAILABLE"
+                        + " ,SỐ LƯỢNG OK RỒI ĐÓ, HỢP LỆ ĐÓ, CHUYỂN QUA TRANG THANH TOÁN ĐI");
     }
 
     // ========== CREATE ORDER ==========
@@ -81,14 +81,25 @@ public class OrderTicketService {
             throw new IllegalArgumentException("You must be logged in to place an order.");
         }
 
-        int available = ticketSetting.getTotalQuantity() - ticketSetting.getSoldQuantity();
+        int totalQty = ticketSetting.getTotalQuantity();
+        Integer soldQtyWrap = ticketSetting.getSoldQuantity();
+
+        // Nếu soldQuantity là null thì đổi thành 0 để thui bị lỗi
+        int soldQty = soldQtyWrap != null ? soldQtyWrap : 0;
+        int available = totalQty - soldQty;
+
         if (dto.quantity() > available) {
             throw new IllegalArgumentException(
-                    String.format("There are only %d seats in this section", available, dto.quantity()));
+                    String.format("THERE ARE ONLY %d SEATS IN THIS SECTION", available));
         }
 
         BigDecimal totalPrice = ticketSetting.getPrice().multiply(BigDecimal.valueOf(dto.quantity()));
         String orderCode = generateOrderCode();
+
+        // cập nhật sold_quantity (số lượng hiện có ở db + số lượng mới mua ròi cập nhật
+        // vô db)
+        ticketSetting.setSoldQuantity(soldQty + dto.quantity());
+        ticketSettingRepo.save(ticketSetting);
 
         OrderTicket order = OrderTicket.builder()
                 .match(match)
@@ -103,7 +114,7 @@ public class OrderTicketService {
                 .status(OrderStatus.PENDING)
                 .note(dto.note())
                 .createdAt(LocalDateTime.now())
-                .account(currentAccount) // GÁN ACCOUNT
+                .account(currentAccount)
                 .build();
 
         OrderTicket savedOrder = orderRepo.save(order);
@@ -121,11 +132,9 @@ public class OrderTicketService {
                 savedOrder.getQuantity(),
                 savedOrder.getTotalPrice(),
                 savedOrder.getStatus(),
-                null, // paymentUrl (vì lúc tạo order chưa có)
                 savedOrder.getCreatedAt(),
-                currentAccount.getId(), // accountId
-                currentAccount.getEmail() // accountEmail
-        );
+                currentAccount.getId(),
+                currentAccount.getEmail());
     }
 
     // ========== VNPAY PAYMENT URL ==========
@@ -170,7 +179,7 @@ public class OrderTicketService {
         return paymentUrl;
     }
 
-    // ========== ZALOPAY PAYMENT URL 
+    // ========== ZALOPAY PAYMENT URL
     @Transactional
     public String createZaloPayPaymentUrl(Long orderId) {
         OrderTicket order = orderRepo.findById(orderId)
@@ -218,7 +227,7 @@ public class OrderTicketService {
             ticketSetting.setSoldQuantity(ticketSetting.getSoldQuantity() + order.getQuantity());
             ticketSettingRepo.save(ticketSetting);
         } else {
-            order.setStatus(OrderStatus.FAILED);
+            order.setStatus(OrderStatus.CANCELLED);
         }
 
         OrderTicket updatedOrder = orderRepo.save(order);
@@ -252,7 +261,7 @@ public class OrderTicketService {
             ticketSetting.setSoldQuantity(ticketSetting.getSoldQuantity() + order.getQuantity());
             ticketSettingRepo.save(ticketSetting);
         } else {
-            order.setStatus(OrderStatus.FAILED);
+            order.setStatus(OrderStatus.CANCELLED);
         }
 
         OrderTicket updatedOrder = orderRepo.save(order);
@@ -288,7 +297,7 @@ public class OrderTicketService {
             ticketSetting.setSoldQuantity(ticketSetting.getSoldQuantity() + order.getQuantity());
             ticketSettingRepo.save(ticketSetting);
         } else {
-            order.setStatus(OrderStatus.FAILED);
+            order.setStatus(OrderStatus.CANCELLED);
         }
 
         OrderTicket updatedOrder = orderRepo.save(order);
@@ -314,7 +323,6 @@ public class OrderTicketService {
                 order.getQuantity(),
                 order.getTotalPrice(),
                 order.getStatus(),
-                null, // paymentUrl (có thể thêm sau nếu cần)
                 order.getCreatedAt(),
                 accountId,
                 accountEmail);
@@ -334,30 +342,33 @@ public class OrderTicketService {
         return xfHeader.split(",")[0];
     }
 
-    // THÊM VÀO CUỐI CLASS, TRƯỚC DẤU }
-@Scheduled(fixedRate = 30000) // Chạy mỗi 60 giây
-@Transactional
-public void cancelExpiredPendingOrders() {
-    LocalDateTime expireTime = LocalDateTime.now().minusMinutes(5); // 5 PHÚT
+    // SET THỜI GIAN HỦY ĐƠN HÀNG PENDING SAU 5 PHÚT ĐỒNG THỜI TRỪ SỐ LƯỢNG VÉ ĐÃ
+    // ĐẶT TRONG ĐƠN HÀNG RA KHỎI SOLD_QUANTITY BẢNG TICKET_SETTINGS
+    @Scheduled(fixedRate = 30000)
+    @Transactional
+    public void cancelExpiredPendingOrders() {
+        LocalDateTime expireTime = LocalDateTime.now().minusMinutes(5); // 5 PHÚT
 
-    List<OrderTicket> expiredOrders = orderRepo.findByStatusAndCreatedAtBefore(
-        OrderStatus.PENDING, expireTime);
+        // tìm các đơn hàng PEnding đã quá hạn
+        List<OrderTicket> expiredOrders = orderRepo.findByStatusAndCreatedAtBefore(
+                OrderStatus.PENDING, expireTime);
 
-    for (OrderTicket order : expiredOrders) {
-        order.setStatus(OrderStatus.CANCELLED);
+        // Lặp từng đơn để set cancelled
+        for (OrderTicket order : expiredOrders) {
+            order.setStatus(OrderStatus.CANCELLED);
 
-        // HOÀN VÉ VỀ KHO
-        TicketSetting setting = ticketSettingRepo
-            .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
-            .orElse(null);
+         // tìm ticket_setting tương ứng để trừ số lượng vé đã đặt trong đơn hàng ra khỏi sold_quantity
+            TicketSetting setting = ticketSettingRepo
+                    .findByMatchIdAndSectionId(order.getMatch().getId(), order.getSection().getId())
+                    .orElse(null);
 
-        if (setting != null) {
-            int newSold = setting.getSoldQuantity() - order.getQuantity();
-            setting.setSoldQuantity(Math.max(0, newSold));
-            ticketSettingRepo.save(setting);
+            if (setting != null) {
+                int newSold = setting.getSoldQuantity() - order.getQuantity();
+                setting.setSoldQuantity(Math.max(0, newSold)); // tránh âm
+                ticketSettingRepo.save(setting);
+            }
+
+            orderRepo.save(order);
         }
-
-        orderRepo.save(order);
     }
-}
 }

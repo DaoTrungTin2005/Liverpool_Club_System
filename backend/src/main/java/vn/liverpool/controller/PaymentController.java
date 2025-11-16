@@ -40,7 +40,7 @@ public class PaymentController {
 
         OrderTicketResponse response = orderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Tạo đơn hàng thành công!", response));
+                .body(ApiResponse.success("CREATE ORDER SUCCESSFULLY", response));
     }
 
 

@@ -16,9 +16,7 @@ public record OrderTicketResponse(
     Integer quantity,
     BigDecimal totalPrice,
     OrderStatus status,
-    String paymentUrl,
     LocalDateTime createdAt,
-
     Long accountId,
     String accountEmail
 ) {}

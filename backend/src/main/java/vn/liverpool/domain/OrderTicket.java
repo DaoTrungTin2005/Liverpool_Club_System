@@ -51,25 +51,24 @@ public class OrderTicket {
     @Column(nullable = false, length = 50)
     private String orderCode;
 
-    // ========== PAYMENT TRANSACTION IDs ==========
     @Column(length = 50)
-    private String vnpayTransactionNo; // VNPay
+    private String vnpayTransactionNo;
 
     @Column(length = 50)
-    private String momoTransactionId; // Momo
+    private String momoTransactionId;
 
     @Column(length = 100)
-    private String zaloPayAppTransId; // ZaloPay 
+    private String zaloPayAppTransId;
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
     @Column(length = 20)
-    private String paymentMethod; // Bank code (VNPay) hoặc payment provider
+    private String paymentMethod;
 
     @Column(length = 20)
-    private String paymentType; // "VNPAY", "MOMO", "ZALOPAY" - ✅ THÊM DÒNG NÀY
+    private String paymentType;
 
     @Column(columnDefinition = "TEXT")
     private String note;
@@ -81,9 +80,8 @@ public class OrderTicket {
     private LocalDateTime paidAt;
 
     public enum OrderStatus {
-        PENDING, // Chờ thanh toán
-        PAID, // Đã thanh toán
-        CANCELLED, // Đã hủy
-        FAILED // Thanh toán thất bại
+        PENDING,
+        PAID,
+        CANCELLED,
     }
 }
