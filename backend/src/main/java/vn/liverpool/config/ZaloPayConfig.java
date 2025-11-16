@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Getter // ✅ ĐẢM BẢO CÓ ANNOTATION NÀY
+@Getter //
 public class ZaloPayConfig {
 
     @Value("${zalopay.app-id}")
