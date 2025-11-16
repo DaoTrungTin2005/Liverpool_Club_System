@@ -3,6 +3,8 @@ package vn.liverpool.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +44,6 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("CREATE ORDER SUCCESSFULLY", response));
     }
-
 
     // tạo link VNPAY
     @PostMapping("/create-vnpay/{orderId}")
@@ -99,7 +100,7 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
-    // MOMO CALLBACK 
+    // MOMO CALLBACK
     @GetMapping("/momo-return")
     public ResponseEntity<ApiResponse<OrderTicketResponse>> momoReturn(
             @RequestParam String orderId,
@@ -189,4 +190,20 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
     }
+
+    // === LẤY DANH SÁCH ĐƠN HÀNG CHO ADMIN ===
+
+    @GetMapping("/admin/tickets/orders")
+    public ResponseEntity<Page<OrderTicketResponse>> getOrdersForAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "createdAt") String sortBy) {
+
+        Page<OrderTicketResponse> result = orderService.getOrdersForAdmin(
+                page, size, keyword, sortBy);
+
+        return ResponseEntity.ok(result);
+    }
+
 }

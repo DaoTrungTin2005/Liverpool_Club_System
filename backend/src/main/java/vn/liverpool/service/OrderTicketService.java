@@ -3,6 +3,10 @@ package vn.liverpool.service;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -374,5 +378,36 @@ public class OrderTicketService {
 
             orderRepo.save(order);
         }
+    }
+
+    // === LẤY DANH SÁCH ĐƠN HÀNG CHO ADMIN ===
+    @Transactional(readOnly = true)
+    public Page<OrderTicketResponse> getOrdersForAdmin(
+            int page,
+            int size,
+            String keyword,
+            String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+
+        Page<OrderTicket> orderPage = (keyword == null || keyword.isBlank())
+                ? orderRepo.findAll(pageable)
+                : orderRepo.searchByKeyword(keyword, pageable);
+
+        return orderPage.map(order -> new OrderTicketResponse(
+                order.getId(),
+                order.getOrderCode(),
+                order.getMatch().getHomeTeam() + " vs " + order.getMatch().getAwayTeam(),
+                order.getSection().getName(),
+                order.getCustomerName(),
+                order.getCustomerEmail(),
+                order.getCustomerPhone(),
+                order.getCustomerAddress(),
+                order.getQuantity(),
+                order.getTotalPrice(),
+                order.getStatus(),
+                order.getCreatedAt(),
+                order.getAccount() != null ? order.getAccount().getId() : null,
+                order.getAccount() != null ? order.getAccount().getEmail() : null));
     }
 }
