@@ -66,7 +66,7 @@ public class PlayerService {
 
                 // Ấy đường dẫn chô lưu dô
                 String uploadDir = System.getProperty("user.dir")
-                                + "/backend/src/main/resources/static/uploads/players";
+                                + "/src/main/resources/static/uploads/players";
 
                 // tạo thư mục lưu nếu chưa có
                 File dir = new File(uploadDir);
@@ -196,7 +196,7 @@ public class PlayerService {
 
                 // Đường dẫn thư mục chứa ảnh
                 String uploadDir = System.getProperty("user.dir")
-                                + "/backend/src/main/resources/static/uploads/players/";
+                                + "/src/main/resources/static/uploads/players/";
 
                 // Xóa ảnh bio (nếu có)
                 if (player.getBioImage() != null) {
@@ -244,7 +244,7 @@ public class PlayerService {
 
                 // đường dẫn ảnh sẽ lưu
                 String uploadDir = System.getProperty("user.dir")
-                                + "/backend/src/main/resources/static/uploads/players";
+                                + "/src/main/resources/static/uploads/players";
 
                 File dir = new File(uploadDir);
                 if (!dir.exists())
