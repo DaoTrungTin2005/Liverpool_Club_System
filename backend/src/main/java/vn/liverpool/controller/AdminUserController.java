@@ -7,14 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vn.liverpool.domain.dto.AccountResponseDTO;
-import vn.liverpool.domain.dto.CreateUserByAdminDTO;
-import vn.liverpool.domain.dto.UpdateUserByAdminDTO;
-import vn.liverpool.domain.dto.UserListResponseDTO;
+import vn.liverpool.domain.dto.account.AccountResponseDTO;
+import vn.liverpool.domain.dto.account.CreateUserByAdminDTO;
+import vn.liverpool.domain.dto.account.UpdateUserByAdminDTO;
+import vn.liverpool.domain.dto.account.UserListResponseDTO;
 import vn.liverpool.service.AdminUserService;
 import vn.liverpool.util.ApiResponse;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/users")

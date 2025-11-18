@@ -1,5 +1,5 @@
 // src/main/java/vn/liverpool/domain/dto/UserListResponseDTO.java
-package vn.liverpool.domain.dto;
+package vn.liverpool.domain.dto.account;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

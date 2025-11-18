@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import vn.liverpool.domain.Account;
-import vn.liverpool.domain.dto.LoginRequest;
-import vn.liverpool.domain.dto.LoginResponse;
+import vn.liverpool.domain.dto.account.LoginRequest;
+import vn.liverpool.domain.dto.account.LoginResponse;
 import vn.liverpool.security.JwtTokenProvider;
 import vn.liverpool.util.ApiResponse;
 

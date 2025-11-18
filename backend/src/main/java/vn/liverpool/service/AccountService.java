@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import vn.liverpool.domain.Account;
 import vn.liverpool.domain.Role;
-import vn.liverpool.domain.dto.RegisterDTO;
+import vn.liverpool.domain.dto.account.RegisterDTO;
 import vn.liverpool.repository.AccountRepository;
 import vn.liverpool.repository.RoleRepository;
 

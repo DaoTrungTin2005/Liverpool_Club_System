@@ -1,4 +1,4 @@
-package vn.liverpool.domain.dto;
+package vn.liverpool.domain.dto.account;
 
 public record LoginResponse(
     String token,

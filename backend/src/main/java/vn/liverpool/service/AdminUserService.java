@@ -15,10 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.liverpool.domain.Account;
 import vn.liverpool.domain.Role;
-import vn.liverpool.domain.dto.AccountResponseDTO;
-import vn.liverpool.domain.dto.CreateUserByAdminDTO;
-import vn.liverpool.domain.dto.UpdateUserByAdminDTO;
-import vn.liverpool.domain.dto.UserListResponseDTO;
+import vn.liverpool.domain.dto.account.AccountResponseDTO;
+import vn.liverpool.domain.dto.account.CreateUserByAdminDTO;
+import vn.liverpool.domain.dto.account.UpdateUserByAdminDTO;
+import vn.liverpool.domain.dto.account.UserListResponseDTO;
 import vn.liverpool.repository.AccountRepository;
 import vn.liverpool.repository.RoleRepository;
 

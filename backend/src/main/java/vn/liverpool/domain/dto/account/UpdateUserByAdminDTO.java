@@ -1,5 +1,5 @@
 // src/main/java/vn/liverpool/domain/dto/UpdateUserByAdminDTO.java
-package vn.liverpool.domain.dto;
+package vn.liverpool.domain.dto.account;
 
 import jakarta.validation.constraints.*;
 

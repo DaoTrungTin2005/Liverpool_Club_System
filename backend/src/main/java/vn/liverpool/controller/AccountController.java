@@ -1,19 +1,14 @@
 package vn.liverpool.controller;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.liverpool.util.ApiResponse;
 import jakarta.validation.Valid;
-import vn.liverpool.domain.dto.AccountResponseDTO;
-import vn.liverpool.domain.dto.RegisterDTO;
+import vn.liverpool.domain.dto.account.AccountResponseDTO;
+import vn.liverpool.domain.dto.account.RegisterDTO;
 import vn.liverpool.service.AccountService;
 
 @RestController
