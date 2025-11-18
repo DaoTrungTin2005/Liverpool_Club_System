@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import vn.liverpool.domain.dto.order.CreateOrderTicketRequest;
 import vn.liverpool.domain.dto.order.OrderTicketResponse;
@@ -83,7 +84,7 @@ public class PaymentController {
 
     // VNPAY CALLBACK
     @GetMapping("/vnpay-return")
-    public ResponseEntity<ApiResponse<OrderTicketResponse>> vnpayReturn(HttpServletRequest request) {
+    public RedirectView vnpayReturn(HttpServletRequest request) {
         Map<String, String> params = new HashMap<>();
         request.getParameterMap().forEach((key, value) -> {
             if (value != null && value.length > 0) {
@@ -91,13 +92,13 @@ public class PaymentController {
             }
         });
 
-        OrderTicketResponse response = orderService.handleVNPayReturn(params);
+        try {
+            OrderTicketResponse orderResponse = orderService.handleVNPayReturn(params);
+            return new RedirectView("http://localhost:5174/match");
 
-        String message = response.status().name().equals("PAID")
-                ? "Thanh toán VNPay thành công!"
-                : "Thanh toán VNPay thất bại!";
-
-        return ResponseEntity.ok(ApiResponse.success(message, response));
+        } catch (Exception e) {
+            return new RedirectView("http://localhost:5174/match");
+        }
     }
 
     // MOMO CALLBACK
