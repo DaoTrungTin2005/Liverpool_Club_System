@@ -15,7 +15,7 @@ export default function AdminMatchAdd() {
   const [ticketSettings, setTicketSettings] = useState({});
   const [selectedSection, setSelectedSection] = useState(null);
   const [tempQuantity, setTempQuantity] = useState(500);
-  const [tempPrice, setTempPrice] = useState(120.0);
+  const [tempPrice, setTempPrice] = useState(200000);
 
   const [formData, setFormData] = useState({
     tournament: "",
@@ -238,7 +238,7 @@ export default function AdminMatchAdd() {
         return {
           sectionId: section.id,
           totalQuantity: userSetting ? userSetting.totalQuantity : 500,
-          price: userSetting ? userSetting.price : 120.0,
+          price: userSetting ? userSetting.price : 120,
         };
       });
 

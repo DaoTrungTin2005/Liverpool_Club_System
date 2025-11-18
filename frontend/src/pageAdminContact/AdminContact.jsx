@@ -61,7 +61,7 @@ export default function AdminContact() {
           <div className="flex flex-col bg-white h-full rounded-3xl shadow-lg overflow-hidden">
             {/* Tiêu đề */}
             <p className="mx-6 text-[#2B3674] font-bold text-2xl my-4">
-              Bill List
+              Contact List
             </p>
 
             {/* Danh sách bill - CUỘN RIÊNG, KHÔNG LÀM DÀI TRANG */}

@@ -5,6 +5,7 @@ import Tilte from "../assets/img/Tilte.png";
 import Position from "../componentUserView/Position.jsx";
 import PositionImg from "../componentUserView/PositionImage.jsx";
 import { playerService } from "../Api/playerService.js";
+import Footer from "../componentUserView/Footer.jsx";
 
 export default function MyClub() {
   const [allPlayers, setAllPlayers] = useState({
@@ -76,6 +77,7 @@ export default function MyClub() {
                 goal={player.totalGoals.toString()}
                 assists={player.totalAssists.toString()}
                 playerId={player.id}
+                number={player.shirtNumber.toString()}
               />
             ))
           ) : (
@@ -189,6 +191,7 @@ export default function MyClub() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -18,7 +18,7 @@ export default function AdminMatch() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const size = 10;
+  const size = 8;
 
   const fetchMatches = async (search = "", pageNum = 0) => {
     setLoading(true);
@@ -107,7 +107,7 @@ export default function AdminMatch() {
             </p>
 
             {/* Header */}
-            <div className="grid auto-cols-auto grid-flow-col mx-6 text-[#A3AED0] grid-cols-7 w-full">
+            <div className="grid mx-6 text-[#A3AED0] grid-cols-7 py-3 text-sm transition border border-transparent">
               <div className=" flex items-center">
                 MatchID
                 <SvgAdminOrder className="ml-1" />
@@ -139,7 +139,7 @@ export default function AdminMatch() {
               matches.map((match) => (
                 <div
                   key={match.matchId}
-                  className="grid grid-cols-7 py-2.5 w-full grid-flow-col mx-6"
+                  className=" grid-flow-col grid grid-cols-7 mx-6 py-3 text-sm hover:bg-gray-50 transition border border-transparent hover:border-gray-200"
                 >
                   <div>{match.matchId}</div>
                   <div>
@@ -160,14 +160,14 @@ export default function AdminMatch() {
                     <Link
                       to={`/admin/match/delete`}
                       state={{ matchId: match.matchId }}
-                      className="mt-0.5 ml-2"
+                      className="ml-2"
                     >
                       <SvgAdminDelete />
                     </Link>
                     <Link
                       to={`/admin/match/view`}
                       state={{ matchId: match.matchId }}
-                      className="mt-0.5 ml-2"
+                      className="mt-0.5 ml-2.5"
                     >
                       <SvgAdminView />
                     </Link>

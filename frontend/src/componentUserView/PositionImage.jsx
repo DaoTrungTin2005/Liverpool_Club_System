@@ -10,6 +10,7 @@ export default function PositionImg({
   match = "4",
   goal = "2",
   assists = "2",
+  number = "00",
   playerId, // Giữ prop này
 }) {
   return (
@@ -21,9 +22,11 @@ export default function PositionImg({
         <img
           src={editimageapi(image, defaultImage)}
           alt={alt}
-          className="w-[350px] h-[500px] rounded-2xl shadow-xl object-cover"
+          className="w-[350px] h-[500px] rounded-2xl shadow-xl object-cover "
         />
-
+        <p className="absolute text-4xl font-bold text-white Kanit left-3 top-3 hidden group-hover:block drop-shadow-lg transition-all duration-300 ease-out">
+          {number}
+        </p>
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-b-2xl transition-all duration-300"></div>
 
         <p
@@ -32,6 +35,7 @@ export default function PositionImg({
               drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)] 
               transition-all duration-300 ease-out
               bottom-8
+              w-100 text-center
               group-hover:bottom-30
             `}
         >

@@ -38,7 +38,7 @@ export default function Header() {
     }
   }, [location]);
   return (
-    <header className="fixed top-0 left-0 w-full z-50 shadow-lg">
+    <header className="fixed top-0 left-0 w-full z-5000 shadow-lg">
       {/* BG đỏ đen gradient phong cách Liverpool */}
       <div className="bg-gradient-to-r from-black via-red-800 to-black px-8 py-3 flex items-center justify-between h-20 max-sm:h-12">
         {/* Logo */}
@@ -76,7 +76,12 @@ export default function Header() {
           >
             Contact
           </Link>
-
+          <Link
+            to="/order"
+            className="hover:text-red-300 duration-200 max-sm:hidden"
+          >
+            Order
+          </Link>
           {!user && (
             <>
               <Link
@@ -91,7 +96,9 @@ export default function Header() {
 
           {user && (
             <>
-              <span className="text-red-300">Xin chào, {user.fullname}</span>
+              <Link to="/admin/user">
+                <span className="text-red-300">Xin chào, {user.fullname}</span>
+              </Link>
               <Button
                 text={"Log Out"}
                 onClick={logout}

@@ -1,11 +1,6 @@
 import "../output.css";
 import Header from "../componentUserView/Header";
 import Liverpool_Banner from "../assets/img/Liverpool_Banner.png";
-import Carabaocup from "../assets/img/Carabaocup.png";
-import Premiercup from "../assets/img/Premiercup.png";
-import C1 from "../assets/img/C1.png";
-import CupFA from "../assets/img/CupFA.png";
-import TotvsLiver from "../assets/img/TotvsLiv.png";
 import Stadium from "../assets/img/Stadium.png";
 import ViewStadium from "../assets/img/ViewSadium.png";
 import Cancel from "../assets/img/Cancel.png";
@@ -15,9 +10,10 @@ import Button from "../pageAdminUser/componentAdminUser/Button";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import Footer from "../componentUserView/Footer.jsx";
 export default function Ticket() {
-  const [popupData, setPopupData] = useState(null); // Dữ liệu từ API popup
-  const [selectedQty, setSelectedQty] = useState(1); // Số lượng vé người dùng chọn
+  const [popupData, setPopupData] = useState(null);
+  const [selectedQty, setSelectedQty] = useState(1);
   const location = useLocation();
   const navigate = useNavigate();
   const [matchData, setMatchData] = useState(null);
@@ -246,27 +242,50 @@ export default function Ticket() {
       </div>
       <div className="flex items-center justify-center pt-28 gap-12 max-sm:gap-5 max-sm:pt-5 h-full"></div>
       <div className="bg-white w-full h-full m-auto flex flex-col pt-20 pb-50 items-center max-sm:w-dvh">
-        <div className="flex flex-col items-center justify-center gap-10">
-          <p className="text-black text-4xl text-center">
+        <div className="flex flex-col items-center justify-center gap-10 p-6">
+          <p className="text-black text-4xl font-semibold tracking-wide text-center">
             {matchData.tournamentName}
           </p>
-          <div className="w-200 flex items-center justify-between gap-15 text-2xl bg-[#EEEEEE]">
-            <img
-              src={matchData.homeLogo}
-              alt={matchData.homeTeam}
-              className="w-15 h-15"
-            />
-            <p className="w-70">{matchData.homeTeam}</p>
-            <p className="w-15 h-15 text-3xl">VS</p>
-            <p className="w-70">{matchData.awayTeam}</p>
-            <img src={matchData.matchImage} alt="VS" className="w-15 h-15" />
+          <div
+            className="w-[700px] flex items-center justify-between gap-10 
+                  px-8 py-6 rounded-2xl bg-gradient-to-r from-white to-[#F2F2F2]
+                  shadow-lg border border-gray-200"
+          >
+            <div className="flex flex-col items-center gap-2">
+              <img
+                src={matchData.homeLogo}
+                alt={matchData.homeTeam}
+                className="w-20 h-20 object-contain"
+              />
+              <p className="text-xl font-medium text-center">
+                {matchData.homeTeam}
+              </p>
+            </div>
+            <p className="text-4xl font-bold text-gray-700">VS</p>
+            <div className="flex flex-col items-center gap-2">
+              <img
+                src={matchData.awayLogo}
+                alt={matchData.awayTeam}
+                className="w-20 h-20 object-contain"
+              />
+              <p className="text-xl font-medium text-center">
+                {matchData.awayTeam}
+              </p>
+            </div>
           </div>
-          <div className="flex text-xl gap-10 items-center justify-center">
-            <p>{formatDate(matchData.matchDate)}</p>
-            <div className="w-[1px] h-6 border border-1 border-black"></div>
-            <p>{formatTime(matchData.matchDate)}</p>
-            <div className="w-[1px] h-6 border border-1 border-black"></div>
-            <p>{matchData.location}</p>
+          <div
+            className="flex text-xl gap-6 items-center justify-center bg-white 
+                  px-8 py-4 rounded-xl shadow border border-gray-200"
+          >
+            <p className="font-medium">{formatDate(matchData.matchDate)}</p>
+
+            <div className="w-[1px] h-6 bg-gray-400"></div>
+
+            <p className="font-medium">{formatTime(matchData.matchDate)}</p>
+
+            <div className="w-[1px] h-6 bg-gray-400"></div>
+
+            <p className="font-medium">{matchData.location}</p>
           </div>
         </div>
         <div className="w-[80%] h-[1px] border border-1 border-black my-30"></div>
@@ -1447,43 +1466,65 @@ export default function Ticket() {
             <p>MAIN STAND</p>
           </div>
           {showStatsIn && popupData && (
-            <div className="w-200 h-140 bg-[#CECCCC] shadow-2xl rounded-3xl flex items-center flex-col justify-center gap-3 absolute z-10 inset-0 m-auto">
+            <div
+              className="w-[550px] h-[620px] bg-white shadow-2xl rounded-3xl 
+                  flex flex-col items-center justify-start gap-6 
+                  absolute z-10 inset-0 m-auto p-6 border border-gray-200"
+            >
               <img
                 src={Cancel}
-                className="z-20 inset-0 absolute w-10 h-10 cursor-pointer"
+                className="absolute top-5 right-5 w-10 h-10 cursor-pointer opacity-80 hover:opacity-100 transition"
                 onClick={closeAllPopups}
               />
               <img
                 src={popupData.viewImageUrl || ViewStadium}
                 alt="View"
-                className="w-full h-80"
+                className="w-full h-[300px] object-cover rounded-2xl shadow-md"
               />
-              <div className="flex flex-col items-center justify-center">
-                <p>${popupData.price?.toFixed(2)}</p>
-                <p>
+              <div className="flex flex-col items-center justify-center gap-1 text-lg font-medium">
+                <p className="text-2xl font-semibold text-green-700">
+                  ${popupData.price?.toFixed(2)}
+                </p>
+                <p className="text-gray-700">
                   {popupData.sectionName} - {popupData.tierName}
                 </p>
-                <p>Available: {popupData.availableTickets} tickets</p>
+                <p className="text-gray-500">
+                  Available: {popupData.availableTickets} tickets
+                </p>
               </div>
-              <div className="flex gap-20 items-center">
-                <div className="flex items-center">
+              <div className="flex gap-12 items-center mt-2">
+                <div className="flex items-center bg-gray-100 rounded-xl shadow-inner px-4 py-2">
                   <div
-                    className="bg-black text-white w-6 h-6 flex items-center justify-center cursor-pointer"
+                    className="bg-black text-white w-7 h-7 flex items-center justify-center 
+                     cursor-pointer rounded-md hover:bg-gray-800 transition"
                     onClick={() => changeQty(1)}
                   >
-                    <p>+</p>
+                    +
                   </div>
-                  <div className="bg-white text-black w-12 flex items-center justify-center">
-                    {selectedQty}
-                  </div>
+
+                  <input
+                    type="text"
+                    value={selectedQty}
+                    onChange={(e) =>
+                      changeQty(Number(e.target.value) - selectedQty)
+                    }
+                    className="bg-white text-black w-16 h-7 mx-3 flex items-center justify-center
+             rounded-md border border-gray-300 font-semibold text-center 
+             focus:outline-none focus:ring-2 focus:ring-black"
+                    min="1"
+                  />
+
                   <div
-                    className="bg-black text-white w-6 h-6 flex items-center justify-center cursor-pointer"
+                    className="bg-black text-white w-7 h-7 flex items-center justify-center 
+                     cursor-pointer rounded-md hover:bg-gray-800 transition"
                     onClick={() => changeQty(-1)}
                   >
-                    <p>-</p>
+                    -
                   </div>
                 </div>
-                <p>${(popupData.price * selectedQty).toFixed(2)}</p>
+                <p className="text-2xl font-semibold text-red-600">
+                  ${(popupData.price * selectedQty).toFixed(2)}
+                </p>
               </div>
               <Button
                 text="Buy Now"
@@ -1492,6 +1533,7 @@ export default function Ticket() {
               />
             </div>
           )}
+
           {showStats && (
             <div className="w-70 h-40 bg-[#CECCCC] shadow-2xl rounded-3xl flex items-center flex-col justify-center absolute z-50 inset-0 m-auto">
               <div className="flex items-center justify-center mt-20">
@@ -1531,6 +1573,7 @@ export default function Ticket() {
           <p className="my-auto">Shortside Lower Tier</p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -75,7 +75,7 @@ export default function BodyPlayer({
             {/* Info Column */}
             <div>
               <h2 className="text-3xl font-bold mb-6">Info</h2>
-              <div className="space-y-5 text-sm">
+              <div className="space-y-5 text-sm KdamThmorPro">
                 <div>
                   <span className="text-gray-500 block">Date of birth</span>
                   <p className="font-semibold text-red-500">{dateOfBirth}</p>

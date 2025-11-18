@@ -21,7 +21,7 @@ export default function UserList({
 
     try {
       const response = await api.get("/api/admin/users/list", {
-        params: { page, size: 10 },
+        params: { page, size: 9 },
       });
 
       if (response.data.status === "success") {
@@ -99,13 +99,13 @@ export default function UserList({
   };
   return (
     <>
-      <div className="flex flex-col bg-white mx-4 h-full rounded-3xl">
+      <div className="flex flex-col bg-white mx-4 h-full rounded-3xl ">
         <p className="mx-6 text-[#2B3674] font-bold text-2xl my-2">
           User Details
         </p>
 
         {/* Header */}
-        <div className="grid auto-cols-auto grid-flow-col mx-6 text-[#A3AED0] grid-cols-[1fr_2fr_3fr_1fr_1fr_0.75fr] w-full">
+        <div className="grid auto-cols-auto grid-flow-col  text-[#A3AED0] grid-cols-[1fr_2fr_3fr_1fr_1fr_0.75fr] mx-6 py-3 text-sm  transition ">
           <div className="... flex items-center">
             UID
             <SvgAdminOrder className="ml-1" />
@@ -141,7 +141,7 @@ export default function UserList({
           users.map((user) => (
             <div
               key={user.id}
-              className="grid grid-cols-[1fr_2fr_3fr_1fr_1fr_0.75fr] py-2.75 mx-6 w-full grid-flow-col"
+              className="grid grid-cols-[1fr_2fr_3fr_1fr_1fr_0.75fr] grid-flow-col grid grid-cols-6 mx-6 py-3 text-sm hover:bg-gray-50 transition border border-transparent hover:border-gray-200 "
             >
               <div>{user.uid || "-"}</div>
               <div>{user.fullName}</div>

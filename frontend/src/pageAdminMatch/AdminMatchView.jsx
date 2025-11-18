@@ -83,14 +83,6 @@ export default function AdminMatchView() {
     const section = sections.find((s) => s.id === id);
     return section?.name || `S${id}`;
   };
-
-  // === HIỂN THỊ THÔNG TIN TICKET ===
-  // const getTicketInfo = (id) => {
-  //   const setting = ticketSettings[id];
-  //   if (!setting) return null;
-  //   return `${setting.quantity} vé - ${setting.price.toLocaleString()} VND`;
-  // };
-
   const [viewDetail, setViewDetail] = useState(null);
 
   const handleSectionClick = (sectionId) => {

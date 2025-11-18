@@ -9,6 +9,7 @@ import PositionImage from "../componentUserView/PositionImage.jsx";
 import next from "../assets/img/next.png";
 import prev from "../assets/img/prev.png";
 import { playerService } from "../Api/playerService.js";
+import Footer from "./Footer.jsx";
 
 export default function ProfilePlayer() {
   const location = useLocation();
@@ -289,6 +290,7 @@ export default function ProfilePlayer() {
                               match={player.totalMatches?.toString() || "0"}
                               assists={player.totalAssists?.toString() || "0"}
                               playerId={player.id}
+                              number={player.shirtNumber.toString()}
                             />
                           </div>
                         ))}
@@ -346,7 +348,7 @@ export default function ProfilePlayer() {
           </div>
         </div>
       )}
-
+      <Footer />
       {/* CSS Animations */}
       <style>{`
         @keyframes slideIn {

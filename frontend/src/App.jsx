@@ -27,7 +27,9 @@ import Ticket from "./PageUserView/Ticket.jsx";
 import Payment from "./PageUserView/Payment.jsx";
 import Contact from "./PageUserView/Contact.jsx";
 import AdminContact from "./pageAdminContact/AdminContact.jsx";
-
+import PaymentSuccess from "./PageUserView/PaymentStatus.jsx";
+import PaymentFailed from "./PageUserView/PaymentStatus.jsx";
+import OrderHistory from "./PageUserView/OrderHistory.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminRoute from "./AdminRoute.jsx"; // ⭐ THÊM DÒNG NÀY
 
@@ -151,6 +153,9 @@ function App() {
         {/* USER PAGE */}
         <Route path="/myclub" element={<MyClub />} />
         <Route path="/myclub/player" element={<ProfilePlayer />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
+        <Route path="/order" element={<OrderHistory />} />
 
         {/* ADMIN TICKET */}
         <Route

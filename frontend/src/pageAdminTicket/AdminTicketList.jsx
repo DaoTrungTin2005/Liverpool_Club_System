@@ -114,7 +114,7 @@ export default function AdminTicketList() {
               tickets.map((ticket) => (
                 <div
                   key={ticket.ticketSettingId}
-                  className="grid grid-cols-6 mx-6 py-3 text-sm hover:bg-gray-50 transition"
+                  className="grid grid-cols-6 mx-6 py-3 text-sm hover:bg-gray-50 transition border border-transparent hover:border-gray-200"
                 >
                   {/* Khu vực */}
                   <div className="font-medium">{ticket.sectionName}</div>

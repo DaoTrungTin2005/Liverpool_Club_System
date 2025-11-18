@@ -9,58 +9,34 @@ export default function Form() {
 
   //  FIX: Xử lý Google callback và redirect đúng
   useEffect(() => {
-    const handleAuth = async () => {
+    const handleGoogleCallback = () => {
       const url = new URL(window.location.href);
-      const tokenFromUrl = url.searchParams.get("token");
 
-      //  Xử lý Google Login callback
-      if (tokenFromUrl) {
-        localStorage.setItem("authToken", tokenFromUrl);
-        localStorage.setItem("tokenTime", Date.now().toString());
-        window.history.replaceState({}, "", "/");
+      // Lấy thông tin từ URL params
+      const token = url.searchParams.get("token");
+      const id = url.searchParams.get("id");
+      const role = url.searchParams.get("role");
+      const error = url.searchParams.get("error");
 
-        try {
-          //  GỌI API LẤY THÔNG TIN USER
-          const userRes = await api.post("/api/auth/login");
-          const role = userRes.data?.data?.role || userRes.data?.role || "USER";
-          const data = userRes.data?.data;
-          const userInfo = {
-            id: data?.id,
-            email: data?.email,
-            fullname: data?.fullname,
-            role: data?.role,
-          };
-
-          localStorage.setItem("userRole", role);
-
-          if (userInfo) {
-            localStorage.setItem("user", JSON.stringify(userInfo));
-          }
-
-          console.log("✅ Google login success - Role:", role);
-
-          // ✅ Redirect dựa vào role
-          window.location.href = role === "ADMIN" ? "/admin/user" : "/match";
-        } catch (err) {
-          console.error("❌ Lỗi lấy thông tin user:", err);
-          alert("Không thể lấy thông tin người dùng!");
-          window.location.href = "/login";
-        }
+      if (error) {
+        alert("Đăng nhập Google thất bại!");
+        window.history.replaceState({}, "", "/login");
         return;
       }
 
-      // ✅ Kiểm tra token hiện tại
-      const token = localStorage.getItem("authToken");
-      const role = localStorage.getItem("userRole");
+      // Nếu có token → lưu và redirect
+      if (token && id && role) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("userRole", role);
+        // ... lưu các thông tin khác
 
-      if (token && role) {
-        window.location.href = role === "ADMIN" ? "/admin/user" : "/match";
+        const redirectTo = role === "ADMIN" ? "/admin/user" : "/match";
+        window.location.href = redirectTo;
       }
     };
 
-    handleAuth();
+    handleGoogleCallback();
   }, []);
-
   const handleFocus = (e) => (e.target.placeholder = "");
   const handleBlur = (e) => {
     if (!e.target.value)
@@ -136,12 +112,9 @@ export default function Form() {
       const res = await api.get("/api/auth/login/google/start");
       if (res.data.redirectUrl) {
         window.location.href = res.data.redirectUrl;
-      } else {
-        alert("Server không trả về redirectUrl hợp lệ!");
       }
     } catch (error) {
-      console.error("❌ Lỗi khi gọi API Google Login:", error);
-      alert("Cannot connect to the Google Login server!");
+      alert("Không thể khởi tạo đăng nhập Google");
     }
   };
 

@@ -10,7 +10,7 @@ export default function MatchBanner(props) {
         <h1 className="text-6xl my-10 font-extrabold bg-gradient-to-r from-[#653C39] via-[#BE0C43] to-[#653C39] bg-clip-text text-transparent">
           {league}
         </h1>
-        <div className="w-full h-[1px] border border-1 border-gray-500 shadow-gray-500 my-10 "></div>
+        <div className="w-full h-[1px] border border-1 border-gray-500 shadow-gray-500 my-10"></div>
 
         {/* ✅ render tất cả trận trong giải */}
         <div className="grid grid-cols-3 h-100 w-full gap-10 max-sm:grid-cols-1">

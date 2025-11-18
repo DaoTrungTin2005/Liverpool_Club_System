@@ -76,16 +76,16 @@ export default function Match() {
         <img
           src={TheKopMFS}
           alt="Liverpool FC - Matches and Tickets"
-          className="absolute inset-0 w-full h-full object-cover object-top"
+          className="absolute inset-0 w-full h-full object-cover top-20 object-[0_52%]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-red-900/90 via-red-900/40 to-transparent" />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center mt-100 translate-y-[-10vh] md:translate-y-[-12vh] lg:translate-y-[-15vh]">
           <h1
             className="
-              text-5xl sm:text-6xl md:text-7xl lg:text-8xl 
+              text-9xl 
               font-black tracking-wider text-white 
-              drop-shadow-2xl leading-none
+              drop-shadow-2xl leading-none Pridi
             "
             style={{
               textShadow: `
@@ -100,17 +100,18 @@ export default function Match() {
           </h1>
           <p
             className="
-              text-base sm:text-lg md:text-xl lg:text-2xl 
-              font-bold tracking-widest 
+              text-6xl
+              font-medium
               text-transparent 
-              [-webkit-text-stroke:1px_white] 
-              mt-3 md:mt-4
-              drop-shadow-lg
+              [-webkit-text-stroke:0.5px_white] 
+              mt-3
+              drop-shadow-lg Kanit
+              [-webkit-text-color:white]
             "
             style={{
-              WebkitTextStroke: "1px white",
-              letterSpacing: "0.3em",
-              textShadow: "0 2px 6px rgba(0,0,0,0.8)",
+              WebkitTextStroke: "0.5px white",
+              letterSpacing: "0.12em",
+              textShadow: "0 2px 6px rgba(255, 255, 255, 0.25)",
             }}
           >
             MATCHES AND TICKETS

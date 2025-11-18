@@ -166,7 +166,7 @@ export default function PlayerList({
           players.map((player) => (
             <div
               key={player.id}
-              className="grid grid-cols-[repeat(10,minmax(0,1fr))] min-w-full text-[#2B3674] text-sm py-1"
+              className="grid grid-cols-[repeat(10,minmax(0,1fr))] text-[#2B3674] text-sm py-1 grid grid-cols-6 text-sm hover:bg-gray-50 transition border border-transparent hover:border-gray-200"
             >
               <div className="truncate py-2 ">{player.id}</div>
               <div className="truncate py-2 ">{player.playerName}</div>

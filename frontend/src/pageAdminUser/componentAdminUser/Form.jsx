@@ -192,7 +192,7 @@ export default function Form({
         action=""
         className="flex flex-col items-center gap-5 text-[#2B3674] text-sm"
       >
-        <label htmlFor="" className="flex flex-col justify-center w-100 gap-5">
+        <label htmlFor="" className="flex flex-col justify-center w-100 gap-5 ">
           FullName:
           <input
             type="text"

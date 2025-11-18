@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import Zalo from "../assets/img/Zalo.png";
 import VNPAY from "../assets/img/VNPay.png";
 import api from "../Api/apitoken";
+import Footer from "../componentUserView/Footer";
 
 export default function Payment() {
   const [selected, setSelected] = useState(null);
@@ -134,13 +135,11 @@ export default function Payment() {
         const result = await api.post(`/api/payment/create-momo/${orderId}`);
         url = result.data.data.paymentUrl;
       }
-
       if (selected === 2) {
         console.log("THANH TOÁN VNPAY");
         const result = await api.post(`/api/payment/create-vnpay/${orderId}`);
         url = result.data.data.paymentUrl;
       }
-
       if (selected === 3) {
         console.log("THANH TOÁN ZALOPAY");
         const result = await api.post(`/api/payment/create-zalopay/${orderId}`);
@@ -156,7 +155,6 @@ export default function Payment() {
       alert("Không thể tạo đơn thanh toán!");
     }
   };
-
   return (
     <div className="flex flex-col Oxanium">
       <Header />
@@ -260,6 +258,7 @@ export default function Payment() {
           </button>
         </form>
       </div>
+      <Footer />
     </div>
   );
 }
