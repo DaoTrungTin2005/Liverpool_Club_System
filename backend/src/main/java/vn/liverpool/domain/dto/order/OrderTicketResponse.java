@@ -18,5 +18,6 @@ public record OrderTicketResponse(
     OrderStatus status,
     LocalDateTime createdAt,
     Long accountId,
-    String accountEmail
+    String accountEmail,
+    String note
 ) {}

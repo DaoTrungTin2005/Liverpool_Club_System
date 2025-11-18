@@ -137,8 +137,10 @@ public class OrderTicketService {
                 savedOrder.getTotalPrice(),
                 savedOrder.getStatus(),
                 savedOrder.getCreatedAt(),
+                
                 currentAccount.getId(),
-                currentAccount.getEmail());
+                currentAccount.getEmail(),
+                savedOrder.getNote());
     }
 
     // ========== VNPAY PAYMENT URL ==========
@@ -332,7 +334,8 @@ public class OrderTicketService {
                 order.getStatus(),
                 order.getCreatedAt(),
                 accountId,
-                accountEmail);
+                accountEmail,
+                order.getNote());
     }
 
     private String generateOrderCode() {
@@ -408,6 +411,7 @@ public class OrderTicketService {
                 order.getStatus(),
                 order.getCreatedAt(),
                 order.getAccount() != null ? order.getAccount().getId() : null,
-                order.getAccount() != null ? order.getAccount().getEmail() : null));
+                order.getAccount() != null ? order.getAccount().getEmail() : null,
+                order.getNote()));
     }
 }
