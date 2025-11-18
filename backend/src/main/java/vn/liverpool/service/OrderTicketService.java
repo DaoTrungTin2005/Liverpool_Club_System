@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.liverpool.domain.*;
 import vn.liverpool.domain.OrderTicket.OrderStatus;
 import vn.liverpool.domain.dto.order.CreateOrderTicketRequest;
+import vn.liverpool.domain.dto.order.OrderTicketHistoryResponse;
 import vn.liverpool.domain.dto.order.OrderTicketResponse;
 import vn.liverpool.domain.dto.order.ValidateSelectionRequest;
 import vn.liverpool.domain.dto.order.ValidateSelectionResponse;
@@ -37,6 +38,7 @@ public class OrderTicketService {
     private final ZaloPayService zaloPayService;
     private final HttpServletRequest request;
     private final UserContextService userContextService;
+    private final AccountRepository accountRepository;
 
     // khi nhấn buy now ktra số lượng hợp lệ chưa
     public ValidateSelectionResponse validateSelection(ValidateSelectionRequest dto) {
@@ -137,7 +139,7 @@ public class OrderTicketService {
                 savedOrder.getTotalPrice(),
                 savedOrder.getStatus(),
                 savedOrder.getCreatedAt(),
-                
+
                 currentAccount.getId(),
                 currentAccount.getEmail(),
                 savedOrder.getNote());
@@ -413,5 +415,59 @@ public class OrderTicketService {
                 order.getAccount() != null ? order.getAccount().getId() : null,
                 order.getAccount() != null ? order.getAccount().getEmail() : null,
                 order.getNote()));
+    }
+
+    // === LẤY LỊCH SỬ ĐƠN HÀNG CỦA USER ===
+    @Transactional(readOnly = true)
+    public List<OrderTicketHistoryResponse> getUserOrderHistory(String userEmail) {
+
+        Account account = accountRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Lấy danh sách orders theo thời gian mới -> cũ
+        List<OrderTicket> orders = orderRepo.findOrdersByAccountId(account.getId());
+
+        String baseUrl = getBaseUrl() + "/uploads/matches/";
+
+        return orders.stream()
+                .map(order -> {
+
+                    Match match = order.getMatch();
+                    Tournament tournament = match.getTournament();
+
+                    // Format ngày giờ
+                    LocalDateTime createdAt = order.getCreatedAt();
+                    LocalDateTime matchDate = match.getMatchDate();
+
+                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+                    DateTimeFormatter fullFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+                    // Convert từng field
+                    String timePayment = createdAt.format(fullFormatter);
+                    String timeDay = matchDate.format(dateFormatter);
+                    String timeHours = matchDate.format(timeFormatter);
+
+                    return new OrderTicketHistoryResponse(
+                            match.getId(),
+                            order.getOrderCode(), // paymentId
+                            timePayment, // timePayment
+                            match.getHomeTeam(),
+                            match.getHomeLogo() != null ? baseUrl + match.getHomeLogo() : null,
+                            match.getAwayTeam(),
+                            match.getAwayLogo() != null ? baseUrl + match.getAwayLogo() : null,
+                            tournament.getName(), // league
+                            timeDay,
+                            timeHours,
+                            match.getLocation(),
+                            order.getQuantity(),
+                            order.getTotalPrice().longValue(),
+                            order.getStatus().toString());
+                })
+                .toList();
+    }
+
+    private String getBaseUrl() {
+        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
     }
 }

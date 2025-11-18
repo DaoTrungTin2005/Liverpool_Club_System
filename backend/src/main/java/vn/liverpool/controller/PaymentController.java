@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import vn.liverpool.domain.dto.order.CreateOrderTicketRequest;
+import vn.liverpool.domain.dto.order.OrderTicketHistoryResponse;
 import vn.liverpool.domain.dto.order.OrderTicketResponse;
 import vn.liverpool.domain.dto.order.ValidateSelectionRequest;
 import vn.liverpool.domain.dto.order.ValidateSelectionResponse;
@@ -18,6 +19,7 @@ import vn.liverpool.service.OrderTicketService;
 import vn.liverpool.util.ApiResponse;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -94,7 +96,7 @@ public class PaymentController {
 
         try {
             OrderTicketResponse orderResponse = orderService.handleVNPayReturn(params);
-            return new RedirectView("http://localhost:5174/payment-success" );
+            return new RedirectView("http://localhost:5174/payment-success");
 
         } catch (Exception e) {
             return new RedirectView("http://localhost:5174/payment-failed");
@@ -207,4 +209,16 @@ public class PaymentController {
         return ResponseEntity.ok(result);
     }
 
+    // LỊCH SỬ ĐƠN HÀNG CỦA USER
+
+@GetMapping("/user/order-history")
+public ResponseEntity<ApiResponse<List<OrderTicketHistoryResponse>>> getUserOrderHistory(
+        HttpServletRequest request) {
+
+    String userEmail = request.getUserPrincipal().getName();
+    
+    List<OrderTicketHistoryResponse> result = orderService.getUserOrderHistory(userEmail);
+
+    return ResponseEntity.ok(ApiResponse.success("Get order history successfully", result));
+}
 }

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import vn.liverpool.domain.Account;
 import vn.liverpool.domain.OrderTicket;
 import vn.liverpool.domain.OrderTicket.OrderStatus;
 
@@ -38,4 +40,12 @@ public interface OrderTicketRepository extends JpaRepository<OrderTicket, Long> 
     Page<OrderTicket> searchByKeyword(
             @Param("keyword") String keyword,
             Pageable pageable);
+
+      @Query("""
+        SELECT o
+        FROM OrderTicket o
+        WHERE o.account.id = :accountId
+        ORDER BY o.createdAt DESC
+    """)
+    List<OrderTicket> findOrdersByAccountId(@Param("accountId") Long accountId);
 }
