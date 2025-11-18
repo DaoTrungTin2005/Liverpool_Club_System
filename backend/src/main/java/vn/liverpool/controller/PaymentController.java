@@ -97,7 +97,7 @@ public class PaymentController {
             return new RedirectView("http://localhost:5174/match");
 
         } catch (Exception e) {
-            return new RedirectView("http://localhost:5174/match");
+            return new RedirectView("http://localhost:5174/match/fail");
         }
     }
 
