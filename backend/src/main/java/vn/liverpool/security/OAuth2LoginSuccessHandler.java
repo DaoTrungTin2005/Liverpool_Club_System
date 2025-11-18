@@ -1,6 +1,5 @@
 package vn.liverpool.security;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +9,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import vn.liverpool.domain.Account;
 import vn.liverpool.domain.Role;
 import vn.liverpool.repository.AccountRepository;
@@ -21,8 +17,6 @@ import vn.liverpool.repository.RoleRepository;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -64,22 +58,39 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         // Kiểm tra: nếu response đã bị ghi gì đó rồi → không ghi nữa
         if (response.isCommitted())
             return;
-        // Set HTTP-Only Cookie
-        Cookie cookie = new Cookie("authToken", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // true nếu HTTPS
-        cookie.setPath("/");
-        cookie.setMaxAge(86400 * 7); // 7 ngày
-        response.addCookie(cookie);
 
-        // Redirect về frontend
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:5174/match");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String jsonResponse = """
+                {
+                    "status": "success",
+                    "message": "Login successful",
+                    "data": {
+                        "token": "%s",
+                        "id": %d,
+                        "email": "%s",
+                        "fullname": "%s",
+                        "role": "%s"
+                    },
+                    "timestamp": "%s"
+                }
+                """.formatted(
+                token,
+                account.getId(),
+                account.getEmail(),
+                account.getFullname(),
+                account.getRole().getName(),
+                java.time.Instant.now());
+
+        // Ghi JSON vào response
+        response.getWriter().write(jsonResponse);
     }
 
     // hàm hổ trợ Tìm và tao user mới từ thông tin Google
     private Account createGoogleUser(String email, String name, String googleId) {
 
-        // tìm role trước ko có để báo lỗi
+        //tìm role trước ko có để báo lỗi
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException(
                         " Role USER not found!"));

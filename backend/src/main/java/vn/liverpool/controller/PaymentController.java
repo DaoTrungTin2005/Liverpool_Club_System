@@ -94,10 +94,10 @@ public class PaymentController {
 
         try {
             OrderTicketResponse orderResponse = orderService.handleVNPayReturn(params);
-            return new RedirectView("http://localhost:5174/match");
+            return new RedirectView("http://localhost:5174/payment-success" );
 
         } catch (Exception e) {
-            return new RedirectView("http://localhost:5174/match/fail");
+            return new RedirectView("http://localhost:5174/payment-failed");
         }
     }
 
