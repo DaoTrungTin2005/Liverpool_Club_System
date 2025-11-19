@@ -31,7 +31,7 @@ import PaymentSuccess from "./PageUserView/PaymentStatus.jsx";
 import PaymentFailed from "./PageUserView/PaymentStatus.jsx";
 import OrderHistory from "./PageUserView/OrderHistory.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import AdminRoute from "./AdminRoute.jsx"; // ⭐ THÊM DÒNG NÀY
+import AdminRoute from "./AdminRoute.jsx";
 
 function App() {
   return (

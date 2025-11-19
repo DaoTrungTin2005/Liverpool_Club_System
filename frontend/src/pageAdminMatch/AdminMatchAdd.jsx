@@ -84,7 +84,7 @@ export default function AdminMatchAdd() {
     } else {
       // Reset về giá trị mặc định
       setTempQuantity(500);
-      setTempPrice(120.0);
+      setTempPrice(200000);
     }
 
     setShowStatsIn(true);
@@ -238,7 +238,7 @@ export default function AdminMatchAdd() {
         return {
           sectionId: section.id,
           totalQuantity: userSetting ? userSetting.totalQuantity : 500,
-          price: userSetting ? userSetting.price : 120,
+          price: userSetting ? userSetting.price : 200000,
         };
       });
 
