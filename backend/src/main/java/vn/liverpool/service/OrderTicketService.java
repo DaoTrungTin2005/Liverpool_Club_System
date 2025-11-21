@@ -359,7 +359,7 @@ public class OrderTicketService {
     @Scheduled(fixedRate = 30000)
     @Transactional
     public void cancelExpiredPendingOrders() {
-        LocalDateTime expireTime = LocalDateTime.now().minusMinutes(5); // 5 PHÚT
+        LocalDateTime expireTime = LocalDateTime.now().minusMinutes(15); // 15 PHÚT
 
         // tìm các đơn hàng PEnding đã quá hạn
         List<OrderTicket> expiredOrders = orderRepo.findByStatusAndCreatedAtBefore(
