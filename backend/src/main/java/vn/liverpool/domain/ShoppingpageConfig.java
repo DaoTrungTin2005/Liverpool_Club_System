@@ -8,10 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "homepage_config")
+@Table(name = "shoppingpage_config")
 @Getter
 @Setter
-public class HomepageConfig {
+public class ShoppingpageConfig {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

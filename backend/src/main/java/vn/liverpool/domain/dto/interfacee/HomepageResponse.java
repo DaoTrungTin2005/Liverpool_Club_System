@@ -1,7 +1,8 @@
 // src/main/java/vn/liverpool/domain/dto/homepage/HomepageResponse.java
 package vn.liverpool.domain.dto.interfacee;
 
-import vn.liverpool.domain.HomepageConfig;
+
+import vn.liverpool.domain.ShoppingpageConfig;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -24,7 +25,7 @@ public record HomepageResponse(
     public record Feature(String main, String sub) {}
 
     // Constructor chính – tự parse từ Entity
-    public HomepageResponse(HomepageConfig c, String baseUrl) {
+    public HomepageResponse(ShoppingpageConfig c, String baseUrl) {
         this(
                 c.getIntroTitle(),
                 c.getIntroContent(),

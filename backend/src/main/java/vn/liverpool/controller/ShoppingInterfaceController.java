@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import vn.liverpool.service.HomepageService;
+
+import vn.liverpool.service.ShoppingpageService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/homepage")
+@RequestMapping("/api/admin/shoppingpage")
 @RequiredArgsConstructor
 public class ShoppingInterfaceController {
 
-    private final HomepageService service;
+    private final ShoppingpageService service;
 
     @PutMapping(value = "/update", consumes = "multipart/form-data")
-    public ResponseEntity<?> updateHomepage(
+    public ResponseEntity<?> updateShoppingpage(
             @RequestPart("data") String dataJson,
 
             // 2 ảnh intro
@@ -47,7 +48,7 @@ public class ShoppingInterfaceController {
         if (shoesImages == null) shoesImages = new ArrayList<>();
 
         // Service trả về Map chứa toàn bộ response
-        Map<String, Object> responseData = service.updateHomepageWithFixedFiles(
+        Map<String, Object> responseData = service.updateShoppingpageWithFixedFiles(
                 dataJson,
                 introImage1, introImage2,
                 kitImages,

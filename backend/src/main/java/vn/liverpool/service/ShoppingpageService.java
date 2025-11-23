@@ -7,8 +7,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import vn.liverpool.domain.HomepageConfig;
-import vn.liverpool.repository.HomepageConfigRepository;
+
+import vn.liverpool.domain.ShoppingpageConfig;
+import vn.liverpool.repository.ShoppingpageConfigRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,9 +21,9 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class HomepageService {
+public class ShoppingpageService {
 
-    private final HomepageConfigRepository repo;
+    private final ShoppingpageConfigRepository repo;
     private final HttpServletRequest request;
 
     private String getBaseUrl() {
@@ -31,10 +32,11 @@ public class HomepageService {
 
     // ================== XÓA ẢNH CŨ ==================
     private void deleteOldImages() {
-        HomepageConfig old = repo.findById(1L).orElse(null);
-        if (old == null) return;
+        ShoppingpageConfig old = repo.findById(1L).orElse(null);
+        if (old == null)
+            return;
 
-        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/homepage";
+        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/shoppingpage";
 
         Arrays.asList(old.getIntroImage1(), old.getIntroImage2(),
                 old.getShoesImage1(), old.getShoesImage2(), old.getShoesImage3())
@@ -51,15 +53,17 @@ public class HomepageService {
         if (filename != null && !filename.isBlank()) {
             try {
                 Files.deleteIfExists(Paths.get(dir, filename));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
     // ================== LƯU FILE AN TOÀN ==================
     private String saveFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) return null;
+        if (file == null || file.isEmpty())
+            return null;
 
-        String dir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/homepage";
+        String dir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/shoppingpage";
         new File(dir).mkdirs();
 
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -73,17 +77,19 @@ public class HomepageService {
 
     // ================== BUILD KIT & BALL (có title) ==================
     private String buildImageTitleString(JsonNode array, List<MultipartFile> files) {
-        if (array == null || files == null || array.isEmpty() || files.isEmpty()) return null;
+        if (array == null || files == null || array.isEmpty() || files.isEmpty())
+            return null;
 
         StringBuilder sb = new StringBuilder();
-        
+
         // Duyệt qua tất cả files có sẵn
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
-            
+
             // Bỏ qua file null/empty
-            if (file == null || file.isEmpty()) continue;
-            
+            if (file == null || file.isEmpty())
+                continue;
+
             // Lấy title từ JSON nếu có
             String title = "";
             if (i < array.size()) {
@@ -92,7 +98,7 @@ public class HomepageService {
                     title = item.get("title").asText("");
                 }
             }
-            
+
             // Save file và thêm vào string
             String filename = saveFile(file);
             if (filename != null) {
@@ -100,13 +106,15 @@ public class HomepageService {
             }
         }
 
-        if (sb.length() > 0) sb.setLength(sb.length() - 1);
+        if (sb.length() > 0)
+            sb.setLength(sb.length() - 1);
         return sb.length() == 0 ? null : sb.toString();
     }
 
     // ================== BUILD ACCESSORIES (chỉ ảnh) ==================
     private String buildImageOnlyString(List<MultipartFile> files) {
-        if (files == null || files.isEmpty()) return null;
+        if (files == null || files.isEmpty())
+            return null;
 
         StringBuilder sb = new StringBuilder();
         for (MultipartFile file : files) {
@@ -117,13 +125,15 @@ public class HomepageService {
                 }
             }
         }
-        if (sb.length() > 0) sb.setLength(sb.length() - 1);
+        if (sb.length() > 0)
+            sb.setLength(sb.length() - 1);
         return sb.length() == 0 ? null : sb.toString();
     }
 
     // ================== BUILD SHOES FEATURES ==================
     private String buildFeatureString(JsonNode features) {
-        if (features == null || !features.isArray() || features.isEmpty()) return null;
+        if (features == null || !features.isArray() || features.isEmpty())
+            return null;
 
         StringBuilder sb = new StringBuilder();
         for (JsonNode f : features) {
@@ -131,28 +141,31 @@ public class HomepageService {
             String sub = f.has("sub") && f.get("sub") != null ? f.get("sub").asText("") : "";
             sb.append(main).append("|").append(sub).append(",");
         }
-        if (sb.length() > 0) sb.setLength(sb.length() - 1);
+        if (sb.length() > 0)
+            sb.setLength(sb.length() - 1);
         return sb.length() == 0 ? null : sb.toString();
     }
 
     // ================== UPDATE CHÍNH ==================
-    public Map<String, Object> updateHomepageWithFixedFiles(
+    public Map<String, Object> updateShoppingpageWithFixedFiles(
             String dataJson,
             MultipartFile intro1, MultipartFile intro2,
             List<MultipartFile> kitFiles,
             List<MultipartFile> ballFiles,
             List<MultipartFile> accessoryFiles,
-            List<MultipartFile> shoesFiles
-    ) {
+            List<MultipartFile> shoesFiles) {
 
         try {
-            System.out.println("=== HOMEPAGE UPDATE DEBUG START ===");
+            System.out.println("=== shoppingpage UPDATE DEBUG START ===");
             System.out.println("dataJson: " + (dataJson != null ? "OK" : "NULL!"));
-            System.out.println("intro1: " + (intro1 != null && !intro1.isEmpty() ? intro1.getOriginalFilename() : "null/empty"));
-            System.out.println("intro2: " + (intro2 != null && !intro2.isEmpty() ? intro2.getOriginalFilename() : "null/empty"));
+            System.out.println(
+                    "intro1: " + (intro1 != null && !intro1.isEmpty() ? intro1.getOriginalFilename() : "null/empty"));
+            System.out.println(
+                    "intro2: " + (intro2 != null && !intro2.isEmpty() ? intro2.getOriginalFilename() : "null/empty"));
             System.out.println("kitFiles: " + (kitFiles != null ? kitFiles.size() + " files" : "NULL"));
             System.out.println("ballFiles: " + (ballFiles != null ? ballFiles.size() + " files" : "NULL"));
-            System.out.println("accessoryFiles: " + (accessoryFiles != null ? accessoryFiles.size() + " files" : "NULL"));
+            System.out
+                    .println("accessoryFiles: " + (accessoryFiles != null ? accessoryFiles.size() + " files" : "NULL"));
             System.out.println("shoesFiles: " + (shoesFiles != null ? shoesFiles.size() + " files" : "NULL"));
 
             ObjectMapper mapper = new ObjectMapper();
@@ -162,7 +175,7 @@ public class HomepageService {
             deleteOldImages();
             System.out.println("✓ Xóa ảnh cũ thành công");
 
-            HomepageConfig config = repo.findById(1L).orElse(new HomepageConfig());
+            ShoppingpageConfig config = repo.findById(1L).orElse(new ShoppingpageConfig());
             config.setId(1L);
             System.out.println("✓ Load config thành công");
 
@@ -196,18 +209,19 @@ public class HomepageService {
             config.setShoesImage1(shoesFiles != null && shoesFiles.size() > 0 ? saveFile(shoesFiles.get(0)) : null);
             config.setShoesImage2(shoesFiles != null && shoesFiles.size() > 1 ? saveFile(shoesFiles.get(1)) : null);
             config.setShoesImage3(shoesFiles != null && shoesFiles.size() > 2 ? saveFile(shoesFiles.get(2)) : null);
-            System.out.println("✓ Shoes images: " + config.getShoesImage1() + ", " + config.getShoesImage2() + ", " + config.getShoesImage3());
+            System.out.println("✓ Shoes images: " + config.getShoesImage1() + ", " + config.getShoesImage2() + ", "
+                    + config.getShoesImage3());
 
             String featuresResult = buildFeatureString(data.get("shoesMiniTitles"));
             config.setShoesMiniTitles(featuresResult);
             System.out.println("✓ Features: " + featuresResult);
 
             repo.save(config);
-            
+
             // Pretty print response JSON - đầy đủ như input
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setDefaultPrettyPrinter(new com.fasterxml.jackson.core.util.DefaultPrettyPrinter());
-            
+
             // Rebuild kits array từ string
             List<Map<String, String>> kitsArray = new ArrayList<>();
             if (config.getKits() != null && !config.getKits().isBlank()) {
@@ -215,7 +229,7 @@ public class HomepageService {
                         .forEach(item -> {
                             String[] parts = item.split("\\|", 2);
                             Map<String, String> kit = new LinkedHashMap<>();
-                            kit.put("image", getBaseUrl() + "/uploads/homepage/" + parts[0].trim());
+                            kit.put("image", getBaseUrl() + "/uploads/shoppingpage/" + parts[0].trim());
                             kit.put("title", parts.length > 1 ? parts[1].trim() : "");
                             kitsArray.add(kit);
                         });
@@ -228,7 +242,7 @@ public class HomepageService {
                         .forEach(item -> {
                             String[] parts = item.split("\\|", 2);
                             Map<String, String> ball = new LinkedHashMap<>();
-                            ball.put("image", getBaseUrl() + "/uploads/homepage/" + parts[0].trim());
+                            ball.put("image", getBaseUrl() + "/uploads/shoppingpage/" + parts[0].trim());
                             ball.put("title", parts.length > 1 ? parts[1].trim() : "");
                             ballsArray.add(ball);
                         });
@@ -238,14 +252,17 @@ public class HomepageService {
             List<String> accessoriesArray = new ArrayList<>();
             if (config.getAccessories() != null && !config.getAccessories().isBlank()) {
                 Arrays.stream(config.getAccessories().split(","))
-                        .forEach(img -> accessoriesArray.add(getBaseUrl() + "/uploads/homepage/" + img.trim()));
+                        .forEach(img -> accessoriesArray.add(getBaseUrl() + "/uploads/shoppingpage/" + img.trim()));
             }
 
             // Rebuild shoes images
             List<String> shoesImages = new ArrayList<>();
-            if (config.getShoesImage1() != null) shoesImages.add(getBaseUrl() + "/uploads/homepage/" + config.getShoesImage1());
-            if (config.getShoesImage2() != null) shoesImages.add(getBaseUrl() + "/uploads/homepage/" + config.getShoesImage2());
-            if (config.getShoesImage3() != null) shoesImages.add(getBaseUrl() + "/uploads/homepage/" + config.getShoesImage3());
+            if (config.getShoesImage1() != null)
+                shoesImages.add(getBaseUrl() + "/uploads/shoppingpage/" + config.getShoesImage1());
+            if (config.getShoesImage2() != null)
+                shoesImages.add(getBaseUrl() + "/uploads/shoppingpage/" + config.getShoesImage2());
+            if (config.getShoesImage3() != null)
+                shoesImages.add(getBaseUrl() + "/uploads/shoppingpage/" + config.getShoesImage3());
 
             // Rebuild features array từ string
             List<Map<String, String>> featuresArray = new ArrayList<>();
@@ -264,14 +281,15 @@ public class HomepageService {
             response.put("status", "success");
             response.put("message", "Cập nhật trang chủ thành công!");
             response.put("timestamp", java.time.LocalDateTime.now().toString());
-            
+
             Map<String, Object> dataMap = new LinkedHashMap<>();
             dataMap.put("introTitle", config.getIntroTitle());
             dataMap.put("introContent", config.getIntroContent());
             dataMap.put("introImages", List.of(
-                getBaseUrl() + "/uploads/homepage/" + (config.getIntroImage1() != null ? config.getIntroImage1() : ""),
-                getBaseUrl() + "/uploads/homepage/" + (config.getIntroImage2() != null ? config.getIntroImage2() : "")
-            ));
+                    getBaseUrl() + "/uploads/shoppingpage/"
+                            + (config.getIntroImage1() != null ? config.getIntroImage1() : ""),
+                    getBaseUrl() + "/uploads/shoppingpage/"
+                            + (config.getIntroImage2() != null ? config.getIntroImage2() : "")));
             dataMap.put("kits", kitsArray);
             dataMap.put("balls", ballsArray);
             dataMap.put("accessories", accessoriesArray);
@@ -279,31 +297,26 @@ public class HomepageService {
             dataMap.put("shoesContent", config.getShoesContent());
             dataMap.put("shoesImages", shoesImages);
             dataMap.put("shoesMiniTitles", featuresArray);
-            
+
             response.put("data", dataMap);
-            
+
             System.out.println("\n" + "=".repeat(100));
-            System.out.println(" HOMEPAGE UPDATE THÀNH CÔNG");
+            System.out.println(" shoppingpage UPDATE THÀNH CÔNG");
             System.out.println("=".repeat(100) + "\n");
-            
+
             return response;
-            
+
         } catch (Exception e) {
             System.err.println(" LỖI:");
             System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
-            
+
             Map<String, Object> errorResponse = new LinkedHashMap<>();
             errorResponse.put("status", "error");
-            errorResponse.put("message", "Homepage update failed: " + e.getMessage());
+            errorResponse.put("message", "shoppingpage update failed: " + e.getMessage());
             errorResponse.put("timestamp", java.time.LocalDateTime.now().toString());
             return errorResponse;
         }
     }
 
-    // ================== GET HOMEPAGE ==================
-    public vn.liverpool.domain.dto.interfacee.HomepageResponse getHomepage() {
-        HomepageConfig config = repo.findById(1L).orElse(new HomepageConfig());
-        return new vn.liverpool.domain.dto.interfacee.HomepageResponse(config, getBaseUrl());
-    }
 }
