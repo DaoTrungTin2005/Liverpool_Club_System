@@ -283,13 +283,13 @@ public class HomepageService {
             response.put("data", dataMap);
             
             System.out.println("\n" + "=".repeat(100));
-            System.out.println("📤 HOMEPAGE UPDATE THÀNH CÔNG");
+            System.out.println(" HOMEPAGE UPDATE THÀNH CÔNG");
             System.out.println("=".repeat(100) + "\n");
             
             return response;
             
         } catch (Exception e) {
-            System.err.println("❌ LỖI:");
+            System.err.println(" LỖI:");
             System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
             
