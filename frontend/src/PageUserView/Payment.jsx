@@ -215,11 +215,11 @@ export default function Payment() {
           <fieldset className="text-center border border-1 border-gray-500 h-40 w-120 m-auto font-medium text-xl ">
             <legend>{sectionName}</legend>
             <div className="flex items-center justify-center gap-10 my-10">
-              <div className="w-40 h-10 bg-red-600 text-white flex items-center justify-center">
+              <div className="w-80 h-10 bg-red-600 text-white flex items-center justify-center">
                 <p>Quantity: {quantity}</p>
               </div>
-              <div className="w-40 h-10 bg-red-600 text-white flex items-center justify-center">
-                <p>Quantity: {Number(quantity) * Number(price)}</p>
+              <div className="w-80 h-10 bg-red-600 text-white flex items-center justify-center">
+                <p>Toltal: {Number(quantity) * Number(price)} VND</p>
               </div>
             </div>
           </fieldset>

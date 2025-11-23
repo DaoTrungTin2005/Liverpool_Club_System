@@ -30,6 +30,12 @@ import AdminContact from "./pageAdminContact/AdminContact.jsx";
 import PaymentSuccess from "./PageUserView/PaymentStatus.jsx";
 import PaymentFailed from "./PageUserView/PaymentStatus.jsx";
 import OrderHistory from "./PageUserView/OrderHistory.jsx";
+import AdminProduct from "./pageAdminProduct/AdminProduct.jsx";
+import AdminProductShopping from "./pageAdminProduct/AdminProductShopping.jsx";
+import AdminProductAdd from "./pageAdminProduct/AdminProductAdd.jsx";
+import AdminProductUpdate from "./pageAdminProduct/AdminProductUpdate.jsx";
+import AdminProductDelete from "./pageAdminProduct/AdminProductDelete.jsx";
+import AdminProductView from "./pageAdminProduct/AdminProductView.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminRoute from "./AdminRoute.jsx";
 
@@ -37,7 +43,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/register" />} />
+        <Route path="/" element={<Navigate to="/match" />} />
 
         {/* Auth */}
         <Route path="/register" element={<Register />} />
@@ -141,15 +147,16 @@ function App() {
           }
         />
 
+        <Route path="/admin/club/view" element={<AdminMyClubView />} />
+        <Route path="/admin/product" element={<AdminProduct />} />
         <Route
-          path="/admin/club/view"
-          element={
-            <AdminRoute>
-              <AdminMyClubView />
-            </AdminRoute>
-          }
+          path="/admin/product/shopping"
+          element={<AdminProductShopping />}
         />
-
+        <Route path="/admin/product/add" element={<AdminProductAdd />} />
+        <Route path="/admin/product/update" element={<AdminProductUpdate />} />
+        <Route path="/admin/product/delete" element={<AdminProductDelete />} />
+        <Route path="/admin/product/view" element={<AdminProductView />} />
         {/* USER PAGE */}
         <Route path="/myclub" element={<MyClub />} />
         <Route path="/myclub/player" element={<ProfilePlayer />} />

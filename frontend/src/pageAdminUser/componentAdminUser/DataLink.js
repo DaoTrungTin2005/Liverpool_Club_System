@@ -13,16 +13,16 @@ export const DataLink = [
     content: "Home",
     link: "/match",
   },
-  // {
-  //   svg: SvgAdmin02,
-  //   content: "Manage Product",
-  //   link: "/admin/product",
-  // },
+  {
+    svg: SvgAdmin02,
+    content: "Manage Product",
+    link: "/admin/product",
+  },
   { svg: SvgAdmin03, content: "Manage User", link: "/admin/user" },
   { svg: SvgAdmin04, content: "Manage Ticket", link: "/admin/ticket" },
   { svg: SvgAdmin05, content: "My Club", link: "/admin/club" },
   { svg: SvgAdmin06, content: "Bill Information", link: "/admin/bill" },
-  // { svg: SvgAdmin07, content: "Statistics", link: "/admin/statistics" },
+  { svg: SvgAdmin07, content: "Statistics", link: "/admin/statistics" },
   { svg: SvgAdmin08, content: "Match", link: "/admin/match" },
   {
     svg: SvgAdmin09,

@@ -6,14 +6,14 @@ export default function MatchBanner(props) {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center gap-10 w-full h-full py-30 px-30 ">
+      <div className="flex flex-col items-center justify-center gap-10 w-full h-full my-10 px-30">
         <h1 className="text-6xl my-5 font-extrabold bg-gradient-to-r from-[#653C39] via-[#BE0C43] to-[#653C39] bg-clip-text text-transparent">
           {league}
         </h1>
         <div className="w-full h-[1px] border border-1 border-gray-500 shadow-gray-500 my-5"></div>
 
         {/* ✅ render tất cả trận trong giải */}
-        <div className="grid grid-cols-3 h-100 w-full gap-10 max-sm:grid-cols-1">
+        <div className="grid grid-cols-3 w-full gap-10 max-sm:grid-cols-1">
           {matches.map((match) => {
             const dateObj = new Date(match.matchDate);
             const date = dateObj.toLocaleDateString("vi-VN");

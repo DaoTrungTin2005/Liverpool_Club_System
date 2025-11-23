@@ -290,7 +290,7 @@ export default function Ticket() {
         </div>
         <div className="w-[80%] h-[1px] border border-1 border-black my-30"></div>
         <p className="text-bold font-black text-6xl mb-50">ANFIELD STADIUM</p>
-        <div className="w-full bg-white rounded-3xl flex items-center flex-col justify-center gap-3 relative">
+        <div className="w-fu max-h-full flex items-center flex-col justify-center gap-20 relative">
           <div className="flex flex-col items-center justify-center -mb-10 text-xs">
             <p className="flex items-center justify-center">
               SIR KENNY DALGLISH STAND
@@ -613,8 +613,8 @@ export default function Ticket() {
             </div>
             <p className="flex items-center justify-center">LONGSIDE TIER</p>
           </div>
-          <div className="flex gap-5 items-center justify-center text-xs">
-            <div className="flex items-center justify-center -mr-20 mt-10">
+          <div className="flex gap-1 items-center justify-center text-xs">
+            <div className="flex items-center justify-center mt-10">
               <div className="flex items-center justify-center rotate-270 -mr-14">
                 <p className="">ANFIELD ROAD STAND</p>
               </div>
@@ -885,7 +885,7 @@ export default function Ticket() {
             <img
               src={Stadium}
               alt="Stadium"
-              className="w-80 h-60 ml-20 -mr-12 max-sm:w-40 max-sm:h-30"
+              className="w-120 h-80 ml-20 max-sm:w-40 max-sm:h-30"
             />
             <div className="flex items-center ml-10 text-xs">
               <p className="rotate-90 h-12 w-40 my-0 -mr-7">SHORTSIDE TIER</p>
@@ -1469,7 +1469,7 @@ export default function Ticket() {
             <div
               className="w-[550px] h-[620px] bg-white shadow-2xl rounded-3xl 
                   flex flex-col items-center justify-start gap-6 
-                  absolute z-10 inset-0 m-auto p-6 border border-gray-200"
+                  absolute z-10 inset-0 m-auto p-6 border border-gray-200 Oxanium"
             >
               <img
                 src={Cancel}
@@ -1482,8 +1482,8 @@ export default function Ticket() {
                 className="w-full h-[300px] object-cover rounded-2xl shadow-md"
               />
               <div className="flex flex-col items-center justify-center gap-1 text-lg font-medium">
-                <p className="text-2xl font-semibold text-green-700">
-                  ${popupData.price?.toFixed(2)}
+                <p className="text-2xl font-semibold text-black">
+                  {popupData.price?.toFixed(2)} VND
                 </p>
                 <p className="text-gray-700">
                   {popupData.sectionName} - {popupData.tierName}
@@ -1522,20 +1522,21 @@ export default function Ticket() {
                     -
                   </div>
                 </div>
-                <p className="text-2xl font-semibold text-red-600">
-                  ${(popupData.price * selectedQty).toFixed(2)}
+                <p className="text-2xl font-semibold text-black">
+                  {(popupData.price * selectedQty).toFixed(2)} VND
                 </p>
               </div>
               <Button
                 text="Buy Now"
                 onClick={handleBuyNow}
                 disabled={isChecking}
+                className="!m-0"
               />
             </div>
           )}
 
           {showStats && (
-            <div className="w-70 h-40 bg-[#CECCCC] shadow-2xl rounded-3xl flex items-center flex-col justify-center absolute z-50 inset-0 m-auto">
+            <div className="w-70 h-40 bg-[#CECCCC] shadow-2xl rounded-3xl flex items-center flex-col justify-center absolute z-50  bottom-85 right-133 m-auto">
               <div className="flex items-center justify-center mt-20">
                 <img src={Cancel} className=" w-10 h-10" />
                 <p>SEAT ISN’T AVAILABLE</p>
@@ -1544,7 +1545,7 @@ export default function Ticket() {
             </div>
           )}
           {showStatsCancel && (
-            <div className="w-70 h-40 bg-[#CECCCC] shadow-2xl rounded-3xl flex items-center flex-col justify-center absolute z-50 inset-0 m-auto">
+            <div className="w-70 h-40 bg-[#CECCCC] shadow-2xl rounded-3xl flex items-center flex-col justify-center absolute z-50 bottom-85 right-133 m-auto">
               <div className="flex items-center justify-center mt-20">
                 <img src={Cancel} className=" w-10 h-10" />
                 <p>

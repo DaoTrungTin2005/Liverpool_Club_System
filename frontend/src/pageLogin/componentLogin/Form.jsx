@@ -13,25 +13,26 @@ export default function Form() {
       const url = new URL(window.location.href);
 
       // Lấy thông tin từ URL params
-      const token = url.searchParams.get("token");
-      const id = url.searchParams.get("id");
-      const role = url.searchParams.get("role");
-      const error = url.searchParams.get("error");
+      const code = url.searchParams.get("code");
+      if (code) {
+        api
+          .post("/api/auth/login/google/callback", { code })
+          .then((res) => {
+            const { token, role, id, fullname, email } = res.data.data;
 
-      if (error) {
-        alert("Đăng nhập Google thất bại!");
-        window.history.replaceState({}, "", "/login");
-        return;
-      }
+            localStorage.setItem("authToken", token);
+            localStorage.setItem("userRole", role);
+            localStorage.setItem(
+              "user",
+              JSON.stringify({ id, fullname, email })
+            );
 
-      // Nếu có token → lưu và redirect
-      if (token && id && role) {
-        localStorage.setItem("authToken", token);
-        localStorage.setItem("userRole", role);
-        // ... lưu các thông tin khác
-
-        const redirectTo = role === "ADMIN" ? "/admin/user" : "/match";
-        window.location.href = redirectTo;
+            window.location.href = role === "ADMIN" ? "/admin/user" : "/match";
+          })
+          .catch(() => {
+            alert("Đăng nhập Google thất bại!");
+            window.location.href = "/login";
+          });
       }
     };
 

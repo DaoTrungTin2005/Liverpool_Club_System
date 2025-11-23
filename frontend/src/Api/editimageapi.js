@@ -12,6 +12,5 @@ export const editimageapi = (url, fallbackImage = null) => {
   }
 };
 export const getBaseImageUrl = () => {
-  // Lấy từ baseURL của axios instance
-  return "http://0d9ffd8a6329.ngrok-free.app";
+  return "https://8dca35ecd710.ngrok-free.app";
 };

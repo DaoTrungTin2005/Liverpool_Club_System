@@ -1,10 +1,11 @@
 // src/api.js
 import axios from "axios";
+import { logout } from "./logout";
 
 const TOKEN_KEY = "authToken";
-const ROLE_KEY = "userRole"; // admin | user
-const TOKEN_TIME_KEY = "tokenTime"; // lưu thời điểm lưu token
-const EXPIRE_TIME = 60 * 60 * 1000; // 1 giờ = 3600000 ms
+const ROLE_KEY = "userRole";
+const TOKEN_TIME_KEY = "tokenTime";
+const EXPIRE_TIME = 60 * 60 * 1000;
 
 // Hàm kiểm tra hết hạn token
 function checkTokenExpired() {
@@ -18,14 +19,15 @@ function checkTokenExpired() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ROLE_KEY);
     localStorage.removeItem(TOKEN_TIME_KEY);
-    console.log("⚠ Token đã hết hạn và bị xóa!");
+    alert("⚠ Token đã hết hạn và bị xóa!");
+    logout();
     return true;
   }
   return false;
 }
 
 const api = axios.create({
-  baseURL: "https://35ceb8e26715.ngrok-free.app/",
+  baseURL: "https://00bc46ca013c.ngrok-free.app/",
   headers: {
     "ngrok-skip-browser-warning": "true",
     Accept: "application/json",
