@@ -20,9 +20,13 @@ export default function AdminShopping() {
   const [contentList, setContentList] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [title_shoes, setTitle_shoes] = useState("");
+  const [content_shoes, setContent_shoes] = useState("");
   const [image1, setImage1] = useState(null);
   const [image2, setImage2] = useState(null);
   const [image3, setImage3] = useState(null);
+  const [image4, setImage4] = useState(null);
+  const [image5, setImage5] = useState(null);
   const [ballImages, setBallImages] = useState([null, null, null]);
   const [accImages, setAccImages] = useState([null, null, null, null]);
 
@@ -46,6 +50,12 @@ export default function AdminShopping() {
   };
   const handleImage3 = (e) => {
     if (e.target.files[0]) setImage3(URL.createObjectURL(e.target.files[0]));
+  };
+  const handleImage4 = (e) => {
+    if (e.target.files[0]) setImage4(URL.createObjectURL(e.target.files[0]));
+  };
+  const handleImage5 = (e) => {
+    if (e.target.files[0]) setImage5(URL.createObjectURL(e.target.files[0]));
   };
 
   const handleImageChange = (e) => {
@@ -332,14 +342,14 @@ export default function AdminShopping() {
                   <input
                     className="text-gray-500 border border-1 rounded-sm w-[50%] h-10 flex items-center justify-center italic text-xs"
                     placeholder="Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={title_shoes}
+                    onChange={(e) => setTitle_shoes(e.target.value)}
                   ></input>
                   <textarea
                     className="text-gray-500 border border-1 rounded-sm w-[50%] h-30 flex items-center justify-center italic text-xs"
                     placeholder="Content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
+                    value={content_shoes}
+                    onChange={(e) => setContent_shoes(e.target.value)}
                   ></textarea>
                   <div
                     className="text-black border border-1 rounded-sm w-[50%] h-10 flex items-center justify-center italic text-xs cursor-pointer"
@@ -351,9 +361,9 @@ export default function AdminShopping() {
                   </div>
                   <div className="flex items-center justify-between w-[50%]">
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image1 ? (
+                      {image3 ? (
                         <img
-                          src={image1}
+                          src={image3}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -363,14 +373,14 @@ export default function AdminShopping() {
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={handleImage1}
+                        onChange={handleImage3}
                       />
                     </label>
 
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image2 ? (
+                      {image4 ? (
                         <img
-                          src={image2}
+                          src={image4}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -380,14 +390,14 @@ export default function AdminShopping() {
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={handleImage2}
+                        onChange={handleImage4}
                       />
                     </label>
 
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image3 ? (
+                      {image5 ? (
                         <img
-                          src={image3}
+                          src={image5}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -397,7 +407,7 @@ export default function AdminShopping() {
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={handleImage3}
+                        onChange={handleImage5}
                       />
                     </label>
                   </div>

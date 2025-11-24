@@ -11,6 +11,15 @@ export default function AdminProductUpdate() {
   const [Quantity, setQuantity] = useState("");
   const [contentList, setContentList] = useState([]);
   const [showStats_Mini, setShowStats_Mini] = useState();
+  const [ImagePreview, setImagePreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file)); // Tạo preview
+    }
+  };
+
   const close = () => {
     setShowStats_Mini(false);
   };
@@ -75,7 +84,18 @@ export default function AdminProductUpdate() {
               <div className="flex flex-col w-[35%] items-center">
                 <p>ProductImage:</p>
                 <label className="w-full text-black border border-1 rounded-sm h-30">
-                  <input type="file" className="  hidden" />
+                  <input
+                    type="file"
+                    className="  hidden"
+                    onChange={handleImageChange}
+                  />
+                  {ImagePreview && (
+                    <img
+                      src={ImagePreview}
+                      alt="preview"
+                      className="w-full h-30 object-cover rounded-sm"
+                    />
+                  )}
                 </label>
               </div>
               <div className="flex flex-col w-[65%] items-center">

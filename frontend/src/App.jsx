@@ -36,6 +36,7 @@ import AdminProductAdd from "./pageAdminProduct/AdminProductAdd.jsx";
 import AdminProductUpdate from "./pageAdminProduct/AdminProductUpdate.jsx";
 import AdminProductDelete from "./pageAdminProduct/AdminProductDelete.jsx";
 import AdminProductView from "./pageAdminProduct/AdminProductView.jsx";
+import Shopping from "./PageUserView/Shopping.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminRoute from "./AdminRoute.jsx";
 
@@ -243,6 +244,7 @@ function App() {
         <Route path="/ticket" element={<Ticket />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/shopping" element={<Shopping />}></Route>
 
         {/* Nếu ai tự gõ /admin → CHẶN LUÔN */}
         <Route path="/admin" element={<Navigate to="/match" />} />
