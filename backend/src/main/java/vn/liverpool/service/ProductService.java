@@ -146,6 +146,34 @@ public class ProductService {
                 variantResponses);
     }
 
+    // === ĐỔ DỮ LIỆU CŨ KHI UPDATE ===
+    @Transactional(readOnly = true)
+    public ProductResponse getProductDetail(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
+
+        String baseUrl = getBaseUrl() + "/uploads/products/";
+
+        List<ProductResponse.VariantResponse> variantResponses = product.getVariants().stream()
+                .map(v -> new ProductResponse.VariantResponse(
+                        v.getId(),
+                        v.getSize(),
+                        v.getPrice(),
+                        v.getQuantity(),
+                        v.getSoldQuantity()))
+                .toList();
+
+        return new ProductResponse(
+                product.getId(),
+                product.getProductName(),
+                product.getType(),
+                product.getBio(),
+                product.getProductImage() != null ? baseUrl + product.getProductImage() : null,
+                product.getCreatedAt(),
+                product.getUpdatedAt(),
+                variantResponses);
+    }
+
     ///////////////////////////// util///
 
     // === HÀM LƯU FILE ===

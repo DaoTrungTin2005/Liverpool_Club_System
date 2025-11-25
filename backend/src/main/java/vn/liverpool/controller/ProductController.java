@@ -3,6 +3,7 @@ package vn.liverpool.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,6 +47,13 @@ public class ProductController {
 
         ProductResponse updated = productService.updateProduct(id, dto, productImage);
         return ResponseEntity.ok(ApiResponse.success("Product updated successfully", updated));
+    }
+
+    // === ĐỔ DỮ LIỆU CŨ KHI UPDATE ===
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductDetail(@PathVariable Long id) {
+        ProductResponse detail = productService.getProductDetail(id);
+        return ResponseEntity.ok(ApiResponse.success("Product detail retrieved successfully", detail));
     }
 
 }
