@@ -85,7 +85,70 @@ public class ProductService {
                 variantResponses);
     }
 
-    // === HÀM LƯU FILE (giống hệt code mày) ===
+    // === UPDATE PRODUCT ===
+    @Transactional
+    public ProductResponse updateProduct(
+            Long productId,
+            ProductCreateRequest dto,
+            MultipartFile productImage) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
+
+        String uploadDir = System.getProperty("user.dir")
+                + "/src/main/resources/static/uploads/products";
+        File dir = new File(uploadDir);
+        if (!dir.exists())
+            dir.mkdirs();
+        String baseUrl = getBaseUrl() + "/uploads/products/";
+
+        if (productImage != null && !productImage.isEmpty()) {
+            deleteOldFile(uploadDir, product.getProductImage());
+            product.setProductImage(saveFile(productImage, uploadDir));
+        }
+
+        product.setProductName(dto.getProductName());
+        product.setType(dto.getType());
+        product.setBio(dto.getBio());
+
+        product.getVariants().clear();
+
+        for (ProductCreateRequest.VariantDTO v : dto.getVariants()) {
+            ProductVariant variant = new ProductVariant();
+            variant.setProduct(product);
+            variant.setSize(v.getSize());
+            variant.setPrice(v.getPrice());
+            variant.setQuantity(v.getQuantity());
+            variant.setSoldQuantity(0);
+            product.getVariants().add(variant);
+        }
+
+        // === LƯU PRODUCT thì Hibernate tự sync variants ===
+        Product updatedProduct = productRepository.save(product);
+
+        List<ProductResponse.VariantResponse> variantResponses = updatedProduct.getVariants().stream()
+                .map(v -> new ProductResponse.VariantResponse(
+                        v.getId(),
+                        v.getSize(),
+                        v.getPrice(),
+                        v.getQuantity(),
+                        v.getSoldQuantity()))
+                .toList();
+
+        return new ProductResponse(
+                updatedProduct.getId(),
+                updatedProduct.getProductName(),
+                updatedProduct.getType(),
+                updatedProduct.getBio(),
+                updatedProduct.getProductImage() != null ? baseUrl + updatedProduct.getProductImage() : null,
+                updatedProduct.getCreatedAt(),
+                updatedProduct.getUpdatedAt(),
+                variantResponses);
+    }
+
+    ///////////////////////////// util///
+
+    // === HÀM LƯU FILE ===
     private String saveFile(MultipartFile file, String uploadDir) {
         if (file == null || file.isEmpty())
             return null;
@@ -99,12 +162,12 @@ public class ProductService {
         }
     }
 
-    // === LẤY BASE URL (giống hệt code mày) ===
+    // === LẤY BASE URL ===
     private String getBaseUrl() {
         return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
     }
 
-    // === XÓA FILE CŨ KHI UPDATE (dành cho sau này) ===
+    // === XÓA FILE CŨ KHI UPDATE ===
     private void deleteOldFile(String uploadDir, String oldFileName) {
         if (oldFileName == null || oldFileName.isBlank())
             return;
