@@ -174,7 +174,19 @@ public class ProductService {
                 variantResponses);
     }
 
-    ///////////////////////////// util///
+    // === DELETE PRODUCT ===
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
+
+        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/products";
+
+        deleteOldFile(uploadDir, product.getProductImage());
+
+        // Xóa product -> tự động xóa variants (cascade + orphanRemoval)
+        productRepository.delete(product);
+    }
 
     // === HÀM LƯU FILE ===
     private String saveFile(MultipartFile file, String uploadDir) {
