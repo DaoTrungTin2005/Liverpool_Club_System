@@ -72,4 +72,11 @@ public class CartController {
         CartResponse cart = cartService.getCurrentCart();
         return ResponseEntity.ok(ApiResponse.success("Take shopping cart successfully", cart));
     }
+
+    // Thêm vào CartController.java
+    @GetMapping("/count")
+    public ResponseEntity<ApiResponse<Integer>> getCartCount() {
+        int count = cartService.getCartItemCount();
+        return ResponseEntity.ok(ApiResponse.success("Count quantity in shopping cart successfully", count));
+    }
 }

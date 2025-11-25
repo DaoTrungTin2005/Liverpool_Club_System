@@ -178,6 +178,21 @@ public class CartService {
         return toCartResponse(cart);
     }
 
+    // SHOW RA CÁI SỐ (TÍNH TỔNG SỐ LƯỢNG CART_ITEM) Ở GIỎ HÀNG
+    public int getCartItemCount() {
+        // Lấy user hiện tại (đã login rồi nên chắc chắn có)
+        Account account = UserContextService.getCurrentAccount();
+
+        return cartRepository.findByAccountId(account.getId())
+                .map(cart -> {
+                    // Nếu có giỏ hàng → đếm tổng số lượng của tất cả món
+                    return cart.getItems().stream()
+                            .mapToInt(CartItem::getQuantity) // lấy quantity của từng món
+                            .sum(); // cộng lại
+                })
+                .orElse(0); // Nếu chưa có giỏ hàng → trả về 0
+    }
+
     // === HÀM PHỤ: CHUYỂN CART ENTITY -> DTO ===
     private CartResponse toCartResponse(Cart cart) {
         String baseUrl = getBaseUrl() + "/uploads/products/";
