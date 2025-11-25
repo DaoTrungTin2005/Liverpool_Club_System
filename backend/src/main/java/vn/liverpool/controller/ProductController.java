@@ -1,5 +1,6 @@
 package vn.liverpool.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import vn.liverpool.domain.dto.matches_and_tickets.CreateMatchAndTicketRequest;
 import vn.liverpool.domain.dto.matches_and_tickets.MatchAndTicketResponse;
 import vn.liverpool.domain.dto.product.ProductCreateRequest;
+import vn.liverpool.domain.dto.product.ProductListResponse;
 import vn.liverpool.domain.dto.product.ProductResponse;
 import vn.liverpool.service.ProductService;
 import vn.liverpool.util.ApiResponse;
@@ -50,7 +53,7 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("Product updated successfully", updated));
     }
 
-    // === ĐỔ DỮ LIỆU CŨ KHI UPDATE ===
+    // === ĐỔ DỮ LIỆU CŨ KHI UPDATE + VIEW ===
     @GetMapping("/detail/{id}")
     public ResponseEntity<ApiResponse<ProductResponse>> getProductDetail(@PathVariable Long id) {
         ProductResponse detail = productService.getProductDetail(id);
@@ -62,6 +65,18 @@ public class ProductController {
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully", null));
+    }
+
+    // === LIST ALL PRODUCTS (có phân trang + search) ===
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<Page<ProductListResponse>>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sort,
+            @RequestParam(defaultValue = "") String search) {
+
+        Page<ProductListResponse> products = productService.getAllProducts(page, size, sort, search);
+        return ResponseEntity.ok(ApiResponse.success("Fetched products successfully", products));
     }
 
 }

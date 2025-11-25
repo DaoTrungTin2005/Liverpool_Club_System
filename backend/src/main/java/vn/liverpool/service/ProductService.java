@@ -1,6 +1,12 @@
 package vn.liverpool.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import vn.liverpool.domain.Product;
 import vn.liverpool.domain.ProductVariant;
 import vn.liverpool.domain.dto.product.ProductCreateRequest;
+import vn.liverpool.domain.dto.product.ProductListResponse;
 import vn.liverpool.domain.dto.product.ProductResponse;
 import vn.liverpool.repository.ProductRepository;
 
@@ -218,4 +225,40 @@ public class ProductService {
             System.err.println("Không xóa được file cũ: " + oldFileName);
         }
     }
+
+    // === GET ALL PRODUCT ===
+    @Transactional(readOnly = true)
+    public Page<ProductListResponse> getAllProducts(int page, int size, String sort, String search) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+
+        // Lấy Page<Product>
+        Page<Product> productPage = (search == null || search.isBlank())
+                ? productRepository.findAll(pageable)
+                : productRepository.searchProducts(search, pageable);
+
+        String baseUrl = getBaseUrl() + "/uploads/products/";
+
+        List<ProductListResponse> list = new ArrayList<>();
+
+        for (Product p : productPage.getContent()) {
+            // mỗi variant tạo 1 bản ghi -> variant khác nhau trả về bấy nhiêu response
+            for (ProductVariant v : p.getVariants()) {
+                list.add(new ProductListResponse(
+                        p.getId(),
+                        v.getId(),
+                        p.getProductName(),
+                        p.getBio(),
+                        v.getPrice(),
+                        v.getQuantity(),
+                        v.getSoldQuantity(),
+                        p.getType(),
+                        v.getSize(),
+                        baseUrl + p.getProductImage()));
+            }
+        }
+
+        // Vì bạn muốn trả Page<ProductListResponse>, cần tạo Page thủ công
+        return new PageImpl<>(list, pageable, list.size());
+    }
+
 }
