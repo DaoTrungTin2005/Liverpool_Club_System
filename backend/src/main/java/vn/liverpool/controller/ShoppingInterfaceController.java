@@ -42,10 +42,14 @@ public class ShoppingInterfaceController {
     ) throws IOException {
 
         // Đảm bảo không null
-        if (kitImages == null) kitImages = new ArrayList<>();
-        if (ballImages == null) ballImages = new ArrayList<>();
-        if (accessoryImages == null) accessoryImages = new ArrayList<>();
-        if (shoesImages == null) shoesImages = new ArrayList<>();
+        if (kitImages == null)
+            kitImages = new ArrayList<>();
+        if (ballImages == null)
+            ballImages = new ArrayList<>();
+        if (accessoryImages == null)
+            accessoryImages = new ArrayList<>();
+        if (shoesImages == null)
+            shoesImages = new ArrayList<>();
 
         // Service trả về Map chứa toàn bộ response
         Map<String, Object> responseData = service.updateShoppingpageWithFixedFiles(
@@ -58,4 +62,12 @@ public class ShoppingInterfaceController {
 
         return ResponseEntity.ok(responseData);
     }
+
+    // ================== GET CONFIG ĐỂ ĐỔ DỮ LIỆU CŨ ==================
+    @GetMapping("/config")
+    public ResponseEntity<?> getShoppingpageConfig() {
+        Map<String, Object> config = service.getShoppingpageConfig();
+        return ResponseEntity.ok(config);
+    }
+
 }

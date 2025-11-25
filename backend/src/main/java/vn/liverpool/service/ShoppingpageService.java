@@ -319,4 +319,91 @@ public class ShoppingpageService {
         }
     }
 
+    // ================== GET CONFIG ĐỂ ĐỔ DỮ LIỆU CŨ KHI UPDATE ==================
+    public Map<String, Object> getShoppingpageConfig() {
+        ShoppingpageConfig config = repo.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Chưa có config shoppingpage"));
+
+        String baseUrl = getBaseUrl() + "/uploads/shoppingpage/";
+
+        // Rebuild kits array từ string
+        List<Map<String, String>> kitsArray = new ArrayList<>();
+        if (config.getKits() != null && !config.getKits().isBlank()) {
+            Arrays.stream(config.getKits().split(","))
+                    .forEach(item -> {
+                        String[] parts = item.split("\\|", 2);
+                        Map<String, String> kit = new LinkedHashMap<>();
+                        kit.put("image", baseUrl + parts[0].trim());
+                        kit.put("title", parts.length > 1 ? parts[1].trim() : "");
+                        kitsArray.add(kit);
+                    });
+        }
+
+        // Rebuild balls array từ string
+        List<Map<String, String>> ballsArray = new ArrayList<>();
+        if (config.getBalls() != null && !config.getBalls().isBlank()) {
+            Arrays.stream(config.getBalls().split(","))
+                    .forEach(item -> {
+                        String[] parts = item.split("\\|", 2);
+                        Map<String, String> ball = new LinkedHashMap<>();
+                        ball.put("image", baseUrl + parts[0].trim());
+                        ball.put("title", parts.length > 1 ? parts[1].trim() : "");
+                        ballsArray.add(ball);
+                    });
+        }
+
+        // Rebuild accessories array từ string
+        List<String> accessoriesArray = new ArrayList<>();
+        if (config.getAccessories() != null && !config.getAccessories().isBlank()) {
+            Arrays.stream(config.getAccessories().split(","))
+                    .forEach(img -> accessoriesArray.add(baseUrl + img.trim()));
+        }
+
+        // Rebuild shoes images
+        List<String> shoesImages = new ArrayList<>();
+        if (config.getShoesImage1() != null)
+            shoesImages.add(baseUrl + config.getShoesImage1());
+        if (config.getShoesImage2() != null)
+            shoesImages.add(baseUrl + config.getShoesImage2());
+        if (config.getShoesImage3() != null)
+            shoesImages.add(baseUrl + config.getShoesImage3());
+
+        // Rebuild features array từ string
+        List<Map<String, String>> featuresArray = new ArrayList<>();
+        if (config.getShoesMiniTitles() != null && !config.getShoesMiniTitles().isBlank()) {
+            Arrays.stream(config.getShoesMiniTitles().split(","))
+                    .forEach(item -> {
+                        String[] parts = item.split("\\|", 2);
+                        Map<String, String> feature = new LinkedHashMap<>();
+                        feature.put("main", parts[0].trim());
+                        feature.put("sub", parts.length > 1 ? parts[1].trim() : "");
+                        featuresArray.add(feature);
+                    });
+        }
+
+        // Build response giống hệt update response
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "success");
+        response.put("message", "Lấy config thành công");
+        response.put("timestamp", java.time.LocalDateTime.now().toString());
+
+        Map<String, Object> dataMap = new LinkedHashMap<>();
+        dataMap.put("introTitle", config.getIntroTitle());
+        dataMap.put("introContent", config.getIntroContent());
+        dataMap.put("introImages", List.of(
+                config.getIntroImage1() != null ? baseUrl + config.getIntroImage1() : "",
+                config.getIntroImage2() != null ? baseUrl + config.getIntroImage2() : ""));
+        dataMap.put("kits", kitsArray);
+        dataMap.put("balls", ballsArray);
+        dataMap.put("accessories", accessoriesArray);
+        dataMap.put("shoesTitle", config.getShoesTitle());
+        dataMap.put("shoesContent", config.getShoesContent());
+        dataMap.put("shoesImages", shoesImages);
+        dataMap.put("shoesMiniTitles", featuresArray);
+
+        response.put("data", dataMap);
+
+        return response;
+    }
+
 }
