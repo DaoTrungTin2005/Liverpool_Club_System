@@ -35,7 +35,11 @@ public class CartItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    private int quantity = 1; // số luowgnj user muốn mua
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variant_id")
+    private ProductVariant variant;
+
+    private int quantity = 1; // số lượng từng món hàng mà đã set trong giỏ á (ko phải số luowg tồn kho nhe)
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -43,16 +47,4 @@ public class CartItem {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // Tăng/giảm số lượng
-    public void increaseQuantity(int amount) {
-        this.quantity += amount;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void setQuantity(int quantity) {
-        if (quantity <= 0)
-            throw new IllegalArgumentException("Quantity must be > 0");
-        this.quantity = quantity;
-        this.updatedAt = LocalDateTime.now();
-    }
 }
