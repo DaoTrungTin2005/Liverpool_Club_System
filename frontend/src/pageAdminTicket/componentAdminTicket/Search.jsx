@@ -6,7 +6,7 @@ import {
 } from "../../assets/svg/SvgAdmin.jsx";
 import Avatar from "../../assets/img/Avatar01.png";
 
-export default function Search({ onSearch }) {
+export default function Search({ onSearch, bg }) {
   const [query, setQuery] = useState("");
 
   const handleInputChange = (e) => {
@@ -21,9 +21,12 @@ export default function Search({ onSearch }) {
   };
 
   return (
-    <div className="flex gap-2 m-4 p-2 rounded-3xl w-sm bg-white items-center justify-around h-10 mt-10">
+    <div
+      className={`flex gap-2 m-4 p-2 rounded-3xl w-sm bg-white items-center justify-around h-10 mt-10
+        ${bg}`}
+    >
       <form
-        className="flex items-center gap-2 h-7 w-3xs rounded-2xl bg-[#F4F7FE]"
+        className="flex items-center gap-2 h-7 w-3xs rounded-2xl bg-[#F4F7FE] p-2"
         onSubmit={handleSubmit}
       >
         <SvgAdminSearch01 />

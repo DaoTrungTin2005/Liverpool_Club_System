@@ -39,6 +39,7 @@ import AdminProductView from "./pageAdminProduct/AdminProductView.jsx";
 import Shopping from "./PageUserView/Shopping.jsx";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminRoute from "./AdminRoute.jsx";
+import ShoppingDetails from "./PageUserView/ShoppingDetails.jsx";
 
 function App() {
   return (
@@ -245,6 +246,7 @@ function App() {
         <Route path="/payment" element={<Payment />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/shopping" element={<Shopping />}></Route>
+        <Route path="/shopping/details" element={<ShoppingDetails />}></Route>
 
         {/* Nếu ai tự gõ /admin → CHẶN LUÔN */}
         <Route path="/admin" element={<Navigate to="/match" />} />
