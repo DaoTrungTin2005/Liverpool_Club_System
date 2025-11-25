@@ -3,6 +3,7 @@ package vn.liverpool.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,5 +65,11 @@ public class CartController {
     public ResponseEntity<ApiResponse<String>> clearCart() {
         cartService.clearCart();
         return ResponseEntity.ok(ApiResponse.success("Remove all shopping cart successfully"));
+    }
+
+    @GetMapping("/show")
+    public ResponseEntity<ApiResponse<CartResponse>> getCart() {
+        CartResponse cart = cartService.getCurrentCart();
+        return ResponseEntity.ok(ApiResponse.success("Take shopping cart successfully", cart));
     }
 }

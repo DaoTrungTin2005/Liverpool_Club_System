@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.http.HttpServletRequest;
 import vn.liverpool.domain.*;
 import vn.liverpool.domain.dto.cart.*;
 import vn.liverpool.repository.*;
@@ -24,6 +25,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final ProductVariantRepository variantRepository;
+    private final HttpServletRequest request;
 
     // === THÊM SẢN PHẨM VÀO GIỎ ===
     public CartResponse addToCart(Long productId, Long variantId, int quantity) {
@@ -164,8 +166,22 @@ public class CartService {
         cartRepository.save(cart);
     }
 
+    // SHOW RA DỮ LIỆU TRONG GIỎ HÀNG
+    public CartResponse getCurrentCart() {
+        Account account = UserContextService.getCurrentAccount();
+        Cart cart = cartRepository.findByAccountId(account.getId())
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setAccount(account);
+                    return cartRepository.save(newCart);
+                });
+        return toCartResponse(cart);
+    }
+
     // === HÀM PHỤ: CHUYỂN CART ENTITY -> DTO ===
     private CartResponse toCartResponse(Cart cart) {
+        String baseUrl = getBaseUrl() + "/uploads/products/";
+
         var items = cart.getItems().stream()
                 .map(item -> {
                     Product product = item.getProduct();
@@ -183,7 +199,8 @@ public class CartService {
                             item.getId(),
                             product.getId(),
                             product.getProductName(),
-                            product.getProductImage(),
+                            product.getProductImage() != null ? baseUrl + product.getProductImage()
+                                    : null,
                             variant.getId(),
                             variant.getSize(),
                             variant.getPrice(),
@@ -204,5 +221,10 @@ public class CartService {
         }
 
         return new CartResponse(items, totalItems, BigDecimal.ZERO, totalPrice);
+    }
+
+    // === LẤY BASE URL ===
+    private String getBaseUrl() {
+        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
     }
 }
