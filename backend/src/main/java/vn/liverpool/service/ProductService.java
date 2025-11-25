@@ -20,6 +20,7 @@ import vn.liverpool.repository.ProductRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -261,4 +262,77 @@ public class ProductService {
         return new PageImpl<>(list, pageable, list.size());
     }
 
+    // === GET ALL PRODUCTS WITH FILTERS ===
+
+    @Transactional(readOnly = true)
+    public List<ProductListResponse> getAllProductsWithFilters(
+            String search,
+            String type,
+            BigDecimal minPrice,
+            BigDecimal maxPrice) {
+
+        String cleanSearch = search != null ? search.trim() : "";
+        String cleanType = type != null ? type.trim() : "";
+
+        List<Product> products = productRepository.searchProductsWithFilters(
+                cleanSearch.isEmpty() ? null : cleanSearch,
+                cleanType.isEmpty() ? null : cleanType,
+                minPrice,
+                maxPrice);
+
+        String baseUrl = getBaseUrl() + "/uploads/products/";
+
+        List<ProductListResponse> list = new ArrayList<>();
+
+        for (Product p : products) {
+
+            ProductVariant cheapestVariant = null;
+
+            // lặp để tìm thằng bé nhất
+            for (ProductVariant v : p.getVariants()) {
+                // Lọc variants theo price range (thằng nào ko nằm trong khoảng tìm thì cút)
+
+                boolean matchesPrice = true;
+                if (minPrice != null && v.getPrice().compareTo(minPrice) < 0) {
+                    matchesPrice = false;
+                }
+                if (maxPrice != null && v.getPrice().compareTo(maxPrice) > 0) {
+                    matchesPrice = false;
+                }
+
+                // Tìm variant rẻ nhất trong các variant thỏa mãn điều kiện
+
+                // matchesPrice : chỉ xử lí giá nằm trong khoảng lọc
+                if (matchesPrice) {
+                    if (cheapestVariant == null ||
+                            v.getPrice().compareTo(cheapestVariant.getPrice()) < 0) {
+                        cheapestVariant = v;
+                    }
+                }
+            }
+
+            // Chỉ add 1 lần với variant rẻ nhất
+            if (cheapestVariant != null) {
+                list.add(new ProductListResponse(
+                        p.getId(),
+                        cheapestVariant.getId(),
+                        p.getProductName(),
+                        p.getBio(),
+                        cheapestVariant.getPrice(),
+                        cheapestVariant.getQuantity(),
+                        cheapestVariant.getSoldQuantity(),
+                        p.getType(),
+                        cheapestVariant.getSize(), // lấy size của thằng rẻ nhất
+                        baseUrl + p.getProductImage()));
+            }
+        }
+
+        return list;
+    }
+
+    // === GET ALL TYPES (cho dropdown) ===
+    @Transactional(readOnly = true)
+    public List<String> getAllProductTypes() {
+        return productRepository.findAllDistinctTypes();
+    }
 }

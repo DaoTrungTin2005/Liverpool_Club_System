@@ -1,5 +1,8 @@
 package vn.liverpool.controller;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -77,6 +80,27 @@ public class ProductController {
 
         Page<ProductListResponse> products = productService.getAllProducts(page, size, sort, search);
         return ResponseEntity.ok(ApiResponse.success("Fetched products successfully", products));
+    }
+
+    // === SHOP PAGE - GET PRODUCTS WITH FILTERS (NO PAGINATION) ===
+    @GetMapping("/shop")
+    public ResponseEntity<ApiResponse<List<ProductListResponse>>> getShopProducts(
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "") String type,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+
+        List<ProductListResponse> products = productService.getAllProductsWithFilters(
+                search, type, minPrice, maxPrice);
+
+        return ResponseEntity.ok(ApiResponse.success("Fetched shop products successfully", products));
+    }
+
+    // === GET ALL PRODUCT TYPES ===
+    @GetMapping("/types")
+    public ResponseEntity<ApiResponse<List<String>>> getAllProductTypes() {
+        List<String> types = productService.getAllProductTypes();
+        return ResponseEntity.ok(ApiResponse.success("Fetched product types successfully", types));
     }
 
 }
