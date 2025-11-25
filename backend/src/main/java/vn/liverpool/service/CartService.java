@@ -3,6 +3,9 @@ package vn.liverpool.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import vn.liverpool.domain.*;
 import vn.liverpool.domain.dto.cart.*;
 import vn.liverpool.repository.*;
@@ -15,6 +18,8 @@ import java.util.Optional;
 @Transactional
 public class CartService {
 
+    @PersistenceContext
+    private EntityManager entityManager;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
@@ -118,6 +123,45 @@ public class CartService {
 
         // 6. Trả về giỏ hàng mới nhất
         return toCartResponse(cartItem.getCart());
+    }
+
+    // DELETE item
+
+    public CartResponse removeItem(Long cartItemId) {
+
+        // tìm thawnfh cartItem để xóa nó
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Not found Product in cart"));
+
+        Account current = UserContextService.getCurrentAccount();
+        if (!cartItem.getCart().getAccount().getId().equals(current.getId())) {
+            throw new RuntimeException("Không được xóa đồ của người khác");
+        }
+
+        Long cartId = cartItem.getCart().getId();
+
+        cartItemRepository.delete(cartItem);
+        cartItemRepository.flush(); // ép Hibernate thực hiện câu lệnh SQL ngay lập tức
+
+        // Clear persistence context để chắc chắn load fresh data
+        entityManager.clear(); // clear() = xóa cache, đảm bảo khi fetch lại Cart từ database là dữ liệu mới
+                               // nhất.
+
+        // load lại giỏ hàng
+        Cart refreshedCart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Not Found your Shopping Cart"));
+
+        return toCartResponse(refreshedCart);
+    }
+
+    // DELETE ALL SHOPPING CART
+    public void clearCart() {
+        Account account = UserContextService.getCurrentAccount();
+        Cart cart = cartRepository.findByAccountId(account.getId())
+                .orElseThrow(() -> new RuntimeException("Not Found shopping cart"));
+
+        cart.getItems().clear();
+        cartRepository.save(cart);
     }
 
     // === HÀM PHỤ: CHUYỂN CART ENTITY -> DTO ===
