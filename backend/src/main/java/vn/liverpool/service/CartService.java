@@ -68,7 +68,7 @@ public class CartService {
             // số luong hiện có + số lượng mới set
             int newQty = item.getQuantity() + quantity;
             if (newQty > available) {
-                throw new RuntimeException("Not available. Remain: " + available);
+                throw new RuntimeException("exceeds the available quantity. Available: " + available);
             }
             item.setQuantity(newQty);
         } else {
@@ -84,6 +84,40 @@ public class CartService {
 
         // 6. Trả về giỏ hàng mới nhất
         return toCartResponse(cart);
+    }
+
+    // UPDATE QUANTITY
+    public CartResponse updateQuantity(Long cartItemId, int quantity) {
+        if (quantity < 1) {
+            throw new RuntimeException("Quantity > 0");
+        }
+
+        // 1. Tìm CartItem theo ID
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Product not available in cart"));
+
+        // 2. Kiểm tra có phải của user hiện tại không (bảo mật)
+        Account currentAccount = UserContextService.getCurrentAccount();
+        if (!cartItem.getCart().getAccount().getId().equals(currentAccount.getId())) {
+            throw new RuntimeException("Không được phép sửa giỏ hàng của người khác");
+        }
+
+        // 3. Kiểm tra tồn kho của variant
+        ProductVariant variant = cartItem.getVariant();
+        int available = variant.getQuantity() - variant.getSoldQuantity();
+        if (quantity > available) {
+            throw new RuntimeException("exceeds the available quantity. Available: " + available);
+        }
+
+        // 4. Cập nhật số lượng
+        cartItem.setQuantity(quantity);
+
+        // 5. Save lại (có thể không cần vì đang trong @Transactional, nhưng save cho
+        // chắc)
+        cartItemRepository.save(cartItem);
+
+        // 6. Trả về giỏ hàng mới nhất
+        return toCartResponse(cartItem.getCart());
     }
 
     // === HÀM PHỤ: CHUYỂN CART ENTITY -> DTO ===

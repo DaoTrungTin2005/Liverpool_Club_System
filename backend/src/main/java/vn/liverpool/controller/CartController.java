@@ -3,6 +3,7 @@ package vn.liverpool.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import vn.liverpool.domain.dto.cart.AddToCartRequest;
 import vn.liverpool.domain.dto.cart.CartResponse;
+import vn.liverpool.domain.dto.cart.UpdateCartItemRequest;
 import vn.liverpool.service.CartService;
 import vn.liverpool.util.ApiResponse;
 
@@ -35,5 +37,16 @@ public class CartController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Add to cart successfully", cart));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<CartResponse>> updateQuantity(
+            @RequestBody @Valid UpdateCartItemRequest request) {
+
+        CartResponse cart = cartService.updateQuantity(
+                request.cartItemId(),
+                request.quantity());
+
+        return ResponseEntity.ok(ApiResponse.success("Update quantity successfully", cart));
     }
 }

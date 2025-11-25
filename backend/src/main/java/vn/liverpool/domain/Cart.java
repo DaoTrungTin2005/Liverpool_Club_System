@@ -33,21 +33,4 @@ public class Cart {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // Helper methods
-    public void addItem(CartItem item) {
-        items.add(item);
-        item.setCart(this);
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void removeItem(CartItem item) {
-        items.remove(item);
-        item.setCart(null);
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void clear() {
-        items.clear();
-        this.updatedAt = LocalDateTime.now();
-    }
 }
