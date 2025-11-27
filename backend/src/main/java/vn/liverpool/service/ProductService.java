@@ -258,7 +258,6 @@ public class ProductService {
             }
         }
 
-        // Vì bạn muốn trả Page<ProductListResponse>, cần tạo Page thủ công
         return new PageImpl<>(list, pageable, list.size());
     }
 
