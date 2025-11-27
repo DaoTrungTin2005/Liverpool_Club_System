@@ -5,7 +5,7 @@ import { logout } from "./logout";
 const TOKEN_KEY = "authToken";
 const ROLE_KEY = "userRole";
 const TOKEN_TIME_KEY = "tokenTime";
-const EXPIRE_TIME = 60 * 60 * 1000;
+const EXPIRE_TIME = 60 * 60 * 10000;
 
 // Hàm kiểm tra hết hạn token
 function checkTokenExpired() {
@@ -27,7 +27,7 @@ function checkTokenExpired() {
 }
 
 const api = axios.create({
-  baseURL: "https://00bc46ca013c.ngrok-free.app/",
+  baseURL: "https://small-piano-tap-actual.trycloudflare.com/",
   headers: {
     "ngrok-skip-browser-warning": "true",
     Accept: "application/json",

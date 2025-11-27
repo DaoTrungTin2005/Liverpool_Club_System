@@ -2,18 +2,17 @@ import "../output.css";
 import ImgAdminUser01Component from "../pageAdminUser/componentAdminUser/ImgAdminUser01";
 import LinkGoPage from "../pageAdminUser/componentAdminUser/LinkGoPage";
 import Button from "../pageAdminUser/componentAdminUser/Button";
-import Search from "../pageAdminTicket/componentAdminTicket/Search.jsx";
-import { SvgAdminUpdate } from "../assets/svg/SvgAdmin";
-import { Link } from "react-router-dom";
+import api from "../Api/apitoken.js";
 import { logout } from "../Api/logout.js";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 export default function AdminShopping() {
   const [showStats, setShowStats] = useState(false);
   const [showStats_Kit, setShowStats_Kit] = useState(false);
   const [showStats_Shoes, setShowStats_Shoes] = useState(false);
   const [showStats_Mini, setShowStats_Mini] = useState(false);
   const [kitName, setKitName] = useState("");
-  const [kitImage, setKitImage] = useState(null); // lưu file ảnh hoặc URL
+  const [kitImage, setKitImage] = useState(null);
   const [Main, setMain] = useState("");
   const [Sub, setSub] = useState("");
   const [kitList, setKitList] = useState([]);
@@ -23,84 +22,326 @@ export default function AdminShopping() {
   const [title_shoes, setTitle_shoes] = useState("");
   const [content_shoes, setContent_shoes] = useState("");
   const [image1, setImage1] = useState(null);
+  const [image1Preview, setImage1Preview] = useState(null);
   const [image2, setImage2] = useState(null);
+  const [image2Preview, setImage2Preview] = useState(null);
   const [image3, setImage3] = useState(null);
+  const [image3Preview, setImage3Preview] = useState(null);
   const [image4, setImage4] = useState(null);
+  const [image4Preview, setImage4Preview] = useState(null);
   const [image5, setImage5] = useState(null);
+  const [image5Preview, setImage5Preview] = useState(null);
   const [ballImages, setBallImages] = useState([null, null, null]);
+  const [ballNames, setBallNames] = useState(["", "", ""]);
   const [accImages, setAccImages] = useState([null, null, null, null]);
+  async function ensureFile(img, defaultName) {
+    if (img instanceof File) return img; // file mới
+    if (typeof img === "string") {
+      const res = await fetch(img);
+      const blob = await res.blob();
+      return new File([blob], defaultName, { type: blob.type });
+    }
+    return null;
+  }
+
+  useEffect(() => {
+    const loadShoppingConfig = async () => {
+      try {
+        const res = await api.get("/api/admin/shoppingpage/config");
+        const data = res.data.data;
+        console.log("📥 Loaded config:", data);
+
+        /** INTRO */
+        setTitle(data.introTitle || "");
+        setContent(data.introContent || "");
+
+        const introImgs = data.introImages || [];
+        setImage1(introImgs[0] || null);
+        setImage1Preview(introImgs[0] || null);
+
+        setImage2(introImgs[1] || null);
+        setImage2Preview(introImgs[1] || null);
+
+        /** KITS */
+        setKitList(
+          (data.kits || []).map((kit) => ({
+            name: kit.title || "",
+            image: kit.image || null,
+            file: null, // quan trọng → không làm hỏng FormData
+          }))
+        );
+
+        /** BALLS */
+        const balls = data.balls || [];
+        setBallNames([
+          balls[0]?.title || "",
+          balls[1]?.title || "",
+          balls[2]?.title || "",
+        ]);
+        setBallImages([
+          balls[0]?.image || null,
+          balls[1]?.image || null,
+          balls[2]?.image || null,
+        ]);
+
+        /** ACCESSORIES */
+        const acc = data.accessories || [];
+        setAccImages([
+          acc[0] || null,
+          acc[1] || null,
+          acc[2] || null,
+          acc[3] || null,
+        ]);
+
+        /** SHOES */
+        setTitle_shoes(data.shoesTitle || "");
+        setContent_shoes(data.shoesContent || "");
+
+        const shoesImgs = data.shoesImages || [];
+        setImage3(shoesImgs[0] || null);
+        setImage3Preview(shoesImgs[0] || null);
+
+        setImage4(shoesImgs[1] || null);
+        setImage4Preview(shoesImgs[1] || null);
+
+        setImage5(shoesImgs[2] || null);
+        setImage5Preview(shoesImgs[2] || null);
+
+        /** MINI TITLES */
+        setContentList(
+          (data.shoesMiniTitles || []).map((item) => ({
+            Main: item.main || "",
+            Sub: item.sub || "",
+          }))
+        );
+
+        console.log("🎉 All config loaded successfully");
+      } catch (err) {
+        console.error("❌ Error loading config:", err);
+        alert("Không thể tải dữ liệu!");
+      }
+    };
+
+    loadShoppingConfig();
+  }, []);
+
+  const handleUpdateShopping = async () => {
+    try {
+      const formData = new FormData();
+
+      /** 1) JSON luôn chứa URL ảnh cũ */
+      const jsonData = {
+        introTitle: title,
+        introContent: content,
+        shoesTitle: title_shoes,
+        shoesContent: content_shoes,
+        introImages: [image1, image2].filter((x) => typeof x === "string"),
+        shoesImages: [image3, image4, image5].filter(
+          (x) => typeof x === "string"
+        ),
+        accessories: accImages.filter((x) => typeof x === "string"), // FIXED
+
+        kits: kitList.map((kit) => ({
+          title: kit.name,
+          ...(typeof kit.image === "string" && { image: kit.image }),
+        })),
+
+        balls: ballImages.map((img, idx) => ({
+          title: ballNames[idx] || "",
+          ...(typeof img === "string" && { image: img }),
+        })),
+
+        shoesMiniTitles: contentList.map((item) => ({
+          main: item.Main,
+          sub: item.Sub,
+        })),
+      };
+
+      formData.append(
+        "data",
+        new Blob([JSON.stringify(jsonData)], { type: "application/json" })
+      );
+
+      /** 2) CHỈ gửi file mới */
+      formData.append("introImage1", await ensureFile(image1, "intro1.jpg"));
+      formData.append("introImage2", await ensureFile(image2, "intro2.jpg"));
+      formData.append("shoesImages", await ensureFile(image3, "intro3.jpg"));
+      formData.append("shoesImages", await ensureFile(image4, "intro3.jpg"));
+      formData.append("shoesImages", await ensureFile(image4, "intro3.jpg"));
+      // KITS
+      for (let i = 0; i < kitList.length; i++) {
+        const kit = kitList[i];
+
+        // Ưu tiên file mới, nếu không có thì dùng URL cũ
+        const source = kit.file ? kit.file : kit.image;
+
+        const file = await ensureFile(source, `kit_${i}.jpg`);
+
+        if (file) formData.append("kitImages", file);
+      }
+
+      // BALLS
+      for (let i = 0; i < ballImages.length; i++) {
+        const img = ballImages[i];
+        const file = await ensureFile(img, `ball_${i}.jpg`);
+        if (file) formData.append("ballImages", file);
+      }
+
+      // ACCESSORIES
+      for (let i = 0; i < accImages.length; i++) {
+        const img = accImages[i];
+        const file = await ensureFile(img, `acc_${i}.jpg`);
+        if (file) formData.append("accessoryImages", file);
+      }
+
+      /** Debug */
+      console.log("========= DEBUG FORMDATA =========");
+      for (let [key, val] of formData.entries()) {
+        console.log(key, val instanceof File ? val.name : "(JSON BLOB)");
+      }
+
+      /** Call API */
+      const res = await api.put("/api/admin/shoppingpage/update", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("Update thành công!", res.data);
+    } catch (err) {
+      console.error("❌ Update error:", err);
+      alert("Update thất bại!");
+    }
+  };
 
   const handleAccImage = (e, index) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file) {
+      console.warn(`⚠️ No file selected for Accessories ${index + 1}`);
+      return;
+    }
 
-    const url = URL.createObjectURL(file);
+    console.log(
+      `✅ Accessories ${index + 1} selected:`,
+      file.name,
+      file.type,
+      file.size
+    );
 
     const newImages = [...accImages];
-    newImages[index] = url;
-
+    newImages[index] = file;
     setAccImages(newImages);
+
+    console.log(
+      "📋 Updated accImages:",
+      newImages.map((f, i) => (f ? `${i}: ${f.name}` : `${i}: null`))
+    );
   };
 
   const handleImage1 = (e) => {
-    if (e.target.files[0]) setImage1(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage1(file);
+    setImage1Preview(URL.createObjectURL(file));
   };
+
   const handleImage2 = (e) => {
-    if (e.target.files[0]) setImage2(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage2(file);
+    setImage2Preview(URL.createObjectURL(file));
   };
+
   const handleImage3 = (e) => {
-    if (e.target.files[0]) setImage3(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage3(file);
+    setImage3Preview(URL.createObjectURL(file));
   };
+
   const handleImage4 = (e) => {
-    if (e.target.files[0]) setImage4(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage4(file);
+    setImage4Preview(URL.createObjectURL(file));
   };
+
   const handleImage5 = (e) => {
-    if (e.target.files[0]) setImage5(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage5(file);
+    setImage5Preview(URL.createObjectURL(file));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setKitImage(imageUrl);
+      console.log("📁 File selected:", file.name, file.type, file.size);
+      setKitImage(file);
+    } else {
+      console.warn("⚠️ No file selected");
     }
   };
 
   const handleEnter = () => {
     if (kitName.trim() !== "" && kitImage) {
-      setKitList([...kitList, { name: kitName.trim(), image: kitImage }]);
+      const imageUrl = URL.createObjectURL(kitImage);
+      const newKit = {
+        name: kitName.trim(),
+        image: imageUrl,
+        file: kitImage,
+      };
+
+      setKitList([...kitList, newKit]);
+
+      console.log("✅ Kit added:", newKit);
+      console.log("📋 Current kitList:", [...kitList, newKit]);
+
       setKitName("");
       setKitImage(null);
-      // Reset input file (rất quan trọng để chọn lại cùng 1 ảnh)
-      document.getElementById("imageInput").value = "";
+
+      const inputElement = document.getElementById("imageInput");
+      if (inputElement) {
+        inputElement.value = "";
+      }
+    } else {
+      alert("⚠️ Vui lòng nhập tên Kit và chọn ảnh!");
     }
   };
+
   const handleEnter_Mini = () => {
     if (Main.trim() !== "" && Sub.trim() !== "") {
       setContentList([...contentList, { Main: Main.trim(), Sub: Sub.trim() }]);
       setMain("");
       setSub("");
+    } else {
+      alert("⚠️ Vui lòng nhập đầy đủ Main và Sub content!");
     }
   };
+
   const handleBallImage = (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
-
     const newImages = [...ballImages];
-    newImages[index] = url;
-
+    newImages[index] = file;
     setBallImages(newImages);
   };
+
+  const handleBallName = (e, index) => {
+    const newNames = [...ballNames];
+    newNames[index] = e.target.value;
+    setBallNames(newNames);
+  };
+
   const close = () => {
     setShowStats_Mini(false);
   };
+
   const closeAllPopups = () => {
     setShowStats(false);
     setShowStats_Kit(false);
     setShowStats_Shoes(false);
   };
+
   return (
     <>
       <div className="bg-linear-[var(--colorBg)] flex">
@@ -110,11 +351,18 @@ export default function AdminShopping() {
           <Button text="Log Out" onClick={logout} />
         </div>
         <div className="flex flex-col w-[78%]">
-          <div className="flex flex-col bg-white mx-4 h-[90%] rounded-3xl overflow-hidden items-center justify-center m-auto gap-5">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault(); // chặn reload trang
+              handleUpdateShopping(); // gọi API
+              closeAllPopups(); // đóng hết popup
+            }}
+            className="flex flex-col bg-white mx-4 h-[90%] rounded-3xl overflow-hidden items-center justify-center m-auto gap-5"
+          >
             <p className="mx-6 text-[#2B3674] font-bold text-2xl my-2">
               Shopping Interface
             </p>
-            <form className="flex flex-col items-center justify-center gap-3 w-full">
+            <div className="flex flex-col items-center justify-center gap-3 w-full">
               <div
                 className="text-black border border-1 rounded-sm w-[50%] h-10 flex items-center justify-center cursor-pointer"
                 onClick={() => setShowStats(true)}
@@ -133,37 +381,40 @@ export default function AdminShopping() {
                   {[0, 1, 2].map((i) => (
                     <label
                       key={i}
-                      className="border border-1 rounded-sm w-20 h-20 text-xs italic flex items-center justify-center text-center"
+                      className="border border-1 rounded-sm w-20 h-20 text-xs italic flex items-center justify-center text-center cursor-pointer"
                     >
                       {ballImages[i] ? (
                         <img
-                          src={ballImages[i]}
+                          src={
+                            ballImages[i] instanceof File
+                              ? URL.createObjectURL(ballImages[i])
+                              : ballImages[i] // URL từ API
+                          }
+                          alt={`Ball ${i + 1}`}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
-                        "Add Img " + (Number(i) + Number(1))
+                        "Add Img " + (i + 1)
                       )}
                       <input
                         type="file"
                         className="hidden"
+                        accept="image/*"
                         onChange={(e) => handleBallImage(e, i)}
                       />
                     </label>
                   ))}
                 </div>
                 <div className="grid grid-cols-3 grid-auto-rows-fr w-full gap-42 mt-3">
-                  <input
-                    type="text"
-                    className="border border-1 rounded-sm w-20 h-7"
-                  />
-                  <input
-                    type="text"
-                    className="border border-1 rounded-sm w-20 h-7"
-                  />
-                  <input
-                    type="text"
-                    className="border border-1 rounded-sm w-20 h-7"
-                  />
+                  {[0, 1, 2].map((i) => (
+                    <input
+                      key={i}
+                      type="text"
+                      className="border border-1 rounded-sm w-20 h-7"
+                      value={ballNames[i]}
+                      onChange={(e) => handleBallName(e, i)}
+                    />
+                  ))}
                 </div>
               </div>
               <div className="text-black w-[50%] flex flex-col">
@@ -172,19 +423,25 @@ export default function AdminShopping() {
                   {[0, 1, 2, 3].map((i) => (
                     <label
                       key={i}
-                      className="border border-1 rounded-sm w-20 h-20 text-xs italic flex items-center justify-center text-center"
+                      className="border border-1 rounded-sm w-20 h-20 text-xs italic flex items-center justify-center text-center cursor-pointer"
                     >
                       {accImages[i] ? (
                         <img
-                          src={accImages[i]}
+                          src={
+                            accImages[i] instanceof File
+                              ? URL.createObjectURL(accImages[i])
+                              : accImages[i] // URL từ API
+                          }
+                          alt={`Accessory ${i + 1}`}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
-                        "Add Img " + (Number(i) + Number(1))
+                        "Add Img " + (i + 1)
                       )}
                       <input
                         type="file"
                         className="hidden"
+                        accept="image/*"
                         onChange={(e) => handleAccImage(e, i)}
                       />
                     </label>
@@ -213,9 +470,9 @@ export default function AdminShopping() {
                   ></textarea>
                   <div className="flex items-center justify-evenly w-full">
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image1 ? (
+                      {image1Preview ? (
                         <img
-                          src={image1}
+                          src={image1Preview}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -230,9 +487,9 @@ export default function AdminShopping() {
                     </label>
 
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image2 ? (
+                      {image2Preview ? (
                         <img
-                          src={image2}
+                          src={image2Preview}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -265,31 +522,20 @@ export default function AdminShopping() {
                     <label className="border border-gray-400 rounded-sm w-24 h-24 flex flex-col items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
                       {kitImage ? (
                         <img
-                          src={kitImage}
+                          src={URL.createObjectURL(kitImage)}
                           alt="preview"
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
-                        <>
-                          Add Image
-                          <input
-                            id="imageInput"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageChange}
-                          />
-                        </>
+                        "Add Image"
                       )}
-                      {kitImage && (
-                        <input
-                          id="imageInput"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleImageChange}
-                        />
-                      )}
+                      <input
+                        id="imageInput"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                      />
                     </label>
                   </div>
                   <span
@@ -361,9 +607,9 @@ export default function AdminShopping() {
                   </div>
                   <div className="flex items-center justify-between w-[50%]">
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image3 ? (
+                      {image3Preview ? (
                         <img
-                          src={image3}
+                          src={image3Preview}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -378,9 +624,9 @@ export default function AdminShopping() {
                     </label>
 
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image4 ? (
+                      {image4Preview ? (
                         <img
-                          src={image4}
+                          src={image4Preview}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -395,9 +641,9 @@ export default function AdminShopping() {
                     </label>
 
                     <label className="border border-1 rounded-sm w-20 h-20 flex items-center justify-center text-center text-gray-500 italic text-xs cursor-pointer hover:border-red-500 transition">
-                      {image5 ? (
+                      {image5Preview ? (
                         <img
-                          src={image5}
+                          src={image5Preview}
                           className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
@@ -454,7 +700,7 @@ export default function AdminShopping() {
                           <span
                             onClick={() =>
                               setContentList(
-                                kitList.filter((_, i) => i !== index)
+                                contentList.filter((_, i) => i !== index)
                               )
                             }
                             className="text-red-500 hover:text-red-700 font-bold text-xl leading-none cursor-pointer"
@@ -480,9 +726,10 @@ export default function AdminShopping() {
               <Button
                 text="Update"
                 className="rounded-lg !bg-[linear-gradient(90deg,#FE0101_0%,#461111_100%)] !RussoOne !p-0 !m-4 "
+                type="submit"
               />
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </>

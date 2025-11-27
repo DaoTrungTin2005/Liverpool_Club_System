@@ -12,5 +12,5 @@ export const editimageapi = (url, fallbackImage = null) => {
   }
 };
 export const getBaseImageUrl = () => {
-  return "https://8dca35ecd710.ngrok-free.app";
+  return "https://small-piano-tap-actual.trycloudflare.com";
 };
