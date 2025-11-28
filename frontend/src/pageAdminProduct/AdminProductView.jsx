@@ -4,10 +4,48 @@ import Button from "../pageAdminUser//componentAdminUser/Button.jsx";
 import "../pageRegister/Register.css";
 import { useState } from "react";
 import { logout } from "../Api/logout.js";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import api from "../Api/apitoken.js";
 
 export default function AdminProductView() {
+  const location = useLocation();
+  const productId = location.state?.productId;
   const [contentList, setContentList] = useState([]);
   const [showStats_Mini, setShowStats_Mini] = useState();
+  const [productName, setProductName] = useState("");
+  const [type, setType] = useState("");
+  const [bio, setBio] = useState("");
+  const [image, setImage] = useState("");
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await api.get(`/api/products/detail/${productId}`);
+        if (res.data.status === "success") {
+          const p = res.data.data;
+
+          setProductName(p.productName);
+          setType(p.type);
+          setBio(p.bio);
+          setImage(p.productImage);
+
+          setContentList(
+            p.variants.map((v) => ({
+              size: v.size,
+              price: v.price,
+              quantity: v.quantity,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error("Error loading product:", err);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
   const close = () => {
     setShowStats_Mini(false);
   };
@@ -30,7 +68,7 @@ export default function AdminProductView() {
             <label className="flex flex-col w-[40%]">
               ProductName:
               <label />
-              hello
+              {productName}
             </label>
             <div className="flex items-center w-[40%]">
               <label className="flex flex-col w-full">
@@ -39,7 +77,7 @@ export default function AdminProductView() {
                   className="border rounded-md p-2 text-black w-[50%]"
                   onChange={(e) => console.log(e.target.value)}
                 >
-                  123
+                  {type}
                 </label>
               </label>
               <span
@@ -54,14 +92,15 @@ export default function AdminProductView() {
             <div className="flex items-center w-[40%] gap-5">
               <div className="flex flex-col w-[35%] items-center">
                 <p>ProductImage:</p>
-                <label className="w-full text-black border border-1 rounded-sm h-30">
-                  img.img
-                </label>
+                <img
+                  src={image}
+                  className="w-full text-black border border-1 rounded-sm h-30"
+                ></img>
               </div>
               <div className="flex flex-col w-[65%] items-center">
                 <p>Bio:</p>
                 <label className="w-full text-black border border-1 rounded-sm h-30">
-                  helooo
+                  {bio}
                 </label>
               </div>
             </div>
@@ -109,10 +148,12 @@ export default function AdminProductView() {
                 />
               </div>
             )}
-            <Button
-              text="BACK"
-              className="rounded-lg !bg-[linear-gradient(90deg,#FE0101_0%,#461111_100%)] !RussoOne !p-0 !m-4 curpsor-pointer"
-            />
+            <Link to={"/admin/product"}>
+              <Button
+                text="BACK"
+                className="rounded-lg !bg-[linear-gradient(90deg,#FE0101_0%,#461111_100%)] !RussoOne !p-0 !m-4 curpsor-pointer"
+              />
+            </Link>
           </form>
         </div>
       </div>

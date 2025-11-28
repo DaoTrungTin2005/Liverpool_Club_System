@@ -12,5 +12,5 @@ export const editimageapi = (url, fallbackImage = null) => {
   }
 };
 export const getBaseImageUrl = () => {
-  return "https://small-piano-tap-actual.trycloudflare.com";
+  return "https://expensive-connecting-cancellation-foster.trycloudflare.com";
 };

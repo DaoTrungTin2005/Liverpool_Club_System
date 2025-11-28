@@ -4,6 +4,11 @@ import LinkGoPage from "../pageAdminUser/componentAdminUser/LinkGoPage.jsx";
 import Button from "../pageAdminUser/componentAdminUser/Button.jsx";
 import FrameX from "../assets/img/FrameX.png";
 import { logout } from "../Api/logout.js";
+import api from "../Api/apitoken.js";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import Options from "../pageAdminUser/componentAdminUser/options.jsx";
 export default function AdminProductDelete(props) {
   const tilte = {
     ...props,
@@ -11,6 +16,41 @@ export default function AdminProductDelete(props) {
     text02:
       "If you cancel now, your progress will be deleted, and you will have to start over.",
   };
+  const { state } = useLocation();
+  const navigate = useNavigate();
+
+  const productId = state?.productId;
+  const product = state?.product;
+
+  const [deleting, setDeleting] = useState(false);
+
+  // === HÀM XÁC NHẬN XÓA ===
+  const onConfirm = async () => {
+    if (!productId || deleting) return;
+    setDeleting(true);
+
+    try {
+      await api.delete(`api/products/delete/${productId}`);
+      alert(`Đã xóa product: ${product?.fullName || productId}`);
+      navigate("/admin/product");
+    } catch (err) {
+      console.error("Xóa thất bại:", err);
+      alert("Xóa thất bại. Vui lòng thử lại.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // === HÀM HỦY ===
+  const onCancel = () => {
+    navigate("/admin/product");
+  };
+
+  // Nếu không có dữ liệu → về danh sách
+  if (!productId) {
+    navigate("/admin/product");
+    return null;
+  }
   return (
     <>
       <div className="bg-linear-[var(--colorBg)] flex">
@@ -23,6 +63,7 @@ export default function AdminProductDelete(props) {
           <p className="text-[#636363] font-bold text-3xl">{tilte.text01}</p>
           <p className="text-[#98A0B4] italic text-sm">{tilte.text02}</p>
           <img src={FrameX} alt="FrameX" />
+          <Options onConfirm={onConfirm} onCancel={onCancel} />
         </div>
         ;
       </div>
