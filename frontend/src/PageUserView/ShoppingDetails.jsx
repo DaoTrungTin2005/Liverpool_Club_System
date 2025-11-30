@@ -8,8 +8,11 @@ import FrameX from "../assets/img/FrameX_2.png";
 import ball from "../assets/img/ball.png";
 import api from "../Api/apitoken";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function ShoppingDetails() {
+  const location = useLocation();
+  const searchTo = location.state?.searchTo;
   const [priceRange, setPriceRange] = useState([0, 250000]);
   const [originalRange, setOriginalRange] = useState([0, 250000]);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
@@ -21,15 +24,16 @@ export default function ShoppingDetails() {
   const availableStock = 100;
   const [type, setType] = useState([]);
   const [products, setProducts] = useState([]);
-  const [allProducts, setAllProducts] = useState([]); // Lưu toàn bộ sản phẩm gốc
   const [searchQuery, setSearchQuery] = useState("");
+  const [productSizes, setProductSizes] = useState([]);
 
+  // Fetch categories
   useEffect(() => {
     const fetchType = async () => {
       try {
         const response = await api.get("/api/products/types");
         if (response.data?.status === "success") {
-          setType(["All Categories", ...response.data.data]); // Thêm "All Categories"
+          setType(["All Categories", ...response.data.data]);
         } else {
           console.error("API trả về lỗi:", response.data);
         }
@@ -41,132 +45,270 @@ export default function ShoppingDetails() {
     fetchType();
   }, []);
 
-  useEffect(() => {
-    const getShopProducts = async () => {
-      try {
-        const res = await api.get("/api/products/shop");
-        const data = res.data.data;
+  // Fetch ALL products (chỉ gọi 1 lần để lấy tất cả variants)
+  const fetchAllProducts = async () => {
+    try {
+      const res = await api.get("/api/products/shop");
+      const data = res.data.data;
 
-        // Lọc lấy sản phẩm giá thấp nhất
-        const lowestPriceProducts = getLowestPriceProducts(data);
+      console.log("📦 Fetched ALL products:", data);
 
-        setAllProducts(lowestPriceProducts); // Lưu toàn bộ sản phẩm
-        setProducts(lowestPriceProducts); // Hiển thị ban đầu
-        calculatePriceRange(lowestPriceProducts);
+      // Hiển thị sản phẩm với giá thấp nhất
+      const lowestPriceProducts = getLowestPriceProducts(data);
+      setProducts(lowestPriceProducts);
 
-        console.log("Sản phẩm giá thấp nhất:", lowestPriceProducts);
-      } catch (error) {
-        console.error("Error fetching shop products:", error);
+      // Tính price range
+      calculatePriceRange(data);
+    } catch (error) {
+      console.error("Error fetching all products:", error);
+    }
+  };
+
+  // Fetch filtered products (chỉ để hiển thị, KHÔNG đè allProductData)
+  const fetchFilteredProducts = async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      // Thêm type nếu không phải "All Categories"
+      if (params.type && params.type !== "All Categories") {
+        queryParams.append("type", params.type);
       }
-    };
 
-    getShopProducts();
+      // Thêm price range
+      if (params.minPrice !== undefined) {
+        queryParams.append("minPrice", params.minPrice);
+      }
+      if (params.maxPrice !== undefined) {
+        queryParams.append("maxPrice", params.maxPrice);
+      }
+
+      // Thêm search query
+      if (params.search && params.search.trim()) {
+        queryParams.append("search", params.search.trim());
+      }
+
+      const queryString = queryParams.toString();
+
+      // Nếu không có params nào, gọi lại fetchAllProducts
+      if (!queryString) {
+        fetchAllProducts();
+        return;
+      }
+
+      const url = `/api/products/shop?${queryString}`;
+
+      console.log("🔍 Calling filtered API:", url);
+
+      const res = await api.get(url);
+      const data = res.data.data;
+
+      console.log("📦 Filtered API Response:", data);
+
+      // CHỈ update products để hiển thị, KHÔNG đè allProductData
+      const lowestPriceProducts = getLowestPriceProducts(data);
+      setProducts(lowestPriceProducts);
+
+      // Nếu search mà không có kết quả
+      if (params.search && params.search.trim() && data.length === 0) {
+        alert("Không tìm thấy sản phẩm");
+      }
+    } catch (error) {
+      console.error("Error fetching filtered products:", error);
+    }
+  };
+
+  // Initial load - lấy TẤT CẢ products
+  useEffect(() => {
+    fetchAllProducts();
   }, []);
+
+  // Xử lý searchTo từ navigation
+  useEffect(() => {
+    if (searchTo) {
+      setSearchQuery(searchTo);
+      fetchFilteredProducts({
+        type: selectedCategory,
+        minPrice: priceRange[0],
+        maxPrice: priceRange[1],
+        search: searchTo,
+      });
+    }
+  }, [searchTo]);
 
   const calculatePriceRange = (list) => {
     if (!list || list.length === 0) return;
-
     const prices = list.map((item) => item.price);
     const min = Math.min(...prices);
     const max = Math.max(...prices);
-
     setPriceRange([min, max]);
     setOriginalRange([min, max]);
   };
 
   const getLowestPriceProducts = (products) => {
     const productMap = new Map();
-
     products.forEach((product) => {
       const existing = productMap.get(product.productId);
-
       if (!existing || product.price < existing.price) {
         productMap.set(product.productId, product);
       }
     });
-
     return Array.from(productMap.values());
   };
 
-  // Hàm filter sản phẩm
-  const applyFilters = () => {
-    let filtered = [...allProducts];
-
-    // Filter theo category
-    if (selectedCategory !== "All Categories") {
-      filtered = filtered.filter(
-        (product) => product.type === selectedCategory
-      );
-    }
-
-    // Filter theo price range
-    filtered = filtered.filter(
-      (product) =>
-        product.price >= priceRange[0] && product.price <= priceRange[1]
-    );
-
-    // Filter theo search query
-    // Filter theo search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (product) =>
-          product.productName?.toLowerCase().includes(query) ||
-          product.bio?.toLowerCase().includes(query)
-      );
-    }
-
-    setProducts(filtered);
-  };
-
-  // Áp dụng filter khi nhấn nút "Filters"
+  // Apply filters - gọi API với params
   const handleApplyFilters = () => {
-    applyFilters();
+    fetchFilteredProducts({
+      type: selectedCategory,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1],
+      search: searchQuery,
+    });
   };
 
-  // Áp dụng filter tự động khi search
-  useEffect(() => {
-    applyFilters();
-  }, [searchQuery]);
-
-  // Mở popup với thông tin sản phẩm
-  const openPopup = (product) => {
-    setSelectedProduct(product);
-    setIsPopupOpen(true);
-    setSelectedSize(null);
-    setQuantity(1);
+  // Xử lý search từ Search component
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+    fetchFilteredProducts({
+      type: selectedCategory,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1],
+      search: value,
+    });
   };
 
-  // Đóng popup
+  const openPopup = async (product) => {
+    try {
+      console.log(
+        "🔍 Fetching product detail for productId:",
+        product.productId
+      );
+
+      // Gọi API lấy chi tiết sản phẩm với đầy đủ variants
+      const res = await api.get(`/api/products/detail/${product.productId}`);
+      const productDetail = res.data.data;
+
+      console.log("📦 Product detail response:", productDetail);
+
+      // Map variants thành format cho sizes
+      const sizes = productDetail.variants.map((variant) => ({
+        size: variant.size,
+        price: variant.price,
+        variantId: variant.id,
+        stock: variant.quantity - variant.soldQuantity,
+      }));
+
+      // Set product info với data từ API detail
+      setSelectedProduct({
+        ...product,
+        productName: productDetail.productName,
+        bio: productDetail.bio,
+        image: productDetail.productImage,
+        type: productDetail.type,
+      });
+
+      setProductSizes(sizes);
+      setIsPopupOpen(true);
+      setSelectedSize(null);
+      setQuantity(1);
+
+      console.log("✅ Loaded sizes:", sizes);
+    } catch (error) {
+      console.error("❌ Error fetching product detail:", error);
+      alert("Không thể tải thông tin sản phẩm. Vui lòng thử lại!");
+    }
+  };
+
   const closePopup = () => {
     setIsPopupOpen(false);
     setSelectedProduct(null);
+    setProductSizes([]);
+    setSelectedSize(null);
   };
 
-  // Chọn size
-  const handleSelectSize = (size) => {
-    setSelectedSize(size);
+  const handleSelectSize = (sizeData) => {
+    setSelectedSize(sizeData);
   };
 
-  // Tăng số lượng
   const increaseQuantity = () => {
-    if (quantity < availableStock) {
+    const maxStock = selectedSize?.stock || availableStock;
+    if (!selectedSize) {
+      alert("Please select a size");
+      return;
+    }
+    if (quantity < maxStock) {
       setQuantity(quantity + 1);
     }
   };
 
-  // Giảm số lượng
   const decreaseQuantity = () => {
+    if (!selectedSize) {
+      alert("Please select a size");
+      return;
+    }
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
   };
 
-  // Tính tổng giá
-  const totalPrice = (selectedProduct?.price || 0) * quantity;
+  const totalPrice =
+    (selectedSize?.price || selectedProduct?.price || 0) * quantity;
 
   const formatPrice = (price) => {
     return price?.toLocaleString() || "0";
+  };
+
+  // Hàm add to cart
+  const handleAddToCart = async () => {
+    // Validate: phải chọn size trước
+    if (!selectedSize) {
+      alert("Vui lòng chọn size trước khi thêm vào giỏ hàng!");
+      return;
+    }
+
+    // Validate: phải có productId
+    if (!selectedProduct?.productId) {
+      alert("Không tìm thấy thông tin sản phẩm!");
+      return;
+    }
+
+    try {
+      const payload = {
+        productId: selectedProduct.productId,
+        variantId: selectedSize.variantId,
+        quantity: quantity || 1, // Mặc định là 1 nếu không có quantity
+      };
+
+      console.log("🛒 Adding to cart:", payload);
+
+      const response = await api.post("/api/cart/add", payload);
+
+      if (response.data?.status === "success") {
+        // Thông báo thành công
+        alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+
+        // Dispatch event để Header tự động refresh
+        window.dispatchEvent(new Event("cartUpdated"));
+
+        // Optional: Đóng popup sau khi add
+        // closePopup();
+
+        console.log("✅ Add to cart success:", response.data);
+      } else {
+        alert("Không thể thêm vào giỏ hàng. Vui lòng thử lại!");
+        console.error("❌ Add to cart failed:", response.data);
+      }
+    } catch (error) {
+      console.error("❌ Error adding to cart:", error);
+
+      // Xử lý các lỗi cụ thể
+      if (error.response?.status === 401) {
+        alert("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+      } else if (error.response?.status === 400) {
+        alert(error.response?.data?.message || "Thông tin không hợp lệ!");
+      } else {
+        alert("Có lỗi xảy ra. Vui lòng thử lại!");
+      }
+    }
   };
 
   const handlePriceChange = (e, index) => {
@@ -355,12 +497,12 @@ export default function ShoppingDetails() {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center pt-10 gap-10">
-          <Search bg="!bg-black" onSearch={(value) => setSearchQuery(value)} />
+          <Search bg="!bg-black" onSearch={handleSearch} />
           <div className="grid grid-cols-3 gap-10">
             {products.length > 0 ? (
               products.map((product) => (
                 <ProductBio
-                  key={product.productId}
+                  key={product.variantId}
                   onClick={() => openPopup(product)}
                   product={product}
                 />
@@ -397,22 +539,22 @@ export default function ShoppingDetails() {
                     </h2>
                   </div>
                   <p className="text-sm mb-3">
-                    {selectedProduct.description ||
+                    {selectedProduct.bio ||
                       "Engineered for precision and power. Features high-tech advanced construction for superior performance."}
                   </p>
                   <h3 className="text-sm">Select Size</h3>
                   <div className="flex items-center gap-3">
-                    {[1, 2, 3, 4, 5, 6, 7].map((size) => (
+                    {productSizes.map((sizeData, index) => (
                       <span
-                        key={size}
-                        onClick={() => handleSelectSize(size)}
+                        key={index}
+                        onClick={() => handleSelectSize(sizeData)}
                         className={`w-10 h-10 border border-1 flex items-center justify-center rounded-md cursor-pointer transition-all ${
-                          selectedSize === size
+                          selectedSize?.size === sizeData.size
                             ? "bg-[linear-gradient(180deg,#EF4444_0%,#892727_100%)] text-white border-[#EF4444]"
                             : "border-[#D1D5DB] hover:border-[#EF4444]"
                         }`}
                       >
-                        {size}
+                        {sizeData.size}
                       </span>
                     ))}
                   </div>
@@ -436,14 +578,20 @@ export default function ShoppingDetails() {
                     <h3 className="flex items-center justify-between text-xs gap-2">
                       Available:
                       <p className="bg-[linear-gradient(180deg,#EF4444_0%,#892727_100%)] bg-clip-text text-transparent font-bold">
-                        {selectedProduct.stock || availableStock}
+                        {selectedSize?.stock ||
+                          Number(selectedProduct.quantity) -
+                            Number(selectedProduct.soldQuantity) ||
+                          availableStock}
                       </p>
                     </h3>
                   </div>
                   <button className="w-full mx-auto h-25 rounded-md hover:shadow-2xl hover:scale-101 cursor-pointer bg-[linear-gradient(90deg,#EF4444_0%,#892727_100%)] hover:![background-image:none] hover:border hover:border-2 hover:border-[#EF4444] hover:text-red-500 hover:!bg-white transition-all duration-300 text-white font-light text-xs flex items-center justify-center gap-5 group">
                     Buy Now
                   </button>
-                  <button className="w-full mx-auto h-25 rounded-md hover:shadow-2xl hover:scale-101 cursor-pointer bg-[linear-gradient(90deg,#EF4444_0%,#892727_100%)] hover:![background-image:none] hover:border hover:border-2 hover:border-[#EF4444] hover:text-red-500 hover:!bg-white transition-all duration-300 text-white font-light text-xs flex items-center justify-center gap-5 group">
+                  <button
+                    className="w-full mx-auto h-25 rounded-md hover:shadow-2xl hover:scale-101 cursor-pointer bg-[linear-gradient(90deg,#EF4444_0%,#892727_100%)] hover:![background-image:none] hover:border hover:border-2 hover:border-[#EF4444] hover:text-red-500 hover:!bg-white transition-all duration-300 text-white font-light text-xs flex items-center justify-center gap-5 group"
+                    onClick={handleAddToCart}
+                  >
                     Add to Cart
                   </button>
                   <h3 className="font-bold text-black text-sm">Key Features</h3>

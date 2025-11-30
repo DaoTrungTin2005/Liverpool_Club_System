@@ -41,6 +41,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminRoute from "./AdminRoute.jsx";
 import ShoppingDetails from "./PageUserView/ShoppingDetails.jsx";
 import ShoppingCart from "./PageUserView/ShoppingCart.jsx";
+import Home from "./PageUserView/Home.jsx";
+import PaymentProduct from "./PageUserView/PaymentProduct.jsx";
+import OrderHistoryProduct from "./PageUserView/OrderHistoryProduct.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -165,7 +168,8 @@ function App() {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
         <Route path="/order" element={<OrderHistory />} />
-
+        <Route path="/payment/product" element={<PaymentProduct />} />
+        <Route path="/orderproduct" element={<OrderHistoryProduct />} />
         {/* ADMIN TICKET */}
         <Route
           path="/admin/ticket"
@@ -246,6 +250,7 @@ function App() {
         <Route path="/payment" element={<Payment />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/shopping" element={<Shopping />}></Route>
+        <Route path="/home" element={<Home />}></Route>
         <Route path="/shopping/details" element={<ShoppingDetails />}></Route>
         <Route path="/shopping/cart" element={<ShoppingCart />}></Route>
 

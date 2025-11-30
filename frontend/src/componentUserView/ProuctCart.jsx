@@ -16,7 +16,7 @@ export default function ProductCart({
         <div className="flex items-center justify-center gap-10 p-5">
           <img src={ball} alt="ball" className="w-20 h-20 rounded-xl" />
           <div className="flex flex-col gap-3 justify-center text-[#4B5563]">
-            <h1 className="font-bold text-black">STRIKER ELITE</h1>
+            <h1 className="font-bold text-black">{item.name}</h1>
             <div className="flex items-center justify-center gap-10">
               <p className="text-sm">Size: {item.size}</p>
               <p className="text-sm">

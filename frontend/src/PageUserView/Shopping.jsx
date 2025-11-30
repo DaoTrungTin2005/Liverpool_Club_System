@@ -11,6 +11,7 @@ import tick from "../assets/img/tick.png";
 import SvgStart from "../assets/svg/SvgStart.jsx";
 import Avatar01 from "../assets/img/Avatar01.png";
 import api from "../Api/apitoken.js"; // ✅ THÊM IMPORT API
+import { Link } from "react-router-dom";
 
 export default function Shopping() {
   const [isDragging, setIsDragging] = useState(false);
@@ -197,9 +198,11 @@ export default function Shopping() {
             <br />
             with performance-driven equipment.
           </p>
-          <button className="ml-34 mt-3 px-6 py-2 bg-[linear-gradient(180deg,#E01E1E_0%,#7A1010_100%)] hover:text-orange-400 cursor-pointer rounded-sm hover:scale-105 font-semibold w-[150px]">
-            SHOP NOW
-          </button>
+          <Link to={"/shopping/details"}>
+            <button className="ml-34 mt-3 px-6 py-2 bg-[linear-gradient(180deg,#E01E1E_0%,#7A1010_100%)] hover:text-orange-400 cursor-pointer rounded-sm hover:scale-105 font-semibold w-[150px]">
+              SHOP NOW
+            </button>
+          </Link>
           <div className="flex gap-16 mx-auto text-center text-white absolute top-90 left-[40%]">
             <div>
               <p className="text-3xl font-bold">20k+</p>
@@ -223,9 +226,11 @@ export default function Shopping() {
           <p className="text-white text-4xl font-bold">LIVERPOOL FC</p>
           <p className="text-white text-2xl font-bold">{title}</p>
           <p className="text-[#D1D5DB] text-xs Inter w-50">{content}</p>
-          <button className="w-30 h-10 hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-white mt-10">
-            Buy Now
-          </button>
+          <Link to={"/shopping/details"} state={{ searchTo: title }}>
+            <button className="w-30 h-10 hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-white mt-10">
+              Buy Now
+            </button>
+          </Link>
         </div>
         {image1 && <img src={image1} alt="img_1" className="w-1/4 h-120" />}
         {image2 && <img src={image2} alt="Img_2" className="w-1/4 h-120" />}
@@ -247,12 +252,14 @@ export default function Shopping() {
                 <img src={kit.image} alt={kit.name} />
               </div>
               <p className="font-bold text-xl">{kit.name}</p>
-              <button
-                className={`w-30 h-10 text-white font-bold ${kit.hoverColor} hover:shadow-2xl hover:scale-105 cursor-pointer`}
-                style={{ backgroundColor: kit.bgColor }}
-              >
-                Buy Now
-              </button>
+              <Link to={"/shopping/details"} state={{ searchTo: kit.name }}>
+                <button
+                  className={`w-30 h-10 text-white font-bold ${kit.hoverColor} hover:shadow-2xl hover:scale-105 cursor-pointer`}
+                  style={{ backgroundColor: kit.bgColor }}
+                >
+                  Buy Now
+                </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -344,9 +351,11 @@ export default function Shopping() {
             </div>
           </div>
         </div>
-        <button className="w-60 h-10 hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-black text-white Inter font-bold mt-4">
-          Shop Now
-        </button>
+        <Link to={"/shopping/details"} state={{ searchTo: "accessories" }}>
+          <button className="w-60 h-10 hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-black text-white Inter font-bold mt-4">
+            Shop Now
+          </button>
+        </Link>
         <style>{`
           .scrollbar-hide::-webkit-scrollbar {
             display: none;
@@ -366,9 +375,11 @@ export default function Shopping() {
             >
               <img src={ball.image} alt={ball.name} className="w-81 h-81" />
               <p className="text-xl">{ball.name}</p>
-              <button className="w-30 h-10 hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-[linear-gradient(90deg,#CB3131_0%,#651818_100%)] text-white Inter font-bold">
-                Shop Now
-              </button>
+              <Link to={"/shopping/details"} state={{ searchTo: ball.name }}>
+                <button className="w-30 h-10 hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-[linear-gradient(90deg,#CB3131_0%,#651818_100%)] text-white Inter font-bold">
+                  Shop Now
+                </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -389,32 +400,34 @@ export default function Shopping() {
             </div>
           ))}
           ,
-          <button className="w-40 h-10 rounded-lg hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-[#AD0000] text-white  font-bold flex items-center justify-center gap-5 group cursor-pointer">
-            Shop Now
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              className="group-hover:animate-[blink_1s_ease-in-out_infinite]"
-            >
-              <path
-                d="M3.33203 8H12.6654"
-                stroke="#FCFCFC"
-                strokeWidth="1.33333"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M8 3.33301L12.6667 7.99967L8 12.6663"
-                stroke="#FCFCFC"
-                strokeWidth="1.33333"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          <Link to={"/shopping/details"} state={{ searchTo: "Shoes" }}>
+            <button className="w-40 h-10 rounded-lg hover:text-red-600 hover:shadow-2xl hover:scale-105 cursor-pointer bg-[#AD0000] text-white  font-bold flex items-center justify-center gap-5 group cursor-pointer">
+              Shop Now
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="group-hover:animate-[blink_1s_ease-in-out_infinite]"
+              >
+                <path
+                  d="M3.33203 8H12.6654"
+                  stroke="#FCFCFC"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M8 3.33301L12.6667 7.99967L8 12.6663"
+                  stroke="#FCFCFC"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </Link>
         </div>
         <div className="flex items-center justify-center gap-10 w-1/2">
           <img src={image3} alt="shoes" className="w-90 h-90 shadow-xl/40" />

@@ -9,7 +9,10 @@ export default function ProductBio({ onClick, product }) {
 
   return (
     <>
-      <div className="rounded-lg flex flex-col shadow-xl pb-10 gap-5 cursor-pointer">
+      <div
+        className="rounded-lg flex flex-col shadow-xl pb-10 gap-5 cursor-pointer "
+        onClick={onClick}
+      >
         <img
           src={product?.image || ball}
           alt={product?.productName || "ball"}

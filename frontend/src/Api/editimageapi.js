@@ -12,5 +12,5 @@ export const editimageapi = (url, fallbackImage = null) => {
   }
 };
 export const getBaseImageUrl = () => {
-  return "https://expensive-connecting-cancellation-foster.trycloudflare.com";
+  return "https://cluster-peninsula-strict-hudson.trycloudflare.com";
 };

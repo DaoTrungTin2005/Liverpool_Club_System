@@ -4,11 +4,47 @@ import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Button from "../pageAdminUser/componentAdminUser/Button";
 import { logout } from "../Api/logout.js";
-export default function Header() {
+import Cart from "../assets/svg/SvgCart.jsx";
+import api from "../Api/apitoken";
+
+export default function Header(props) {
   const [user, setUser] = useState(null);
   const [, setDebugInfo] = useState(null);
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  // Fetch cart count từ API
+  const fetchCartCount = async () => {
+    try {
+      const response = await api.get("/api/cart/show");
+      if (response.data?.status === "success") {
+        const totalItems = response.data.data.totalItems || 0;
+        setCartCount(totalItems);
+      }
+    } catch (error) {
+      // Nếu lỗi 401 (chưa login) hoặc lỗi khác, set về 0
+      console.log(
+        "Cart count error (might not be logged in):",
+        error.response?.status
+      );
+      setCartCount(0);
+    }
+  };
+
+  // Listen to cart update events
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      console.log("🔄 Cart updated, refreshing count...");
+      fetchCartCount();
+    };
+
+    window.addEventListener("cartUpdated", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     // Đọc lại user mỗi khi route thay đổi
@@ -27,6 +63,9 @@ export default function Header() {
           email: parsedUser.email,
           rawKeys: Object.keys(parsedUser),
         });
+
+        // Fetch cart count khi có user
+        fetchCartCount();
       } catch (err) {
         console.error(" Lỗi parse user:", err);
         setUser(null);
@@ -34,9 +73,16 @@ export default function Header() {
       }
     } else {
       setUser(null);
+      setCartCount(0);
       setDebugInfo({ hasUser: false, reason: "No data" });
     }
   }, [location]);
+
+  // Nếu props.number được truyền từ parent, ưu tiên dùng props
+  // Nếu không, dùng cartCount từ API
+  const displayCartCount =
+    props.number !== undefined ? props.number : cartCount;
+
   return (
     <header className="fixed top-0 left-0 w-full z-5000 shadow-lg">
       {/* BG đỏ đen gradient phong cách Liverpool */}
@@ -82,6 +128,12 @@ export default function Header() {
           >
             Order
           </Link>
+          <Link
+            to="/shopping"
+            className="hover:text-red-300 duration-200 max-sm:hidden"
+          >
+            Product
+          </Link>
           {!user && (
             <>
               <Link
@@ -96,6 +148,12 @@ export default function Header() {
 
           {user && (
             <>
+              <Link to="/shopping/cart">
+                <Cart
+                  className="w-10 h-10 text-white relative"
+                  number={displayCartCount}
+                />
+              </Link>
               <Link to="/admin/user">
                 <span className="text-red-300">Xin chào, {user.fullname}</span>
               </Link>

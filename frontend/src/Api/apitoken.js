@@ -27,7 +27,7 @@ function checkTokenExpired() {
 }
 
 const api = axios.create({
-  baseURL: "https://expensive-connecting-cancellation-foster.trycloudflare.com/",
+  baseURL: "https://cluster-peninsula-strict-hudson.trycloudflare.com/",
   headers: {
     "ngrok-skip-browser-warning": "true",
     Accept: "application/json",

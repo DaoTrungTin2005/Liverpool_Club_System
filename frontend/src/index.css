@@ -9,6 +9,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Protest+Strike&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Smooch&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Marathi:ital@0;1&display=swap");
 body {
   font-family: "DM Sans", sans-serif;
 }
@@ -41,6 +47,24 @@ body {
 }
 .Geist {
   font-family: "Geist", sans-serif;
+}
+.ProtestStrike {
+  font-family: "Protest Strike", sans-serif;
+}
+.Roboto {
+  font-family: "Roboto", sans-serif;
+}
+.Rubik {
+  font-family: "Rubik Mono One", sans-serif;
+}
+.RubikGlit {
+  font-family: "Rubik Glitch", sans-serif;
+}
+.Smooch {
+  font-family: "Smooch", sans-serif;
+}
+.Tiro {
+  font-family: "Tiro Devanagari Marathi", sans-serif;
 }
 @keyframes blink {
   0%,
