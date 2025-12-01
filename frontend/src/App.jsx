@@ -44,6 +44,7 @@ import ShoppingCart from "./PageUserView/ShoppingCart.jsx";
 import Home from "./PageUserView/Home.jsx";
 import PaymentProduct from "./PageUserView/PaymentProduct.jsx";
 import OrderHistoryProduct from "./PageUserView/OrderHistoryProduct.jsx";
+import AdminStatistics from "./AdminStatistics/AdminStatistics.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -162,6 +163,7 @@ function App() {
         <Route path="/admin/product/update" element={<AdminProductUpdate />} />
         <Route path="/admin/product/delete" element={<AdminProductDelete />} />
         <Route path="/admin/product/view" element={<AdminProductView />} />
+        <Route path="/admin/statistics" element={<AdminStatistics />} />
         {/* USER PAGE */}
         <Route path="/myclub" element={<MyClub />} />
         <Route path="/myclub/player" element={<ProfilePlayer />} />
