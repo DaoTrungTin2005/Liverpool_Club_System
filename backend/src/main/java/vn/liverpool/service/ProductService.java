@@ -242,7 +242,7 @@ public class ProductService {
         List<ProductListResponse> list = new ArrayList<>();
 
         for (Product p : productPage.getContent()) {
-            // mỗi variant tạo 1 bản ghi -> variant khác nhau trả về bấy nhiêu response
+            // mỗi variant tạo 1 bản ghi hú hú variant khác nhau trả về bấy nhiêu response
             for (ProductVariant v : p.getVariants()) {
                 list.add(new ProductListResponse(
                         p.getId(),
