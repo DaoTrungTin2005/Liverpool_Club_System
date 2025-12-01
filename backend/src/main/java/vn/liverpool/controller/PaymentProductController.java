@@ -190,4 +190,16 @@ public class PaymentProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
     }
+
+    // ========== USER: LỊCH SỬ ĐƠN HÀNG ==========
+    @GetMapping("/user/order-history")
+    public ResponseEntity<ApiResponse<List<OrderProductHistoryResponse>>> getUserOrderHistory(
+            HttpServletRequest request) {
+
+        String userEmail = request.getUserPrincipal().getName();
+
+        List<OrderProductHistoryResponse> result = orderService.getUserOrderHistory(userEmail);
+
+        return ResponseEntity.ok(ApiResponse.success("Get order history successfully", result));
+    }
 }

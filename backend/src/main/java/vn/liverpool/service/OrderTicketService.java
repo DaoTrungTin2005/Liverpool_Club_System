@@ -354,7 +354,7 @@ public class OrderTicketService {
         return xfHeader.split(",")[0];
     }
 
-    // SET THỜI GIAN HỦY ĐƠN HÀNG PENDING SAU 5 PHÚT ĐỒNG THỜI TRỪ SỐ LƯỢNG VÉ ĐÃ
+    // SET THỜI GIAN HỦY ĐƠN HÀNG PENDING SAU 15 PHÚT ĐỒNG THỜI TRỪ SỐ LƯỢNG VÉ ĐÃ
     // ĐẶT TRONG ĐƠN HÀNG RA KHỎI SOLD_QUANTITY BẢNG TICKET_SETTINGS
     @Scheduled(fixedRate = 30000)
     @Transactional

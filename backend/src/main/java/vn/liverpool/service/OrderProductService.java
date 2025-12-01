@@ -302,6 +302,52 @@ public class OrderProductService {
         }
     }
 
+    // ========== GET USER ORDER HISTORY ==========
+    // ========== GET USER ORDER HISTORY (CẬP NHẬT) ==========
+    @Transactional(readOnly = true)
+    public List<OrderProductHistoryResponse> getUserOrderHistory(String userEmail) {
+        Account account = accountRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<OrderProduct> orders = orderRepo.findOrdersByAccountId(account.getId());
+
+        String baseUrl = getBaseUrl() + "/uploads/products/";
+
+        return orders.stream()
+                .map(order -> {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    String timePayment = order.getCreatedAt().format(formatter);
+
+                    List<OrderProductHistoryResponse.OrderHistoryItem> items = order.getOrderItems().stream()
+                            .map(item -> {
+                                // Tính subtotal = quantity × price
+                                BigDecimal subtotal = item.getPrice()
+                                        .multiply(BigDecimal.valueOf(item.getQuantity()));
+
+                                return new OrderProductHistoryResponse.OrderHistoryItem(
+                                        item.getProduct().getProductName(),
+                                        item.getProduct().getProductImage() != null
+                                                ? baseUrl + item.getProduct().getProductImage()
+                                                : null,
+                                        item.getVariant().getSize(),
+                                        item.getQuantity(),
+                                        item.getPrice(),
+                                        subtotal); // ← THÊM SUBTOTAL VÀO ĐÂY
+                            })
+                            .toList();
+
+                    return new OrderProductHistoryResponse(
+                            order.getId(),
+                            order.getOrderCode(),
+                            timePayment,
+                            items,
+                            order.getTotalPrice(),
+                            order.getShippingFee(),
+                            order.getStatus().toString());
+                })
+                .toList();
+    }
+
     // ========== HELPER METHODS ==========
     private OrderProductResponse buildOrderResponse(OrderProduct order) {
         String baseUrl = getBaseUrl() + "/uploads/products/";

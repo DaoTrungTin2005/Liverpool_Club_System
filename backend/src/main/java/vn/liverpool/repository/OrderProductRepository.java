@@ -20,4 +20,6 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
 
     List<OrderProduct> findByStatusAndCreatedAtBefore(OrderStatus status, LocalDateTime expireTime);
 
+    @Query("SELECT o FROM OrderProduct o WHERE o.account.id = :accountId ORDER BY o.createdAt DESC")
+    List<OrderProduct> findOrdersByAccountId(@Param("accountId") Long accountId);
 }
