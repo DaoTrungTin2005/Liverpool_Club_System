@@ -1,4 +1,4 @@
-package vn.liverpool.domain.dto.order;
+package vn.liverpool.domain.dto.order_ticket;
 
 import lombok.Data;
 
