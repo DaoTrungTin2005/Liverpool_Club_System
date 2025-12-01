@@ -25,7 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
-public class PaymentController {
+public class PaymentTicketController {
 
     private final OrderTicketService orderService;
 
@@ -211,14 +211,14 @@ public class PaymentController {
 
     // LỊCH SỬ ĐƠN HÀNG CỦA USER
 
-@GetMapping("/user/order-history")
-public ResponseEntity<ApiResponse<List<OrderTicketHistoryResponse>>> getUserOrderHistory(
-        HttpServletRequest request) {
+    @GetMapping("/user/order-history")
+    public ResponseEntity<ApiResponse<List<OrderTicketHistoryResponse>>> getUserOrderHistory(
+            HttpServletRequest request) {
 
-    String userEmail = request.getUserPrincipal().getName();
-    
-    List<OrderTicketHistoryResponse> result = orderService.getUserOrderHistory(userEmail);
+        String userEmail = request.getUserPrincipal().getName();
 
-    return ResponseEntity.ok(ApiResponse.success("Get order history successfully", result));
-}
+        List<OrderTicketHistoryResponse> result = orderService.getUserOrderHistory(userEmail);
+
+        return ResponseEntity.ok(ApiResponse.success("Get order history successfully", result));
+    }
 }
