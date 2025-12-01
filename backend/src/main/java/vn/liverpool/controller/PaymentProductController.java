@@ -70,6 +70,7 @@ public class PaymentProductController {
     }
 
     // ========== VNPAY CALLBACK ==========
+    // ========== VNPAY CALLBACK ==========
     @GetMapping("/vnpay-return")
     public RedirectView vnpayReturn(HttpServletRequest request) {
         Map<String, String> params = new HashMap<>();
@@ -80,11 +81,22 @@ public class PaymentProductController {
         });
 
         try {
+            // LOG TẤT CẢ PARAMS TỪ VNPAY
+            System.out.println("============ VNPAY RETURN PARAMS ============");
+            params.forEach((key, value) -> System.out.println(key + " = " + value));
+            System.out.println("=============================================");
+
             OrderProductResponse orderResponse = orderService.handleVNPayReturn(params);
+
+            System.out.println("✅ Payment SUCCESS - Order: " + orderResponse.orderCode());
             return new RedirectView("http://localhost:5174/payment-success");
 
         } catch (Exception e) {
-            return new RedirectView("http://localhost:5174/payment-failed");
+            System.err.println("❌ VNPAY PAYMENT FAILED:");
+            e.printStackTrace();
+
+            // Thêm error message vào URL để FE biết lỗi gì
+            return new RedirectView("http://localhost:5174/payment-failed?error=" + e.getMessage());
         }
     }
 

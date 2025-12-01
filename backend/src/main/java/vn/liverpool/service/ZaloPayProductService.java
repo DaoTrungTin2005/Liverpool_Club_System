@@ -16,25 +16,19 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class ZaloPayService {
+public class ZaloPayProductService {
 
     private final ZaloPayProductConfig config;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Tạo URL thanh toán ZaloPay
-     */
     public String createPaymentUrl(String orderCode, Long amount, String description) {
         try {
-            // 1. Tạo app_trans_id (mã giao dịch unique)
             String appTransId = getCurrentDateFormatted() + "_" + orderCode;
 
-            // 2. Tạo embed_data
             Map<String, Object> embedData = new HashMap<>();
             embedData.put("redirecturl", config.getReturnUrl());
 
-            // 3. Tạo item (danh sách sản phẩm)
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
             item.put("itemid", orderCode);
@@ -43,7 +37,6 @@ public class ZaloPayService {
             item.put("itemquantity", 1);
             items.add(item);
 
-            // 4. Chuẩn bị dữ liệu request
             long appTime = System.currentTimeMillis();
 
             Map<String, Object> order = new LinkedHashMap<>();
@@ -58,7 +51,6 @@ public class ZaloPayService {
             order.put("description", description);
             order.put("bank_code", "");
 
-            // 5. Tạo MAC (chữ ký)
             String data = config.getAppId() + "|"
                     + order.get("app_trans_id") + "|"
                     + order.get("app_user") + "|"
@@ -70,7 +62,6 @@ public class ZaloPayService {
             String mac = generateHMAC(data, config.getKey1());
             order.put("mac", mac);
 
-            // 6. Gửi request tới ZaloPay
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -78,11 +69,10 @@ public class ZaloPayService {
 
             @SuppressWarnings("unchecked")
             Map<String, Object> response = restTemplate.postForObject(
-                    config.getEndpoint() + "/create", // Gọi: https://sb-openapi.zalopay.vn/v2/create
+                    config.getEndpoint() + "/create",
                     entity,
                     Map.class);
 
-            // 7. Xử lý response
             if (response != null && Integer.valueOf(1).equals(response.get("return_code"))) {
                 return (String) response.get("order_url");
             } else {
@@ -95,9 +85,6 @@ public class ZaloPayService {
         }
     }
 
-    /**
-     * Verify chữ ký callback từ ZaloPay
-     */
     public boolean verifyPaymentSignature(Map<String, String> params) {
         try {
             String data = params.get("data");
@@ -111,9 +98,6 @@ public class ZaloPayService {
         }
     }
 
-    /**
-     * Generate HMAC SHA256
-     */
     private String generateHMAC(String data, String key) throws Exception {
         Mac hmac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA256");
@@ -122,9 +106,6 @@ public class ZaloPayService {
         return new String(org.springframework.security.crypto.codec.Hex.encode(hash));
     }
 
-    /**
-     * Lấy ngày hiện tại theo format yyMMdd (ví dụ: 241116)
-     */
     private String getCurrentDateFormatted() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
         return sdf.format(new Date());

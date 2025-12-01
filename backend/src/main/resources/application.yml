@@ -23,7 +23,7 @@ spring:
         format_sql: true
 
   # =============================
-  # MULTIPART CONFIG (PHẢI Ở ĐÂY!)
+  # MULTIPART CONFIG
   # =============================
   servlet:
     multipart:
@@ -66,39 +66,73 @@ liverpool:
     token-validity-in-seconds: 8640000
 
 # =============================
-# VNPAY CONFIG
+# VNPAY CONFIG (FOR TICKETS)
 # =============================
 vnpay:
   tmn-code: V47H1UFP
   hash-secret: GCXFR9H3H5XT3IH3XTWU6PQXAONP969P
   url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  return-url:      https://00bc46ca013c.ngrok-free.app/api/payment/vnpay-return
+  return-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/vnpay-return
   version: 2.1.0
   command: pay
   order-type: other
 
 # =============================
-# MOMO PAYMENT CONFIG
+# VNPAY CONFIG (FOR PRODUCTS)
+# =============================
+vnpay-product:
+  tmn-code: V47H1UFP
+  hash-secret: GCXFR9H3H5XT3IH3XTWU6PQXAONP969P
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/products/vnpay-return
+  version: 2.1.0
+  command: pay
+  order-type: other
+
+# =============================
+# MOMO PAYMENT CONFIG (FOR TICKETS)
 # =============================
 momo:
   partner-code: MOMOBKUN20180529
   access-key: klm05TvNBzhg7h7j
   secret-key: at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa
   endpoint: https://test-payment.momo.vn/v2/gateway/api/create
-  return-url:     https://00bc46ca013c.ngrok-free.app/api/payment/momo-return
-  notify-url:  https://00bc46ca013c.ngrok-free.app/api/payment/momo-notify
-
+  return-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/momo-return
+  notify-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/momo-notify
 
 # =============================
-# ZALOPAY PAYMENT CONFIG
+# MOMO PAYMENT CONFIG (FOR PRODUCTS)
+# =============================
+momo-product:
+  partner-code: MOMOBKUN20180529
+  access-key: klm05TvNBzhg7h7j
+  secret-key: at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa
+  endpoint: https://test-payment.momo.vn/v2/gateway/api/create
+  return-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/products/momo-return
+  notify-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/products/momo-notify
+
+# =============================
+# ZALOPAY PAYMENT CONFIG (FOR TICKETS)
 # =============================
 zalopay:
-  app-id: "2553"  
+  app-id: "2553"
   key1: PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL
   key2: kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz
   endpoint: https://sb-openapi.zalopay.vn/v2
-  return-url:  https://00bc46ca013c.ngrok-free.app/api/payment/zalopay-return
-  callback-url:  https://00bc46ca013c.ngrok-free.app/api/payment/zalopay-callback
+  return-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/zalopay-return
+  callback-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/zalopay-callback
+
+# =============================
+# ZALOPAY PAYMENT CONFIG (FOR PRODUCTS)
+# =============================
+zalopay-product:
+  app-id: "2553"
+  key1: PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL
+  key2: kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz
+  endpoint: https://sb-openapi.zalopay.vn/v2
+  return-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/products/zalopay-return
+  callback-url: https://hip-those-recipe-sol.trycloudflare.com/api/payment/products/zalopay-callback
+
 # =============================
 # LOGGING
 # =============================

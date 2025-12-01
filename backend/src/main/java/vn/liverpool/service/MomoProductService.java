@@ -17,7 +17,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MomoService {
+public class MomoProductService {
 
     private final MomoProductConfig momoConfig;
     private final RestTemplate restTemplate;
@@ -31,7 +31,6 @@ public class MomoService {
             String ipnUrl = momoConfig.getNotifyUrl();
             String requestType = "captureWallet";
 
-            // CHÍNH XÁC NHƯ PHP: 9 THAM SỐ, KHÔNG CÓ timeExpire
             String rawSignature = String.format(
                     "accessKey=%s&amount=%d&extraData=%s&ipnUrl=%s&orderId=%s&orderInfo=%s&partnerCode=%s&redirectUrl=%s&requestId=%d&requestType=%s",
                     momoConfig.getAccessKey(),
@@ -47,7 +46,6 @@ public class MomoService {
 
             String signature = hmacSHA256(momoConfig.getSecretKey(), rawSignature);
 
-            // BODY GIỐNG PHP 99%
             Map<String, Object> body = new LinkedHashMap<>();
             body.put("partnerCode", momoConfig.getPartnerCode());
             body.put("partnerName", "Liverpool Club");
@@ -87,7 +85,6 @@ public class MomoService {
         }
     }
 
-    // DÙNG CHO CALLBACK
     public boolean verifySignature(Map<String, String> params) {
         try {
             String raw = String.format(

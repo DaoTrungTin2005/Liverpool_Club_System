@@ -3,6 +3,8 @@ package vn.liverpool.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,15 +21,16 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderProductService {
 
     private final OrderProductRepository orderRepo;
     private final ProductRepository productRepo;
     private final ProductVariantRepository variantRepo;
     private final AccountRepository accountRepository;
-    private final VNPayService vnPayService;
-    private final MomoService momoService;
-    private final ZaloPayService zaloPayService;
+    private final VNPayProductService vnPayService; // ← Service MỚI (cho product)
+    private final MomoProductService momoService; // ← Service MỚI
+    private final ZaloPayProductService zaloPayService; // ← Service MỚI
     private final HttpServletRequest request;
     private final UserContextService userContextService;
 
@@ -177,10 +180,16 @@ public class OrderProductService {
     }
 
     // ========== VNPAY CALLBACK ==========
+    // ========== VNPAY CALLBACK ==========
     @Transactional
     public OrderProductResponse handleVNPayReturn(Map<String, String> params) {
+        log.info("🔍 Starting VNPay callback processing...");
+
         boolean isValid = vnPayService.verifyPaymentSignature(params);
+        log.info("✔️ Signature valid: {}", isValid);
+
         if (!isValid) {
+            log.error("❌ Invalid VNPay signature!");
             throw new IllegalArgumentException("Chữ ký không hợp lệ!");
         }
 
@@ -189,20 +198,33 @@ public class OrderProductService {
         String transactionNo = params.get("vnp_TransactionNo");
         String bankCode = params.get("vnp_BankCode");
 
+        log.info("📦 Order Code: {}", orderCode);
+        log.info("💳 Response Code: {}", responseCode);
+        log.info("🔢 Transaction No: {}", transactionNo);
+
         OrderProduct order = orderRepo.findByOrderCode(orderCode)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderCode));
+                .orElseThrow(() -> {
+                    log.error("❌ Order not found: {}", orderCode);
+                    return new IllegalArgumentException("Order not found: " + orderCode);
+                });
+
+        log.info("📋 Found order: {} - Current status: {}", order.getId(), order.getStatus());
 
         if ("00".equals(responseCode)) {
+            log.info("✅ Payment SUCCESS");
             order.setStatus(OrderStatus.PAID);
             order.setPaidAt(LocalDateTime.now());
             order.setVnpayTransactionNo(transactionNo);
             order.setPaymentMethod(bankCode);
         } else {
+            log.warn("❌ Payment FAILED - Response code: {}", responseCode);
             order.setStatus(OrderStatus.CANCELLED);
             refundInventory(order);
         }
 
         OrderProduct updatedOrder = orderRepo.save(order);
+        log.info("💾 Order saved with status: {}", updatedOrder.getStatus());
+
         return buildOrderResponse(updatedOrder);
     }
 
