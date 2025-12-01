@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.liverpool.domain.*;
 import vn.liverpool.domain.OrderTicket.OrderStatus;
-import vn.liverpool.domain.dto.order.CreateOrderTicketRequest;
-import vn.liverpool.domain.dto.order.OrderTicketHistoryResponse;
-import vn.liverpool.domain.dto.order.OrderTicketResponse;
-import vn.liverpool.domain.dto.order.ValidateSelectionRequest;
-import vn.liverpool.domain.dto.order.ValidateSelectionResponse;
+import vn.liverpool.domain.dto.order_ticket.CreateOrderTicketRequest;
+import vn.liverpool.domain.dto.order_ticket.OrderTicketHistoryResponse;
+import vn.liverpool.domain.dto.order_ticket.OrderTicketResponse;
+import vn.liverpool.domain.dto.order_ticket.ValidateSelectionRequest;
+import vn.liverpool.domain.dto.order_ticket.ValidateSelectionResponse;
 import vn.liverpool.repository.*;
 
 import java.math.BigDecimal;

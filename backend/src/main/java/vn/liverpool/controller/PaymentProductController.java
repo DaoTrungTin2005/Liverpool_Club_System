@@ -3,19 +3,13 @@ package vn.liverpool.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
-
-import vn.liverpool.domain.dto.order_ticket.CreateOrderTicketRequest;
-import vn.liverpool.domain.dto.order_ticket.OrderTicketHistoryResponse;
-import vn.liverpool.domain.dto.order_ticket.OrderTicketResponse;
-import vn.liverpool.domain.dto.order_ticket.ValidateSelectionRequest;
-import vn.liverpool.domain.dto.order_ticket.ValidateSelectionResponse;
-import vn.liverpool.service.OrderTicketService;
+import vn.liverpool.domain.dto.order_product.*;
+import vn.liverpool.service.OrderProductService;
 import vn.liverpool.util.ApiResponse;
 
 import java.util.HashMap;
@@ -23,32 +17,23 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api/payment/products")
 @RequiredArgsConstructor
-public class PaymentTicketController {
+public class PaymentProductController {
 
-    private final OrderTicketService orderService;
+    private final OrderProductService orderService;
 
-    // lúc nhấn nút buy now thì ktra coi có lố số lượng ko, lố thì báo lỗi
-    @PostMapping("/tickets/buy-now")
-    public ResponseEntity<ApiResponse<ValidateSelectionResponse>> validateSelection(
-            @RequestBody @Valid ValidateSelectionRequest request) {
-
-        ValidateSelectionResponse response = orderService.validateSelection(request);
-        return ResponseEntity.ok(ApiResponse.success("QUANTITY OK", response));
-    }
-
-    // tạo đơn hàng
+    // ========== TẠO ĐƠN HÀNG ==========
     @PostMapping("/create-order")
-    public ResponseEntity<ApiResponse<OrderTicketResponse>> createOrder(
-            @RequestBody @Valid CreateOrderTicketRequest request) {
+    public ResponseEntity<ApiResponse<OrderProductResponse>> createOrder(
+            @RequestBody @Valid CreateOrderProductRequest request) {
 
-        OrderTicketResponse response = orderService.createOrder(request);
+        OrderProductResponse response = orderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("CREATE ORDER SUCCESSFULLY", response));
     }
 
-    // tạo link VNPAY
+    // ========== TẠO LINK VNPAY ==========
     @PostMapping("/create-vnpay/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createVNPayUrl(
             @PathVariable Long orderId) {
@@ -60,7 +45,7 @@ public class PaymentTicketController {
         return ResponseEntity.ok(ApiResponse.success("Tạo link VNPay thành công!", data));
     }
 
-    // tạo link MOMO
+    // ========== TẠO LINK MOMO ==========
     @PostMapping("/create-momo/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createMomoUrl(
             @PathVariable Long orderId) {
@@ -72,7 +57,7 @@ public class PaymentTicketController {
         return ResponseEntity.ok(ApiResponse.success("Tạo link Momo thành công!", data));
     }
 
-    // tạo link ZALOPAY
+    // ========== TẠO LINK ZALOPAY ==========
     @PostMapping("/create-zalopay/{orderId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> createZaloPayUrl(
             @PathVariable Long orderId) {
@@ -84,7 +69,7 @@ public class PaymentTicketController {
         return ResponseEntity.ok(ApiResponse.success("Tạo link ZaloPay thành công!", data));
     }
 
-    // VNPAY CALLBACK
+    // ========== VNPAY CALLBACK ==========
     @GetMapping("/vnpay-return")
     public RedirectView vnpayReturn(HttpServletRequest request) {
         Map<String, String> params = new HashMap<>();
@@ -95,7 +80,7 @@ public class PaymentTicketController {
         });
 
         try {
-            OrderTicketResponse orderResponse = orderService.handleVNPayReturn(params);
+            OrderProductResponse orderResponse = orderService.handleVNPayReturn(params);
             return new RedirectView("http://localhost:5174/payment-success");
 
         } catch (Exception e) {
@@ -103,9 +88,9 @@ public class PaymentTicketController {
         }
     }
 
-    // MOMO CALLBACK
+    // ========== MOMO CALLBACK - RETURN ==========
     @GetMapping("/momo-return")
-    public ResponseEntity<ApiResponse<OrderTicketResponse>> momoReturn(
+    public ResponseEntity<ApiResponse<OrderProductResponse>> momoReturn(
             @RequestParam String orderId,
             @RequestParam String resultCode,
             @RequestParam String transId,
@@ -119,7 +104,7 @@ public class PaymentTicketController {
             }
         });
 
-        OrderTicketResponse response = orderService.handleMomoReturn(params);
+        OrderProductResponse response = orderService.handleMomoReturn(params);
 
         String responseMessage = "0".equals(resultCode)
                 ? "Thanh toán Momo thành công!"
@@ -128,7 +113,7 @@ public class PaymentTicketController {
         return ResponseEntity.ok(ApiResponse.success(responseMessage, response));
     }
 
-    // MOMO CALLBACK
+    // ========== MOMO CALLBACK - NOTIFY ==========
     @PostMapping("/momo-notify")
     public ResponseEntity<Map<String, Object>> momoNotify(
             @RequestBody Map<String, String> params) {
@@ -150,9 +135,9 @@ public class PaymentTicketController {
         }
     }
 
-    // ZALOPAY CALLBACK - RETURN
+    // ========== ZALOPAY CALLBACK - RETURN ==========
     @GetMapping("/zalopay-return")
-    public ResponseEntity<ApiResponse<OrderTicketResponse>> zaloPayReturn(
+    public ResponseEntity<ApiResponse<OrderProductResponse>> zaloPayReturn(
             HttpServletRequest request) {
 
         Map<String, String> params = new HashMap<>();
@@ -162,7 +147,7 @@ public class PaymentTicketController {
             }
         });
 
-        OrderTicketResponse response = orderService.handleZaloPayReturn(params);
+        OrderProductResponse response = orderService.handleZaloPayReturn(params);
 
         String returnCode = request.getParameter("return_code");
         String message = "1".equals(returnCode)
@@ -172,7 +157,7 @@ public class PaymentTicketController {
         return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
-    // ZALOPAY CALLBACK
+    // ========== ZALOPAY CALLBACK ==========
     @PostMapping("/zalopay-callback")
     public ResponseEntity<Map<String, Object>> zaloPayCallback(
             @RequestBody Map<String, String> params) {
@@ -192,33 +177,5 @@ public class PaymentTicketController {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
-    }
-
-    // === LẤY DANH SÁCH ĐƠN HÀNG CHO ADMIN ===
-
-    @GetMapping("/admin/tickets/orders")
-    public ResponseEntity<Page<OrderTicketResponse>> getOrdersForAdmin(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "createdAt") String sortBy) {
-
-        Page<OrderTicketResponse> result = orderService.getOrdersForAdmin(
-                page, size, keyword, sortBy);
-
-        return ResponseEntity.ok(result);
-    }
-
-    // LỊCH SỬ ĐƠN HÀNG CỦA USER
-
-    @GetMapping("/user/order-history")
-    public ResponseEntity<ApiResponse<List<OrderTicketHistoryResponse>>> getUserOrderHistory(
-            HttpServletRequest request) {
-
-        String userEmail = request.getUserPrincipal().getName();
-
-        List<OrderTicketHistoryResponse> result = orderService.getUserOrderHistory(userEmail);
-
-        return ResponseEntity.ok(ApiResponse.success("Get order history successfully", result));
     }
 }
